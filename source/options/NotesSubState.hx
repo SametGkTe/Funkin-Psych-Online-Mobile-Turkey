@@ -54,6 +54,7 @@ class NotesSubState extends MusicBeatSubstate
 
 	public function new() {
 		super();
+		ClientPrefs.reloadKeyColors();
 
 		isOpened = true;
 		onPixel = PlayState.isPixelStage;
@@ -92,8 +93,8 @@ class NotesSubState extends MusicBeatSubstate
 		var bg:FlxSprite = new FlxSprite(750, 160).makeGraphic(FlxG.width - 780, 540, FlxColor.BLACK);
 		bg.alpha = 0.25;
 		add(bg);
-		
-		var text:Alphabet = new Alphabet(50, 86, 'CTRL', false);
+
+		var text:Alphabet = new Alphabet((controls.mobileControls) ? 44 : 50, 86, (controls.mobileControls) ? 'PRESS' : 'CTRL', false);
 		text.alignment = CENTERED;
 		text.setScale(0.4);
 		add(text);
@@ -150,7 +151,15 @@ class NotesSubState extends MusicBeatSubstate
 
 		var tipX = 20;
 		var tipY = 660;
-		var tip:FlxText = new FlxText(tipX, tipY, 0, "Press RELOAD to Reset the selected Note Part.", 16);
+		var tipText:String;
+
+		if (controls.mobileControls) {
+			tipText = "Press C to Reset the selected Note Part.";
+			tipY = 0;
+		} else
+			tipText = 'Press RELOAD to Reset the selected Note Part.';
+
+		var tip:FlxText = new FlxText(tipX, tipY, 0, tipText, 16);
 		tip.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		tip.borderSize = 2;
 		add(tip);
@@ -170,11 +179,18 @@ class NotesSubState extends MusicBeatSubstate
 		FlxG.mouse.visible = !controls.controllerMode;
 		controllerPointer.visible = controls.controllerMode;
 		_lastControllerMode = controls.controllerMode;
+
+		mobileManager.addMobilePad('NONE', 'B_C');
+		controls.isInSubstate = true;
+		mobileManager.mobilePad.getButton('buttonB').x = FlxG.width - 132;
+		mobileManager.mobilePad.getButton('buttonC').x = 0;
+		mobileManager.mobilePad.getButton('buttonC').y = FlxG.height - 135;
 	}
 
 	function updateTip()
 	{
-		tipTxt.text = 'Hold ' + (!controls.controllerMode ? 'Shift' : 'Left Shoulder Button') + ' + Press RELOAD to fully reset the selected Note.';
+		if (!controls.mobileControls)
+			tipTxt.text = 'Hold ' + (!controls.controllerMode ? 'Shift' : 'Left Shoulder Button') + ' + Press RELOAD to fully reset the selected Note.';
 	}
 
 	var _storedColor:FlxColor;
@@ -185,13 +201,24 @@ class NotesSubState extends MusicBeatSubstate
 		NUMPADZERO => '0', NUMPADONE => '1', NUMPADTWO => '2', NUMPADTHREE => '3', NUMPADFOUR => '4', NUMPADFIVE => '5', NUMPADSIX => '6',
 		NUMPADSEVEN => '7', NUMPADEIGHT => '8', NUMPADNINE => '9', A => 'A', B => 'B', C => 'C', D => 'D', E => 'E', F => 'F'];
 
+	override function closeSubState() {
+		mobileManager.removeMobilePad();
+		super.closeSubState();
+		mobileManager.addMobilePad('NONE', 'B_C');
+		mobileManager.addMobilePadCamera();
+		controls.isInSubstate = true;
+		mobileManager.mobilePad.getButton('buttonB').x = FlxG.width - 132;
+		mobileManager.mobilePad.getButton('buttonC').x = 0;
+		mobileManager.mobilePad.getButton('buttonC').y = FlxG.height - 135;
+	}
+
 	override function update(elapsed:Float) {
-		if (controls.BACK) {
+		if (controls.BACK || mobileButtonJustPressed('B')) {
 			if (GameClient.isConnected()) {
 				GameClient.send('updateArrColors', ClientPrefs.getArrowRGBCompleteMaps());
 			}
 			FlxG.sound.play(Paths.sound('cancelMenu'));
-			isOpened = false;
+			isOpened = controls.isInSubstate = false;
 			close();
 			return;
 		}
@@ -472,7 +499,7 @@ class NotesSubState extends MusicBeatSubstate
 				}
 			} 
 		}
-		else if(controls.RESET && hexTypeNum < 0)
+		else if(mobileButtonJustPressed('C') || controls.RESET && hexTypeNum < 0)
 		{
 			if(FlxG.keys.pressed.SHIFT || FlxG.gamepads.anyJustPressed(LEFT_SHOULDER))
 			{
@@ -611,11 +638,11 @@ class NotesSubState extends MusicBeatSubstate
 
 		// clear groups
 		modeNotes.forEachAlive(function(note:FlxSprite) {
-			note.kill();
+			//note.kill();
 			note.destroy();
 		});
 		myNotes.forEachAlive(function(note:StrumNote) {
-			note.kill();
+			//note.kill();
 			note.destroy();
 		});
 		modeNotes.clear();

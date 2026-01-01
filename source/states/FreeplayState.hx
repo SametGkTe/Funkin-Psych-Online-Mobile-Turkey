@@ -625,6 +625,9 @@ class FreeplayState extends MusicBeatState
 		updateTexts();
 		searchString = searchString;
 
+		mobileManager.addMobilePad('FULL', (GameClient.isConnected()) ? 'FREEPLAY_ONLINE' : 'FREEPLAY');
+		mobileManager.addMobilePadCamera();
+
 		super.create();
 
 		CustomFadeTransition.nextCamera = hudCamera;
@@ -710,10 +713,9 @@ class FreeplayState extends MusicBeatState
 		#end
 
 		for (i => directory in directories) {
-			if (FileSystem.exists(directory)) {
-				for (file in FileSystem.readDirectory(directory)) {
-					var path = haxe.io.Path.join([directory, file]);
-					if (!sys.FileSystem.isDirectory(path) && file.endsWith('.json')) {
+			if (FunkinFileSystem.exists(directory)) {
+				for (file in FunkinFileSystem.readDirectory(directory)) {
+					if (file.endsWith('.json')) {
 						var charToCheck:String = file.substr(0, file.length - 5);
 						if (!charsWeeksLoaded.exists(charToCheck)) {
 							charsWeeksLoaded.set(charToCheck, directoryMods[i]);
@@ -769,6 +771,10 @@ class FreeplayState extends MusicBeatState
 		}
 
 		super.closeSubState();
+		mobileManager.mobilePad.visible = true;
+		mobileManager.removeMobilePad();
+		mobileManager.addMobilePad('FULL', (GameClient.isConnected()) ? 'FREEPLAY_ONLINE' : 'FREEPLAY');
+		mobileManager.addMobilePadCamera();
 	}
 
 	function setDiffVisibility(value:Bool) {
@@ -815,6 +821,8 @@ class FreeplayState extends MusicBeatState
 	public static var vocals:FlxSound = null;
 	public static var opponentVocals:FlxSound = null;
 	var holdTime:Float = 0;
+	var doSongReset:Bool = false;
+	var resetTotalHeld:Float = 0;
 	override function update(elapsed:Float)
 	{
 		Conductor.songPosition = FlxG.sound.music.time;
@@ -867,13 +875,20 @@ class FreeplayState extends MusicBeatState
 			return;
 		}
 
-		if (!searchInputWait && FlxG.keys.justPressed.F) {
+		if (!searchInputWait && (mobileButtonJustPressed('S') || FlxG.keys.justPressed.F)) {
+			FlxG.stage.window.textInputEnabled = true;
 			searchInputWait = true;
 			searchString = searchString;
 		}
 
+		#if android
+		if (FlxG.android.justPressed.BACK) {
+			tempDisableInput();
+		}
+		#end
+
 		var shiftMult:Int = 1;
-		if(FlxG.keys.pressed.SHIFT) shiftMult = 3;
+		if(mobileButtonPressed('Z') || FlxG.keys.pressed.SHIFT) shiftMult = 3;
 
 		if (!selected) {
 			if(songs.length > 0)
@@ -901,7 +916,7 @@ class FreeplayState extends MusicBeatState
 					holdTime = 0;
 				}
 
-				if (controls.FAV && curSelected != -1) {
+				if ((mobileButtonJustPressed('F') || controls.FAV) && curSelected != -1) {
 					var songId = songs[curSelected].songName + '-' + songs[curSelected].folder;
 					if (ClientPrefs.data.favSongs.contains(songId)) {
 						ClientPrefs.data.favSongs.remove(songId);
@@ -919,7 +934,7 @@ class FreeplayState extends MusicBeatState
 					search();
 				}
 
-				if (controls.RESET && curSelected != -1 && !FlxG.keys.pressed.ALT) {
+				if (((mobileButtonJustReleased('R') && resetTotalHeld <= 3.5) || controls.RESET) && curSelected != -1 && !FlxG.keys.pressed.ALT) {
 					var songId = songs[curSelected].songName + '-' + songs[curSelected].folder;
 					if (ClientPrefs.data.hiddenSongs.contains(songId)) {
 						ClientPrefs.data.hiddenSongs.remove(songId);
@@ -960,7 +975,16 @@ class FreeplayState extends MusicBeatState
 				}
 			}
 
-			if (controls.RESET && FlxG.keys.pressed.ALT) {
+			if (mobileButtonPressed('R') && resetTotalHeld <= 3.5)
+			{
+				resetTotalHeld += elapsed;
+				if (resetTotalHeld >= 3.5)
+					doSongReset = true;
+			} else if (mobileButtonReleased('R'))
+				resetTotalHeld = 0;
+
+			if ((mobileButtonPressed('R') && doSongReset) || (controls.RESET && FlxG.keys.pressed.ALT)) {
+				doSongReset = false;
 				ClientPrefs.data.hiddenSongs = [];
 				ClientPrefs.saveSettings();
 				search();
@@ -978,12 +1002,13 @@ class FreeplayState extends MusicBeatState
 					updateGroupTitle();
 				}
 
-				if (FlxG.keys.justPressed.CONTROL) {
+				if (mobileButtonJustPressed('G') || FlxG.keys.justPressed.CONTROL) {
 					persistentUpdate = false;
 					var daCopy = searchGroupVList.copy();
 					for (i => item in daCopy)
 						daCopy[i] = formatGroupItem(item);
-					
+
+					mobileManager.mobilePad.visible = false;
 					var selState = new online.substates.SoFunkinSubstate(daCopy, searchGroupValue, i -> {
 						searchGroupValue = i;
 						search();
@@ -1046,7 +1071,7 @@ class FreeplayState extends MusicBeatState
 				}
 			}
 
-			if(FlxG.keys.justPressed.SPACE)
+			if(mobileButtonJustPressed('X') || FlxG.keys.justPressed.SPACE)
 			{
 				if (curSelected == -1) {
 					var newSel = FlxG.random.int(0, songs.length - 1);
@@ -1079,7 +1104,7 @@ class FreeplayState extends MusicBeatState
 				leaderboardTimer = 0;
 			}
 
-			if (chatBox == null && FlxG.keys.justPressed.TAB) {
+			if (chatBox == null && mobileButtonJustPressed('Y') || FlxG.keys.justPressed.TAB) {
 				persistentUpdate = false;
 				FlxG.switchState(() -> new online.states.SkinsState());
 			}
@@ -1137,6 +1162,7 @@ class FreeplayState extends MusicBeatState
 								loadSong();
 								persistentUpdate = false;
 								_substateIsModifiers = true;
+								mobileManager.mobilePad.visible = false;
 								openSubState(new GameplayChangersSubstate());
 							}
 							catch (e:Dynamic) {
@@ -1156,7 +1182,7 @@ class FreeplayState extends MusicBeatState
 						}
 					case 2:
 						if (!GameClient.isConnected()) {
-							if (!FileSystem.exists("replays/"))
+							if (!FunkinFileSystem.exists("replays/"))
 								FileSystem.createDirectory("replays/");
 
 							var fileDialog = new FileDialog();
@@ -1277,7 +1303,7 @@ class FreeplayState extends MusicBeatState
 		}
 
 		updateTexts(elapsed);
-		if (FlxG.keys.pressed.SHIFT && !selected) {
+		if (mobileButtonPressed('Z') || FlxG.keys.pressed.SHIFT && !selected) {
 			itemsCameraZoom = FlxMath.lerp(itemsCameraZoom, 0.65, elapsed * 10);
 			itemsCameraScrollX = FlxMath.lerp(itemsCameraScrollX, 150, elapsed * 10);
 		}

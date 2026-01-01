@@ -110,6 +110,8 @@ class WeekEditorState extends MusicBeatState
 
 		FlxG.mouse.visible = true;
 
+		mobileManager.addMobilePad("UP_DOWN", "B");
+
 		super.create();
 	}
 
@@ -327,8 +329,8 @@ class WeekEditorState extends MusicBeatState
 
 		var isMissing:Bool = true;
 		if(assetName != null && assetName.length > 0) {
-			if( #if MODS_ALLOWED FileSystem.exists(Paths.modsImages('menubackgrounds/menu_' + assetName)) || #end
-			Assets.exists(Paths.getPath('images/menubackgrounds/menu_' + assetName + '.png', IMAGE), IMAGE)) {
+			if( #if MODS_ALLOWED FunkinFileSystem.exists(Paths.modsImages('menubackgrounds/menu_' + assetName)) || #end
+			Assets.exists(Paths.getPath('images/menubackgrounds/menu_' + assetName + '.astc', BINARY), BINARY)) {
 				bgSprite.loadGraphic(Paths.image('menubackgrounds/menu_' + assetName));
 				isMissing = false;
 			}
@@ -346,8 +348,8 @@ class WeekEditorState extends MusicBeatState
 		
 		var isMissing:Bool = true;
 		if(assetName != null && assetName.length > 0) {
-			if( #if MODS_ALLOWED FileSystem.exists(Paths.modsImages('storymenu/' + assetName)) || #end
-			Assets.exists(Paths.getPath('images/storymenu/' + assetName + '.png', IMAGE), IMAGE)) {
+			if( #if MODS_ALLOWED FunkinFileSystem.exists(Paths.modsImages('storymenu/' + assetName)) || #end
+			Assets.exists(Paths.getPath('images/storymenu/' + assetName + '.astc', BINARY), BINARY)) {
 				weekThing.loadGraphic(Paths.image('storymenu/' + assetName));
 				isMissing = false;
 			}
@@ -356,7 +358,7 @@ class WeekEditorState extends MusicBeatState
 		if(isMissing) {
 			weekThing.visible = false;
 			missingFileText.visible = true;
-			missingFileText.text = 'MISSING FILE: images/storymenu/' + assetName + '.png';
+			missingFileText.text = 'MISSING FILE: images/storymenu/' + assetName;
 		}
 		recalculateStuffPosition();
 
@@ -436,7 +438,7 @@ class WeekEditorState extends MusicBeatState
 
 		if(!blockInput) {
 			ClientPrefs.toggleVolumeKeys(true);
-			if(FlxG.keys.justPressed.ESCAPE) {
+			if(FlxG.keys.justPressed.ESCAPE || mobileButtonJustPressed('B')) {
 				FlxG.switchState(() -> new MasterEditorMenu());
 				states.TitleState.playFreakyMusic();
 			}
@@ -477,7 +479,7 @@ class WeekEditorState extends MusicBeatState
 		if(_file.__path != null) fullPath = _file.__path;
 
 		if(fullPath != null) {
-			var rawJson:String = File.getContent(fullPath);
+			var rawJson:String = FunkinFileSystem.getText(fullPath);
 			if(rawJson != null) {
 				loadedWeek = cast Json.parse(rawJson);
 				if(loadedWeek.weekCharacters != null && loadedWeek.weekName != null) //Make sure it's really a week
@@ -528,11 +530,15 @@ class WeekEditorState extends MusicBeatState
 		var data:String = haxe.Json.stringify(weekFile, "\t");
 		if (data.length > 0)
 		{
+			#if mobile
+			StorageUtil.saveContent('$weekFileName.json', data);
+			#else
 			_file = new FileReference();
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 			_file.save(data, weekFileName + ".json");
+			#end
 		}
 	}
 	
@@ -617,6 +623,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 
 		addEditorBox();
 		changeSelection();
+		mobileManager.addMobilePad("UP_DOWN", "B");
 		super.create();
 	}
 	
@@ -795,7 +802,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 			}
 		} else {
 			ClientPrefs.toggleVolumeKeys(true);
-			if(FlxG.keys.justPressed.ESCAPE) {
+			if(FlxG.keys.justPressed.ESCAPE || mobileButtonJustPressed('B')) {
 				FlxG.switchState(() -> new MasterEditorMenu());
 				states.TitleState.playFreakyMusic();
 			}

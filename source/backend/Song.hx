@@ -138,18 +138,13 @@ class Song
 		var formattedSong:String = Paths.formatToSongPath(jsonInput);
 		#if MODS_ALLOWED
 		var moddyFile:String = Paths.modsJson(formattedFolder + '/' + formattedSong);
-		if (FileSystem.exists(moddyFile)) {
-			rawJson = File.getContent(moddyFile).trim();
+		if (FunkinFileSystem.exists(moddyFile)) {
+			rawJson = FunkinFileSystem.getText(moddyFile).trim();
 		}
 		#end
 
 		if (rawJson == null) {
-			#if sys
-			if (FileSystem.exists(Paths.json(formattedFolder + '/' + formattedSong)))
-				rawJson = File.getContent(Paths.json(formattedFolder + '/' + formattedSong));
-			#else
-			rawJson = Assets.getText(Paths.json(formattedFolder + '/' + formattedSong));
-			#end
+			rawJson = FunkinFileSystem.getText(Paths.json(formattedFolder + '/' + formattedSong));
 
 			if (rawJson == null) {
 				throw new haxe.Exception("Missing file: " + Paths.json(formattedFolder + '/' + formattedSong));
@@ -230,7 +225,7 @@ class Song
 	public static function updateManiaKeys(songData:SwagSong, ?noUpdate:Bool = false):Int {
 		var keys = null;
 
-		if (songData.mania != null)
+		if (songData?.mania != null) {
 			if ((songData.format ?? '').startsWith('psych_v1') || (songData.splashSkin != null) || songData.cutsceneType != null) {
 				keys = songData.mania + 1;
 			}
@@ -250,8 +245,9 @@ class Song
 						keys = songData.mania;
 				}
 			}
+		}
 
-		if (keys == null && songData.keyCount != null)
+		if (keys == null && songData?.keyCount != null)
 			keys = songData.keyCount;
 
 		if (noUpdate)

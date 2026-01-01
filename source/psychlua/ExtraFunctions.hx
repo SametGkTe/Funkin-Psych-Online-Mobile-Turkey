@@ -29,6 +29,11 @@ class ExtraFunctions
 			if (Controls.instance?.moodyBlues != null && Controls.instance.moodyBlues.pressedKeys.get('KEY:' + name) == JUST_PRESSED) {
 				return true;
 			}
+			if (Controls.instance?.mobileControls != null && Controls.instance?.mobileControls)
+			{
+				var check:Bool = specialKeyCheck(name, "justPressed");
+				if (check) return check;
+			}
 			return Reflect.getProperty(FlxG.keys.justPressed, name);
 		});
 		Lua_helper.add_callback(lua, "keyboardPressed", luaPressed = function(name:String)
@@ -38,6 +43,11 @@ class ExtraFunctions
 				if (status == PRESSED || status == JUST_PRESSED)
 					return true;
 			}
+			if (Controls.instance?.mobileControls != null && Controls.instance?.mobileControls)
+			{
+				var check:Bool = specialKeyCheck(name, "pressed");
+				if (check) return check;
+			}
 			return Reflect.getProperty(FlxG.keys.pressed, name);
 		});
 		Lua_helper.add_callback(lua, "keyboardReleased", luaJustReleased = function(name:String)
@@ -46,6 +56,11 @@ class ExtraFunctions
 				var status = Controls.instance?.moodyBlues.pressedKeys.get('KEY:' + name);
 				if (status == JUST_RELEASED)
 					return true;
+			}
+			if (Controls.instance?.mobileControls != null && Controls.instance?.mobileControls)
+			{
+				var check:Bool = specialKeyCheck(name, "justReleased");
+				if (check) return check;
 			}
 			return Reflect.getProperty(FlxG.keys.justReleased, name);
 		});
@@ -111,6 +126,11 @@ class ExtraFunctions
 
 		Lua_helper.add_callback(lua, "keyJustPressed", function(name:String = '') {
 			name = name.toLowerCase();
+			if (Controls.instance?.mobileControls != null && Controls.instance?.mobileControls)
+			{
+				var check:Bool = specialKeyCheck(name, "justPressed");
+				if (check) return check;
+			}
 			switch(name) {
 				case 'left': return PlayState.instance.controls.NOTE_LEFT_P;
 				case 'down': return PlayState.instance.controls.NOTE_DOWN_P;
@@ -122,6 +142,11 @@ class ExtraFunctions
 		});
 		Lua_helper.add_callback(lua, "keyPressed", function(name:String = '') {
 			name = name.toLowerCase();
+			if (Controls.instance?.mobileControls != null && Controls.instance?.mobileControls)
+			{
+				var check:Bool = specialKeyCheck(name, "pressed");
+				if (check) return check;
+			}
 			switch(name) {
 				case 'left': return PlayState.instance.controls.NOTE_LEFT;
 				case 'down': return PlayState.instance.controls.NOTE_DOWN;
@@ -133,6 +158,11 @@ class ExtraFunctions
 		});
 		Lua_helper.add_callback(lua, "keyReleased", function(name:String = '') {
 			name = name.toLowerCase();
+			if (Controls.instance?.mobileControls != null && Controls.instance?.mobileControls)
+			{
+				var check:Bool = specialKeyCheck(name, "released");
+				if (check) return check;
+			}
 			switch(name) {
 				case 'left': return PlayState.instance.controls.NOTE_LEFT_R;
 				case 'down': return PlayState.instance.controls.NOTE_DOWN_R;
@@ -186,25 +216,20 @@ class ExtraFunctions
 
 		// File management
 		Lua_helper.add_callback(lua, "checkFileExists", function(filename:String, ?absolute:Bool = false) {
-			#if MODS_ALLOWED
 			if(absolute)
 			{
-				return FileSystem.exists(filename);
+				return FunkinFileSystem.exists(filename);
 			}
 
+			#if MODS_ALLOWED
 			var path:String = Paths.modFolders(filename);
-			if(FileSystem.exists(path))
+			if(FunkinFileSystem.exists(path))
 			{
 				return true;
 			}
-			return FileSystem.exists(Paths.getPath('assets/$filename', TEXT));
-			#else
-			if(absolute)
-			{
-				return Assets.exists(filename);
-			}
-			return Assets.exists(Paths.getPath('assets/$filename', TEXT));
 			#end
+
+			return FunkinFileSystem.exists(Paths.getPath('assets/$filename', TEXT));
 		});
 		Lua_helper.add_callback(lua, "saveFile", function(path:String, content:String, ?absolute:Bool = false)
 		{
@@ -301,5 +326,59 @@ class ExtraFunctions
 		Lua_helper.add_callback(lua, "getRandomBool", function(chance:Float = 50) {
 			return FlxG.random.bool(chance);
 		});
+	}
+
+	public static function specialKeyCheck(key:String, ?type:String, ?alter:Bool):Dynamic
+	{
+		var textfix:Array<String> = key.trim().split('.');
+		var extraControl:Dynamic = null;
+		if (alter)
+		{
+			type = textfix[1].trim();
+			key = textfix[2].trim();
+		}
+
+		//Custom return thing
+		if (MusicBeatState.getState().mobileManager.hitbox != null)
+		{
+			var hitbox:FunkinHitbox = MusicBeatState.getState().mobileManager.hitbox;
+			for (num in 0...hitbox.hints.length+1) if (checkHitboxPress(hitbox.hints[num], key, type)) return true;
+		}
+
+		if (MusicBeatState.getState().mobileManager.mobilePad != null) {
+			var mobilePadDPad = MusicBeatState.getState().mobileManager.mobilePad.buttons[0];
+			var mobilePadAction = MusicBeatState.getState().mobileManager.mobilePad.buttons[1];
+			for (num in 0...mobilePadDPad.length+1) if (checkMobilePadPress(mobilePadDPad[num], key, type)) return true;
+			for (num in 0...mobilePadAction.length+1) if (checkMobilePadPress(mobilePadAction[num], key, type)) return true;
+		}
+		if (PlayState.instance.customManagers != null && PlayState.instance.customManagers.keys().hasNext()) {
+			for (managerArray in PlayState.instance.customManagers) {
+				var manager:MobileControlManager = managerArray[0];
+				if (managerArray[1] == false) continue;
+
+				if (manager.hitbox != null)
+					for (num in 0...manager.hitbox.hints.length+1) if (checkHitboxPress(manager.hitbox.hints[num], key, type)) return true;
+
+				if (manager.mobilePad != null) {
+					var mobilePadDPad = manager.mobilePad.buttons[0];
+					var mobilePadAction = manager.mobilePad.buttons[1];
+					for (num in 0...mobilePadDPad.length+1) if (checkMobilePadPress(mobilePadDPad[num], key, type)) return true;
+					for (num in 0...mobilePadAction.length+1) if (checkMobilePadPress(mobilePadAction[num], key, type)) return true;
+				}
+			}
+		}
+		return false;
+	}
+	public static function checkMobilePadPress(mobilePad:MobileButton, key:String, type:String) {
+		if (key.toUpperCase() == Reflect.field(mobilePad, 'returnedKey'))
+			if (Reflect.getProperty(mobilePad, type))
+				return true;
+		return false;
+	}
+	public static function checkHitboxPress(hitbox:MobileButton, key:String, type:String) {
+		if (key.toUpperCase() == Reflect.field(hitbox, 'returnedKey'))
+			if (Reflect.getProperty(hitbox, type))
+				return true;
+		return false;
 	}
 }

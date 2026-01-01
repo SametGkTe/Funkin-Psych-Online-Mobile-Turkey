@@ -573,7 +573,10 @@ class ResultsState extends MusicBeatState {
 		var debugPoser = new online.objects.DebugPosHelper();
 		debugPoser.cameras = [camHUD];
 		add(debugPoser);
-    }
+
+		mobileManager.addMobilePad('NONE', 'B_C_T');
+		mobileManager.addMobilePadCamera();
+	}
 
 	function registerMessages() {
 		GameClient.initStateListeners(this, this.registerMessages);

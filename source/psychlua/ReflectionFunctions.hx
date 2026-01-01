@@ -4,6 +4,7 @@ import Type.ValueType;
 import haxe.Constraints;
 
 import substates.GameOverSubstate;
+import psychlua.ExtraFunctions;
 
 //
 // Functions that use a high amount of Reflections, which are somewhat CPU intensive
@@ -36,6 +37,8 @@ class ReflectionFunctions
 		});
 		Lua_helper.add_callback(lua, "getPropertyFromClass", function(classVar:String, variable:String, ?allowMaps:Bool = true):Dynamic {
 			if (classVar == 'flixel.FlxG' && variable.startsWith('keys')) {
+				if (ExtraFunctions.specialKeyCheck(variable, null, true) == true) return true; //Fix it like this
+
 				var why = variable.split('.');
 				switch (why[1]) {
 					case 'pressed':

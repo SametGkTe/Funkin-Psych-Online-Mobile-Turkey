@@ -78,15 +78,6 @@ class TitleState extends MusicBeatState
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
 
-		#if LUA_ALLOWED
-		Mods.pushGlobalMods();
-		#end
-		Mods.loadTopMod();
-
-		FlxG.fixedTimestep = false;
-		FlxG.game.focusLostFramerate = 60;
-		FlxG.keys.preventDefaultKeys = [TAB];
-
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
 		super.create();
@@ -129,6 +120,17 @@ class TitleState extends MusicBeatState
 			}
 			persistentUpdate = true;
 			persistentDraw = true;
+			MobileConfig.init('MobileControls', CoolUtil.getSavePath(), 'assets/mobile/',
+				[
+					'MobilePad/DPadModes',
+					'MobilePad/ActionModes',
+					'Hitbox/HitboxModes',
+				], [
+					DPAD,
+					ACTION,
+					HITBOX
+				]
+			);
 		}
 
 		if (FlxG.save.data.weekCompleted != null)
@@ -149,6 +151,7 @@ class TitleState extends MusicBeatState
 		FlxG.switchState(() -> new ChartingState());
 		#else
 		if(FlxG.save.data.flashing == null && !FlashingState.leftState) {
+			controls.isInSubstate = false;
 			FlxTransitionableState.skipNextTransIn = true;
 			FlxTransitionableState.skipNextTransOut = true;
 			FlxG.switchState(() -> new FlashingState());
@@ -317,12 +320,7 @@ class TitleState extends MusicBeatState
 
 	function getIntroTextShit():Array<Array<String>>
 	{
-		#if MODS_ALLOWED
 		var firstArray:Array<String> = Mods.mergeAllTextsNamed('data/introText.txt', Paths.getPreloadPath());
-		#else
-		var fullText:String = Assets.getText(Paths.txt('introText'));
-		var firstArray:Array<String> = fullText.split('\n');
-		#end
 		var swagGoodArray:Array<Array<String>> = [];
 
 		for (i in firstArray)
@@ -361,9 +359,9 @@ class TitleState extends MusicBeatState
 			Conductor.songPosition = FlxG.sound.music.time;
 		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
 
-		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER || controls.ACCEPT || FlxG.mouse.justPressed;
+		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER #if desktop || controls.ACCEPT #end || FlxG.mouse.justPressed;
 
-		#if mobile
+		#if FLX_TOUCH
 		for (touch in FlxG.touches.list)
 		{
 			if (touch.justPressed)
@@ -492,6 +490,7 @@ class TitleState extends MusicBeatState
 			skipIntro();
 		}
 
+		#if desktop
 		if (controls.RESET) {
 			FlxG.sound.music.stop();
 			playFreakyMusic();
@@ -502,6 +501,7 @@ class TitleState extends MusicBeatState
 			if(controls.UI_LEFT) swagShader.hue -= elapsed * 0.1;
 			if(controls.UI_RIGHT) swagShader.hue += elapsed * 0.1;
 		}
+		#end
 
 		#if RESULTS_TEST
 		if (FlxG.keys.justPressed.F1) {

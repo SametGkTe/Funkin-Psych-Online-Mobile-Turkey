@@ -21,7 +21,7 @@ class ModDownloader {
 	}
 	public var onStatus:DownloaderStatus->Void;
 
-	static var downloadDir:String = openfl.filesystem.File.applicationDirectory.nativePath + "/downloads/";
+	static var downloadDir(get, never):String;
 	var downloadPath:String;
 	var id:String;
 	public var url:String;
@@ -44,7 +44,7 @@ class ModDownloader {
 			return;
 		}
 
-		if (!FileSystem.exists(downloadDir)) {
+		if (!FunkinFileSystem.exists(downloadDir)) {
 			FileSystem.createDirectory(downloadDir);
 		}
 
@@ -128,10 +128,15 @@ class ModDownloader {
 
 	function deleteTempFile() {
 		try {
-			if (FileSystem.exists(downloadPath)) {
+			if (FunkinFileSystem.exists(downloadPath)) {
 				FileSystem.deleteFile(downloadPath);
 			}
 		} catch (_) {}
+	}
+
+	static function get_downloadDir():String
+	{
+		return haxe.io.Path.addTrailingSlash(haxe.io.Path.join([Sys.getCwd(), "downloads"]));
 	}
 
     static var allowedMediaTypes:Array<String> = [
@@ -168,9 +173,11 @@ class ModDownloader {
 	}
 
 	public static function checkDeleteDlDir() {
+		#if !mobile
 		if (FileSystem.exists(downloadDir)) {
 			FileUtils.removeFiles(downloadDir);
 		}
+		#end
 	}
 }
 

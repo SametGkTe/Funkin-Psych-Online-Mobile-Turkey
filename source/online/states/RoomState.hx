@@ -489,36 +489,42 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 
 		GameClient.send("status", "In the Lobby");
 
+		mobileManager.addMobilePad('FULL', 'B_C_Y_T_M');
+		mobileManager.addMobilePadCamera();
+		mobileManager.mobilePad.y -= 300;
+
 		registerMessages();
 	}
 
 	var hasStage:Bool = false;
 	function checkStage() {
-		if (GameClient.room.state.stageName == "") {
-			hasStage = true;
-			return;
-		}
+		try {
+			if (GameClient.room.state.stageName == "") {
+				hasStage = true;
+				return;
+			}
 
-		if (FileSystem.exists(Paths.mods('${GameClient.room.state.stageMod}/stages/${GameClient.room.state.stageName}.json')) ||
-			OpenFlAssets.exists(Paths.getPath('stages/${GameClient.room.state.stageName}.json'), TEXT)) {
-			hasStage = true;
-			return;
-		}
+			if (FunkinFileSystem.exists(Paths.mods('${GameClient.room.state.stageMod}/stages/${GameClient.room.state.stageName}.json')) ||
+				OpenFlAssets.exists(Paths.getPath('stages/${GameClient.room.state.stageName}.json'), TEXT)) {
+				hasStage = true;
+				return;
+			}
 
-		if (GameClient.room.state.stageURL != null) {
-			hasStage = false;
+			if (GameClient.room.state.stageURL != null) {
+				hasStage = false;
 
-			OnlineMods.downloadMod(GameClient.room.state.stageURL, false, (_) -> {
-				if (destroyed)
-					return;
+				OnlineMods.downloadMod(GameClient.room.state.stageURL, false, (_) -> {
+					if (destroyed)
+						return;
 
-				checkStage();
-			});
-		}
+					checkStage();
+				});
+			}
+		} catch(e:Dynamic) {}
 	}
 
 	function checkNoteSkin(player:Player, ?manualDownload:Bool = false) {
-		if (!FileSystem.exists(Paths.mods(player.noteSkinMod)) && player.noteSkinURL != null) {
+		if (!FunkinFileSystem.exists(Paths.mods(player.noteSkinMod)) && player.noteSkinURL != null) {
 			OnlineMods.downloadMod(player.noteSkinURL, manualDownload, function(_) {
 				Mods.updatedOnState = false;
 				Mods.parseList();
@@ -549,8 +555,10 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 	var elapsedShit = 3.;
 	var lastFocused = false;
 
-    override function update(elapsed:Float) {
+	override function update(elapsed:Float) {
 		super.update(elapsed);
+
+		mobileManager.mobilePad.getButton('buttonLeft').visible = mobileManager.mobilePad.getButton('buttonRight').visible = mobileManager.mobilePad.getButton('buttonUp').visible = mobileManager.mobilePad.getButton('buttonDown').visible = mobileManager.mobilePad.getButton('buttonT').visible = mobileManager.mobilePad.getButton('buttonM').visible = mobileButtonPressed('Y');
 
 		if (FlxG.keys.justPressed.F11) {
 			GameClient.reconnect();
@@ -669,18 +677,18 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 
 			// trace('playerHold = ' + playerHold + ', oppHold = ' + oppHold);
 
-			if (FlxG.keys.pressed.ALT) { // useless, but why not?
-				var suffix = FlxG.keys.pressed.CONTROL ? 'miss' : '';
-				if (controls.NOTE_LEFT_P) {
+			if (mobileButtonPressed('Y') || FlxG.keys.pressed.ALT) { // useless, but why not?
+				var suffix = (mobileButtonPressed('M') || FlxG.keys.pressed.CONTROL) ? 'miss' : '';
+				if (mobileButtonJustPressed('LEFT') || controls.NOTE_LEFT_P) {
 					playerAnim('singLEFT' + suffix);
 				}
-				if (controls.NOTE_RIGHT_P) {
+				if (mobileButtonJustPressed('RIGHT') || controls.NOTE_RIGHT_P) {
 					playerAnim('singRIGHT' + suffix);
 				}
-				if (controls.NOTE_UP_P) {
+				if (mobileButtonJustPressed('UP') || controls.NOTE_UP_P) {
 					playerAnim('singUP' + suffix);
 				}
-				if (controls.NOTE_DOWN_P) {
+				if (mobileButtonJustPressed('DOWN') || controls.NOTE_DOWN_P) {
 					playerAnim('singDOWN' + suffix);
 				}
 				if (controls.TAUNT) {
@@ -710,7 +718,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 				}
 			}
 			
-			if ((!FlxG.keys.pressed.ALT && controls.ACCEPT) || FlxG.mouse.justPressed) {
+			if (((!FlxG.keys.pressed.ALT || !mobileButtonPressed('Y')) && controls.ACCEPT) || FlxG.mouse.justPressed) {
 				switch (curSelected) {
 					case 0:
 						openSubState(new RoomSettingsSubstate());
@@ -866,7 +874,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 					Alert.alert("Mod couldn't be found!", "Host didn't specify the URL of this mod");
 				}
 				else if (Mods.getModDirectories().contains(GameClient.room.state.modDir)) {
-					Alert.alert("Mod couldn't be found!", "Expected mod data to exist in this path: " + (GameClient.room.state.modDir ?? "mods/"));
+					Alert.alert("Mod couldn't be found!", "Expected mod data to exist in this path: " + (GameClient.room.state.modDir ?? #if mobile Sys.getCwd() + #end "mods/"));
 				}
 				var sond = FlxG.sound.play(Paths.sound('badnoise' + FlxG.random.int(1, 3)));
 				sond.pitch = 1.1;
@@ -929,21 +937,26 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 
 		updateCharacters();
 
+		final settingsBind:String = !controls.mobileControls ? "\n\n(Keybind: SHIFT)" : "";
+		final chatBind:String = !controls.mobileControls ? "\n\n(Keybind: TAB)" : "";
+		final roomBind:String = !controls.mobileControls ? "\n\nACCEPT - Reveals the code and\ncopies it to your clipboard.\n\nCTRL + C - Copies the code without\nrevealing it on the screen." : "\n\nTOUCH - Reveals the code and\ncopies it to your clipboard.";
+		final modBind:String = !controls.mobileControls ? "\n\nRIGHT CLICK - Open Mod Downloader" : "\n\nTOUCH - Open Mod Downloader";
+		final lobbyBind:String = !controls.mobileControls ? "\nPress UI keybinds\nor use your mouse\nto select an option!" : "\nTouch UI keybinds\nto select an option!";
 		switch (curSelected) {
 			case 0:
-				itemTip.text = " - SETTINGS - \nOpens server settings.\n\n(Keybind: SHIFT)";
+				itemTip.text = " - SETTINGS - \nOpens server settings." + settingsBind;
 			case 1:
-				itemTip.text = " - CHAT - \nOpens chat.\n\n(Keybind: TAB)";
+				itemTip.text = " - CHAT - \nOpens chat." + chatBind;
 			case 2:
 				itemTip.text = " - START GAME/READY - \nToggles your READY status.\n\nPlayers also need to have the\ncurrently selected mod installed.\n\n(Both sides can only\nhave up to 2 players).";
 			case 3:
-				itemTip.text = " - ROOM CODE - \nUnique code of this room.\n\nACCEPT - Reveals the code and\ncopies it to your clipboard.\n\nCTRL + C - Copies the code without\nrevealing it on the screen.";
+				itemTip.text = " - ROOM CODE - \nUnique code of this room." + roomBind;
 			case 4:
 				itemTip.text = " - SELECT SONG - \nSelects the song.\n\n(Players with host permissions\ncan only do that)";
 			case 5:
-				itemTip.text = " - MOD - \nDownloads the currently selected mod\nif it isn't installed.\n\nAfter you install it\npress this button again!\n\nRIGHT CLICK - Open Mod Downloader";
+				itemTip.text = " - MOD - \nDownloads the currently selected mod\nif it isn't installed.\n\nAfter you install it\npress this button again!" + modBind;
 			default:
-				itemTip.text = " - LOBBY - \nPress UI keybinds\nor use your mouse\nto select an option!";
+				itemTip.text = " - LOBBY - " + lobbyBind;
 		}
 
 		itemTip.x = settingsIconBg.x + settingsIconBg.width - itemTip.width;
@@ -1169,7 +1182,7 @@ class LobbyCharacter extends FlxTypedGroup<FlxObject> {
 			character = null;
 		}
 
-		if (FileSystem.exists(Paths.mods(player.skinMod))) {
+		if (FunkinFileSystem.exists(Paths.mods(player.skinMod))) {
 			if (player.skinMod != null)
 				Mods.currentModDirectory = player.skinMod;
 

@@ -1,5 +1,6 @@
 package online.replay;
 
+import psychlua.FunkinLua;
 import objects.Note;
 import states.FreeplayState;
 import flixel.input.gamepad.FlxGamepad;
@@ -54,7 +55,7 @@ class ReplayRecorder extends FlxBasic {
 		misses: 0,
 		points: 0,
 		score: 0,
-        inputs: [],
+		inputs: [],
 		note_offset: 0,
 		gameplay_modifiers: [],
 		ghost_tapping: true,
@@ -63,19 +64,19 @@ class ReplayRecorder extends FlxBasic {
 		version: 4,
 		mod_url: '',
 		keys: 4
-    };
+	};
 
-    var state:PlayState;
+	var state:PlayState;
 
 	var keyboardIds:Map<FlxKey, Array<String>> = [];
 	var controllerIds:Map<FlxGamepadInputID, Array<String>> = [];
 
 	public function new(state:PlayState) {
-        super();
+		super();
 
 		trace("Recording a replay...");
 
-        this.state = state;
+		this.state = state;
 
 		data.player = ClientPrefs.getNickname();
 		data.song = PlayState.SONG.song;
@@ -88,6 +89,7 @@ class ReplayRecorder extends FlxBasic {
 		data.rating_offset = ClientPrefs.data.ratingOffset;
 		data.safe_frames = ClientPrefs.data.safeFrames;
 		data.mod_url = OnlineMods.getModURL(Mods.currentModDirectory);
+
 		data.keys = Note.maniaKeys;
 		data.chart_hash = Md5.encode(PlayState.RAW_SONG);
 
@@ -128,14 +130,14 @@ class ReplayRecorder extends FlxBasic {
 		}
 
 		state.add(this);
-        
+
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 
 		// nvm
 		// @:privateAccess FlxG.gamepads.getFirstActiveGamepad()._device.__gamepad.onButtonDown.add(onPadDown);
 		// @:privateAccess FlxG.gamepads.getFirstActiveGamepad()._device.__gamepad.onButtonUp.add(onPadUp);
-    }
+	}
 
 	override function destroy() {
 		super.destroy();
@@ -146,7 +148,7 @@ class ReplayRecorder extends FlxBasic {
 
 	function onKeyDown(e:KeyboardEvent) {
 		recordKey(Conductor.songPosition, keyboardIds.get(e.keyCode), e.keyCode, 0, true);
-    }
+	}
 
 	function onKeyUp(e:KeyboardEvent) {
 		recordKey(Conductor.songPosition, keyboardIds.get(e.keyCode), e.keyCode, 1, true);
@@ -187,7 +189,7 @@ class ReplayRecorder extends FlxBasic {
 					data.inputs.push([time, 'KEY:SPACE', move]);
 			}
 		}
-		
+
 		if (ids == null)
 			return;
 
@@ -198,7 +200,73 @@ class ReplayRecorder extends FlxBasic {
 		}
 	}
 
-    public function save():Float {
+	public function recordKeyMobileC(time:Float, IDs:Array<String>, move:Int) {
+		trace(time + ' | ' + IDs + ' | ' + move);
+		if (IDs != null || IDs.length >= 0) {
+			var fixedID:String = IDs[0].toLowerCase().replace(" ", "").split("=")[0];
+			if(IDs.length == 1 && !REGISTER_BINDS.contains(fixedID))
+			{
+				switch(IDs[0])
+				{
+					case 'EXTRA_1':
+						if (state.mobileManager.hitbox.getButton('buttonExtra1') != null)
+							data.inputs.push([time, 'KEY:' + state.mobileManager.hitbox.getButton('buttonExtra1').returnedKey.toUpperCase(), move]);
+					case 'EXTRA_2':
+						if (state.mobileManager.hitbox.getButton('buttonExtra2') != null)
+							data.inputs.push([time, 'KEY:' + state.mobileManager.hitbox.getButton('buttonExtra2').returnedKey.toUpperCase(), move]);
+					case 'EXTRA_3':
+						if (state.mobileManager.hitbox.getButton('buttonExtra3') != null)
+							data.inputs.push([time, 'KEY:' + state.mobileManager.hitbox.getButton('buttonExtra3').returnedKey.toUpperCase(), move]);
+					case 'EXTRA_4':
+						if (state.mobileManager.hitbox.getButton('buttonExtra4') != null)
+							data.inputs.push([time, 'KEY:' + state.mobileManager.hitbox.getButton('buttonExtra4').returnedKey.toUpperCase(), move]);
+					case 'EXTRA_5':
+						if (state.mobileManager.hitbox.getButton('buttonExtra5') != null)
+							data.inputs.push([time, 'KEY:' + state.mobileManager.hitbox.getButton('buttonExtra5').returnedKey.toUpperCase(), move]);
+					case 'EXTRA_6':
+						if (state.mobileManager.hitbox.getButton('buttonExtra6') != null)
+							data.inputs.push([time, 'KEY:' + state.mobileManager.hitbox.getButton('buttonExtra6').returnedKey.toUpperCase(), move]);
+					case 'EXTRA_7':
+						if (state.mobileManager.hitbox.getButton('buttonExtra7') != null)
+							data.inputs.push([time, 'KEY:' + state.mobileManager.hitbox.getButton('buttonExtra7').returnedKey.toUpperCase(), move]);
+					case 'EXTRA_8':
+						if (state.mobileManager.hitbox.getButton('buttonExtra8') != null)
+							data.inputs.push([time, 'KEY:' + state.mobileManager.hitbox.getButton('buttonExtra8').returnedKey.toUpperCase(), move]);
+					case 'EXTRA_9':
+						if (state.mobileManager.hitbox.getButton('buttonExtra9') != null)
+							data.inputs.push([time, 'KEY:' + state.mobileManager.hitbox.getButton('buttonExtra9').returnedKey.toUpperCase(), move]);
+					default:
+						// nothing
+				}
+				return;
+			}
+
+			for (id in IDs)
+			{
+				var idName:String = id.toLowerCase();
+
+				if (idName == null || state.paused || !REGISTER_BINDS.contains(idName))
+					continue;
+
+				data.inputs.push([time, idName, move]);
+			}
+		}
+	}
+
+	//TODO: add extra key support
+	public function getDirectionNameFromData(noteData:Dynamic)
+	{
+		var directions = ["note_left", "note_down", "note_up", "note_right"];
+		if (Note.maniaKeys != 4) {
+			directions = [];
+			for (key in 0...Note.maniaKeys) {
+				directions.push('${Note.maniaKeys}k_note_${key + 1}');
+			}
+		}
+		return directions[noteData];
+	}
+
+	public function save():Float {
 		if (!FileSystem.exists("replays/"))
 			FileSystem.createDirectory("replays/");
 
@@ -228,7 +296,7 @@ class ReplayRecorder extends FlxBasic {
 		trace("Saved a replay!");
 
 		return upload();
-    }
+	}
 
 	public function upload():Float {
 		if (!Note.rankedManiaKeysList.contains(data.keys) || ClientPrefs.data.disableSubmiting) {

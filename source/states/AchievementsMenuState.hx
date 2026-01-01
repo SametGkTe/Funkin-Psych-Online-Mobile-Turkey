@@ -120,6 +120,7 @@ class AchievementsMenuState extends MusicBeatState
 		add(nameText);
 		
 		_changeSelection();
+		mobileManager.addMobilePad("FULL", "A_B_C");
 		super.create();
 		
 		FlxG.camera.follow(camFollow, null, 0.15);
@@ -200,8 +201,10 @@ class AchievementsMenuState extends MusicBeatState
 				}
 			}
 			
-			if(controls.RESET && (options[curSelected].unlocked || options[curSelected].curProgress > 0))
+			if((controls.RESET || mobileButtonJustPressed('C')) && (options[curSelected].unlocked || options[curSelected].curProgress > 0))
 			{
+				persistentUpdate = false;
+				controls.isInSubstate = true;
 				openSubState(new ResetAchievementSubstate());
 			}
 		}
@@ -248,6 +251,14 @@ class AchievementsMenuState extends MusicBeatState
 			if(spr.ID == curSelected) spr.alpha = 1;
 		});
 	}
+
+	override function closeSubState() {
+		persistentUpdate = true;
+		controls.isInSubstate = false;
+		mobileManager.removeMobilePad();
+		mobileManager.addMobilePad("FULL", "A_B_C");
+		super.closeSubState();
+	}
 }
 
 class ResetAchievementSubstate extends MusicBeatSubstate
@@ -290,6 +301,8 @@ class ResetAchievementSubstate extends MusicBeatSubstate
 		noText.scrollFactor.set();
 		add(noText);
 		updateOptions();
+
+		mobileManager.addMobilePad('LEFT_RIGHT', 'A_B');
 	}
 
 	override function update(elapsed:Float)

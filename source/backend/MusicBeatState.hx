@@ -6,6 +6,8 @@ import flixel.FlxState;
 
 class MusicBeatState extends FlxUIState
 {
+	public static var instance:MusicBeatState;
+
 	private var theWorld:Bool = false;
 
 	private var curSection:Int = 0;
@@ -22,9 +24,35 @@ class MusicBeatState extends FlxUIState
 		return Controls.instance;
 	}
 
+	public var mobileManager:MobileControlManager;
+	//makes code less messy & easier to write
+	public inline function mobileButtonJustPressed(buttons:Dynamic):Bool {
+		return mobileManager.mobilePad.justPressed(buttons);
+	}
+	public inline function mobileButtonPressed(buttons:Dynamic):Bool {
+		return mobileManager.mobilePad.pressed(buttons);
+	}
+	public inline function mobileButtonJustReleased(buttons:Dynamic):Bool {
+		return mobileManager.mobilePad.justReleased(buttons);
+	}
+	public inline function mobileButtonReleased(buttons:Dynamic):Bool {
+		return mobileManager.mobilePad.released(buttons);
+	}
+	public function new() {
+		super();
+		mobileManager = new MobileControlManager(this);
+	}
+
+	override function destroy()
+	{
+		if (mobileManager != null) mobileManager.destroy();
+		super.destroy();
+	}
+
 	public static var camBeat:FlxCamera;
 
 	override function create() {
+		instance = this;
 		camBeat = FlxG.camera;
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 		#if MODS_ALLOWED Mods.updatedOnState = false; #end

@@ -9,6 +9,7 @@ class TopPlayerSubstate extends MusicBeatSubstate {
 	var topShit:Scoreboard = new Scoreboard(FlxG.width - 300, 35, 15, ["PLAYER", "POINTS"]);
 
 	var blurFilter:BlurFilter;
+	var blackSprite:FlxSprite;
 	var coolCam:FlxCamera;
 
     var curPage:Int = 0;
@@ -22,11 +23,18 @@ class TopPlayerSubstate extends MusicBeatSubstate {
 	override function create() {
 		super.create();
 
-		blurFilter = new BlurFilter();
-		for (cam in FlxG.cameras.list) {
-			if (cam.filters == null)
-				cam.filters = [];
-			cam.filters.push(blurFilter);
+		if (!ClientPrefs.data.disableOnlineShaders) {
+			blurFilter = new BlurFilter();
+			for (cam in FlxG.cameras.list) {
+				if (cam.filters == null)
+					cam.filters = [];
+				cam.filters.push(blurFilter);
+			}
+		} else {
+			blackSprite = new FlxSprite();
+			blackSprite.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+			blackSprite.alpha = 0.75;
+			add(blackSprite);
 		}
 
 		coolCam = new FlxCamera();
@@ -49,6 +57,9 @@ class TopPlayerSubstate extends MusicBeatSubstate {
 		keysTxt = new FlxText(0, 50);
 		keysTxt.setFormat("VCR OSD Mono", 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(keysTxt);
+
+		mobileManager.addMobilePad('FULL', 'A_B');
+		controls.isInSubstate = true;
     }
 
     var top:Array<Dynamic> = [];
@@ -100,15 +111,19 @@ class TopPlayerSubstate extends MusicBeatSubstate {
 	}
 
 	override function destroy() {
+		controls.isInSubstate = false;
 		super.destroy();
 
 		if (leaderboardTimer != null)
 			leaderboardTimer.cancel();
 
-		for (cam in FlxG.cameras.list) {
-			if (cam?.filters != null)
-				cam.filters.remove(blurFilter);
-		}
+		if (!ClientPrefs.data.disableOnlineShaders) {
+			for (cam in FlxG.cameras.list) {
+				if (cam?.filters != null)
+					cam.filters.remove(blurFilter);
+			}
+		} else
+			blackSprite.destroy();
 		FlxG.cameras.remove(coolCam);
 	}
 

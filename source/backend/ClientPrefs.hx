@@ -13,7 +13,29 @@ import flixel.input.gamepad.FlxGamepadInputID;
 import states.TitleState;
 
 // Add a variable here and it will get automatically saved
-class SaveVariables {
+@:structInit class SaveVariables {
+	/* Mobile */
+	public var wideScreen:Bool = false;
+	#if android public var storageType:String = "EXTERNAL_DATA"; #end
+
+	/* Mobile Controls */
+	/* Bool Options */
+	public var disableOnlineShaders:Bool = false;
+	public var hitboxHint:Bool = false;
+	public var ogGameControls:Bool = false; //There we go
+	public var showTweakMenu:Bool = false;
+
+	/* Int/Float Options */
+	public var extraKeys:Int = 2;
+	public var hitboxAlpha:Float = #if mobile 0.7 #else 0 #end;
+	public var mobilePadAlpha:Float = #if mobile 0.6 #else 0 #end;
+
+	/* String Options */
+	public var hitboxType:String = 'Gradient';
+	public var hitboxLocation:String = 'Bottom';
+	public var hitboxMode:String = 'Normal (New)';
+	public var mobileExtraKeyReturns:Array<String> = ['SHIFT', 'SPACE', 'Q', 'E'];
+
 	public var downScroll:Bool = false;
 	public var middleScroll:Bool = false;
 	public var opponentStrums:Bool = true;
@@ -119,8 +141,8 @@ class SaveVariables {
 }
 
 class ClientPrefs {
-	public static var data:SaveVariables = null;
-	public static var defaultData:SaveVariables = null;
+	public static var data:SaveVariables = {};
+	public static var defaultData:SaveVariables = {};
 
 	//Every key has two binds, add your key bind down here and then add your control on options/ControlsSubState.hx and Controls.hx
 	public static var keyBinds:Map<String, Array<FlxKey>> = [
@@ -130,45 +152,45 @@ class ClientPrefs {
 		'note_down'		=> [S, DOWN],
 		'note_right'	=> [D, RIGHT],
 
-		'5k_note_1'    	=> [D],
-		'5k_note_2'    	=> [F],
-		'5k_note_3'    	=> [G, SPACE],
-		'5k_note_4'     => [J],
-		'5k_note_5'     => [K],
-    
-		'6k_note_1'     => [S],
-		'6k_note_2'     => [D],
-		'6k_note_3'     => [F],
-		'6k_note_4'     => [J],
-		'6k_note_5'     => [K],
-		'6k_note_6'     => [L],
-    
-		'7k_note_1'     => [S],
-		'7k_note_2'     => [D],
-		'7k_note_3'     => [F],
-		'7k_note_4'     => [G, SPACE],
-		'7k_note_5'     => [J],
-		'7k_note_6'     => [K],
-		'7k_note_7'     => [L],
-    
-		'8k_note_1'     => [A],
-		'8k_note_2'     => [S],
-		'8k_note_3'     => [D],
-		'8k_note_4'     => [F],
-		'8k_note_5'     => [H],
-		'8k_note_6'     => [J],
-		'8k_note_7'     => [K],
-		'8k_note_8'     => [L],
+		'5k_note_1'		=> [D],
+		'5k_note_2'		=> [F],
+		'5k_note_3'		=> [G, SPACE],
+		'5k_note_4'	 => [J],
+		'5k_note_5'	 => [K],
+	
+		'6k_note_1'	 => [S],
+		'6k_note_2'	 => [D],
+		'6k_note_3'	 => [F],
+		'6k_note_4'	 => [J],
+		'6k_note_5'	 => [K],
+		'6k_note_6'	 => [L],
+	
+		'7k_note_1'	 => [S],
+		'7k_note_2'	 => [D],
+		'7k_note_3'	 => [F],
+		'7k_note_4'	 => [G, SPACE],
+		'7k_note_5'	 => [J],
+		'7k_note_6'	 => [K],
+		'7k_note_7'	 => [L],
+	
+		'8k_note_1'	 => [A],
+		'8k_note_2'	 => [S],
+		'8k_note_3'	 => [D],
+		'8k_note_4'	 => [F],
+		'8k_note_5'	 => [H],
+		'8k_note_6'	 => [J],
+		'8k_note_7'	 => [K],
+		'8k_note_8'	 => [L],
 
-		'9k_note_1'     => [A],
-		'9k_note_2'     => [S],
-		'9k_note_3'     => [D],
-		'9k_note_4'     => [F],
-		'9k_note_5'     => [G, SPACE],
-		'9k_note_6'     => [H],
-		'9k_note_7'     => [J],
-		'9k_note_8'     => [K],
-		'9k_note_9'     => [L],
+		'9k_note_1'	 => [A],
+		'9k_note_2'	 => [S],
+		'9k_note_3'	 => [D],
+		'9k_note_4'	 => [F],
+		'9k_note_5'	 => [G, SPACE],
+		'9k_note_6'	 => [H],
+		'9k_note_7'	 => [J],
+		'9k_note_8'	 => [K],
+		'9k_note_9'	 => [L],
 		
 		'ui_up'			=> [W, UP],
 		'ui_left'		=> [A, LEFT],
@@ -196,45 +218,45 @@ class ClientPrefs {
 		'note_down'		=> [DPAD_DOWN, A],
 		'note_right'	=> [DPAD_RIGHT, B],
 
-		'5k_note_1'     => [DPAD_LEFT, X],
-		'5k_note_2'    	=> [DPAD_DOWN, A],
-		'5k_note_3'    	=> [LEFT_SHOULDER, RIGHT_SHOULDER],
-		'5k_note_4'     => [DPAD_UP, Y],
-		'5k_note_5'     => [DPAD_RIGHT, B],
-    
-		'6k_note_1'     => [DPAD_LEFT],
-		'6k_note_2'     => [DPAD_DOWN],
-		'6k_note_3'     => [DPAD_RIGHT],
-		'6k_note_4'     => [X],
-		'6k_note_5'     => [Y],
-		'6k_note_6'     => [B],
-    
-		'7k_note_1'     => [DPAD_LEFT],
-		'7k_note_2'     => [DPAD_DOWN],
-		'7k_note_3'     => [DPAD_RIGHT],
-		'7k_note_4'     => [LEFT_SHOULDER, RIGHT_SHOULDER],
-		'7k_note_5'     => [X],
-		'7k_note_6'     => [Y],
-		'7k_note_7'     => [B],
-    
-		'8k_note_1'     => [DPAD_LEFT],
-		'8k_note_2'     => [DPAD_DOWN],
-		'8k_note_3'     => [DPAD_UP],
-		'8k_note_4'     => [DPAD_RIGHT],
-		'8k_note_5'     => [X],
-		'8k_note_6'     => [A],
-		'8k_note_7'     => [Y],
-		'8k_note_8'     => [B],
+		'5k_note_1'	 => [DPAD_LEFT, X],
+		'5k_note_2'		=> [DPAD_DOWN, A],
+		'5k_note_3'		=> [LEFT_SHOULDER, RIGHT_SHOULDER],
+		'5k_note_4'	 => [DPAD_UP, Y],
+		'5k_note_5'	 => [DPAD_RIGHT, B],
+	
+		'6k_note_1'	 => [DPAD_LEFT],
+		'6k_note_2'	 => [DPAD_DOWN],
+		'6k_note_3'	 => [DPAD_RIGHT],
+		'6k_note_4'	 => [X],
+		'6k_note_5'	 => [Y],
+		'6k_note_6'	 => [B],
+	
+		'7k_note_1'	 => [DPAD_LEFT],
+		'7k_note_2'	 => [DPAD_DOWN],
+		'7k_note_3'	 => [DPAD_RIGHT],
+		'7k_note_4'	 => [LEFT_SHOULDER, RIGHT_SHOULDER],
+		'7k_note_5'	 => [X],
+		'7k_note_6'	 => [Y],
+		'7k_note_7'	 => [B],
+	
+		'8k_note_1'	 => [DPAD_LEFT],
+		'8k_note_2'	 => [DPAD_DOWN],
+		'8k_note_3'	 => [DPAD_UP],
+		'8k_note_4'	 => [DPAD_RIGHT],
+		'8k_note_5'	 => [X],
+		'8k_note_6'	 => [A],
+		'8k_note_7'	 => [Y],
+		'8k_note_8'	 => [B],
 
-		'9k_note_1'     => [DPAD_LEFT],
-		'9k_note_2'     => [DPAD_DOWN],
-		'9k_note_3'     => [DPAD_UP],
-		'9k_note_4'     => [DPAD_RIGHT],
-		'9k_note_5'     => [LEFT_SHOULDER, RIGHT_SHOULDER],
-		'9k_note_6'     => [X],
-		'9k_note_7'     => [A],
-		'9k_note_8'     => [Y],
-		'9k_note_9'     => [B],
+		'9k_note_1'	 => [DPAD_LEFT],
+		'9k_note_2'	 => [DPAD_DOWN],
+		'9k_note_3'	 => [DPAD_UP],
+		'9k_note_4'	 => [DPAD_RIGHT],
+		'9k_note_5'	 => [LEFT_SHOULDER, RIGHT_SHOULDER],
+		'9k_note_6'	 => [X],
+		'9k_note_7'	 => [A],
+		'9k_note_8'	 => [Y],
+		'9k_note_9'	 => [B],
 		
 		'ui_up'			=> [DPAD_UP, LEFT_STICK_DIGITAL_UP],
 		'ui_left'		=> [DPAD_LEFT, LEFT_STICK_DIGITAL_LEFT],
@@ -249,6 +271,162 @@ class ClientPrefs {
 		'sidebar'		=> [],
 		'fav'			=> [Y]
 	];
+	//This is only way to make work controls on new psych versions
+	public static var mobileBinds:Map<String, Array<String>> = [
+		// 1K
+		'1k_note_1'		=> ['1K_NOTE_1'],
+
+		// 2K
+		'2k_note_1'		=> ['2K_NOTE_1'],
+		'2k_note_2'		=> ['2K_NOTE_2'],
+
+		// 3K
+		'3k_note_1'		=> ['3K_NOTE_1'],
+		'3k_note_2'		=> ['3K_NOTE_2'],
+		'3k_note_3'		=> ['3K_NOTE_3'],
+
+		// 4K
+		'note_left'		=> ['NOTE_LEFT'],
+		'note_down'	=> ['NOTE_DOWN'],
+		'note_up'		=> ['NOTE_UP'],
+		'note_right'		=> ['NOTE_RIGHT'],
+		
+		// 5K
+		'5k_note_1'		=> ['5K_NOTE_1'],
+		'5k_note_2'		=> ['5K_NOTE_2'],
+		'5k_note_3'		=> ['5K_NOTE_3'],
+		'5k_note_4'		=> ['5K_NOTE_4'],
+		'5k_note_5'		=> ['5K_NOTE_5'],
+		
+		// 6K
+		'6k_note_1'		=> ['6K_NOTE_1'],
+		'6k_note_2'		=> ['6K_NOTE_2'],
+		'6k_note_3'		=> ['6K_NOTE_3'],
+		'6k_note_4'		=> ['6K_NOTE_4'],
+		'6k_note_5'		=> ['6K_NOTE_5'],
+		'6k_note_6'		=> ['6K_NOTE_6'],
+		
+		// 7K
+		'7k_note_1'		=> ['7K_NOTE_1'],
+		'7k_note_2'		=> ['7K_NOTE_2'],
+		'7k_note_3'		=> ['7K_NOTE_3'],
+		'7k_note_4'		=> ['7K_NOTE_4'],
+		'7k_note_5'		=> ['7K_NOTE_5'],
+		'7k_note_6'		=> ['7K_NOTE_6'],
+		'7k_note_7'		=> ['7K_NOTE_7'],
+		
+		// 8K
+		'8k_note_1'		=> ['8K_NOTE_1'],
+		'8k_note_2'		=> ['8K_NOTE_2'],
+		'8k_note_3'		=> ['8K_NOTE_3'],
+		'8k_note_4'		=> ['8K_NOTE_4'],
+		'8k_note_5'		=> ['8K_NOTE_5'],
+		'8k_note_6'		=> ['8K_NOTE_6'],
+		'8k_note_7'		=> ['8K_NOTE_7'],
+		'8k_note_8'		=> ['8K_NOTE_8'],
+		
+		// 9K
+		'9k_note_1'		=> ['9K_NOTE_1'],
+		'9k_note_2'		=> ['9K_NOTE_2'],
+		'9k_note_3'		=> ['9K_NOTE_3'],
+		'9k_note_4'		=> ['9K_NOTE_4'],
+		'9k_note_5'		=> ['9K_NOTE_5'],
+		'9k_note_6'		=> ['9K_NOTE_6'],
+		'9k_note_7'		=> ['9K_NOTE_7'],
+		'9k_note_8'		=> ['9K_NOTE_8'],
+		'9k_note_9'		=> ['9K_NOTE_9'],
+		
+		// 20K
+		'20k_note_1'	=> ['20K_NOTE_1'],
+		'20k_note_2'	=> ['20K_NOTE_2'],
+		'20k_note_3'	=> ['20K_NOTE_3'],
+		'20k_note_4'	=> ['20K_NOTE_4'],
+		'20k_note_5'	=> ['20K_NOTE_5'],
+		'20k_note_6'	=> ['20K_NOTE_6'],
+		'20k_note_7'	=> ['20K_NOTE_7'],
+		'20k_note_8'	=> ['20K_NOTE_8'],
+		'20k_note_9'	=> ['20K_NOTE_9'],
+		'20k_note_10'	=> ['20K_EXTRA_10'],
+		'20k_note_11'	=> ['20K_EXTRA_11'],
+		'20k_note_12'	=> ['20K_EXTRA_12'],
+		'20k_note_13'	=> ['20K_EXTRA_13'],
+		'20k_note_14'	=> ['20K_EXTRA_14'],
+		'20k_note_15'	=> ['20K_EXTRA_15'],
+		'20k_note_16'	=> ['20K_EXTRA_16'],
+		'20k_note_17'	=> ['20K_EXTRA_17'],
+		'20k_note_18'	=> ['20K_EXTRA_18'],
+		'20k_note_19'	=> ['20K_EXTRA_19'],
+		'20k_note_20'	=> ['20K_EXTRA_20'],
+		
+		// 55K
+		'55k_note_1'	=> ['55K_NOTE_1'],
+		'55k_note_2'	=> ['55K_NOTE_2'],
+		'55k_note_3'	=> ['55K_NOTE_3'],
+		'55k_note_4'	=> ['55K_NOTE_4'],
+		'55k_note_5'	=> ['55K_NOTE_5'],
+		'55k_note_6'	=> ['55K_NOTE_6'],
+		'55k_note_7'	=> ['55K_NOTE_7'],
+		'55k_note_8'	=> ['55K_NOTE_8'],
+		'55k_note_9'	=> ['55K_NOTE_9'],
+		'55k_note_10'	=> ['55K_EXTRA_10'],
+		'55k_note_11'	=> ['55K_EXTRA_11'],
+		'55k_note_12'	=> ['55K_EXTRA_12'],
+		'55k_note_13'	=> ['55K_EXTRA_13'],
+		'55k_note_14'	=> ['55K_EXTRA_14'],
+		'55k_note_15'	=> ['55K_EXTRA_15'],
+		'55k_note_16'	=> ['55K_EXTRA_16'],
+		'55k_note_17'	=> ['55K_EXTRA_17'],
+		'55k_note_18'	=> ['55K_EXTRA_18'],
+		'55k_note_19'	=> ['55K_EXTRA_19'],
+		'55k_note_20'	=> ['55K_EXTRA_20'],
+		'55k_note_21'	=> ['55K_EXTRA_21'],
+		'55k_note_22'	=> ['55K_EXTRA_22'],
+		'55k_note_23'	=> ['55K_EXTRA_23'],
+		'55k_note_24'	=> ['55K_EXTRA_24'],
+		'55k_note_25'	=> ['55K_EXTRA_25'],
+		'55k_note_26'	=> ['55K_EXTRA_26'],
+		'55k_note_27'	=> ['55K_EXTRA_27'],
+		'55k_note_28'	=> ['55K_EXTRA_28'],
+		'55k_note_29'	=> ['55K_EXTRA_29'],
+		'55k_note_30'	=> ['55K_EXTRA_30'],
+		'55k_note_31'	=> ['55K_EXTRA_31'],
+		'55k_note_32'	=> ['55K_EXTRA_32'],
+		'55k_note_33'	=> ['55K_EXTRA_33'],
+		'55k_note_34'	=> ['55K_EXTRA_34'],
+		'55k_note_35'	=> ['55K_EXTRA_35'],
+		'55k_note_36'	=> ['55K_EXTRA_36'],
+		'55k_note_37'	=> ['55K_EXTRA_37'],
+		'55k_note_38'	=> ['55K_EXTRA_38'],
+		'55k_note_39'	=> ['55K_EXTRA_39'],
+		'55k_note_40'	=> ['55K_EXTRA_40'],
+		'55k_note_41'	=> ['55K_EXTRA_41'],
+		'55k_note_42'	=> ['55K_EXTRA_42'],
+		'55k_note_43'	=> ['55K_EXTRA_43'],
+		'55k_note_44'	=> ['55K_EXTRA_44'],
+		'55k_note_45'	=> ['55K_EXTRA_45'],
+		'55k_note_46'	=> ['55K_EXTRA_46'],
+		'55k_note_47'	=> ['55K_EXTRA_47'],
+		'55k_note_48'	=> ['55K_EXTRA_48'],
+		'55k_note_49'	=> ['55K_EXTRA_49'],
+		'55k_note_50'	=> ['55K_EXTRA_50'],
+		'55k_note_51'	=> ['55K_EXTRA_51'],
+		'55k_note_52'	=> ['55K_EXTRA_52'],
+		'55k_note_53'	=> ['55K_EXTRA_53'],
+		'55k_note_54'	=> ['55K_EXTRA_54'],
+		'55k_note_55'	=> ['55K_EXTRA_55'],
+
+		'ui_up'			=> ['UP'],
+		'ui_left'			=> ['LEFT'],
+		'ui_down'		=> ['DOWN'],
+		'ui_right'		=> ['RIGHT'],
+
+		'accept'		=> ['A'],
+		'back'			=> ['B'],
+		'pause'			=> ['P'],
+		'reset'			=> ['NONE'],
+		'taunt'			=> ['T']
+	];
+	public static var defaultMobileBinds:Map<String, Array<String>> = null;
 	public static var defaultKeys:Map<String, Array<FlxKey>> = null;
 	public static var defaultButtons:Map<String, Array<FlxGamepadInputID>> = null;
 
@@ -275,13 +453,16 @@ class ClientPrefs {
 	public static function clearInvalidKeys(key:String) {
 		var keyBind:Array<FlxKey> = keyBinds.get(key);
 		var gamepadBind:Array<FlxGamepadInputID> = gamepadBinds.get(key);
+		var mobileBind:Array<String> = mobileBinds.get(key);
 		while(keyBind != null && keyBind.contains(NONE)) keyBind.remove(NONE);
 		while(gamepadBind != null && gamepadBind.contains(NONE)) gamepadBind.remove(NONE);
+		while(mobileBind != null && mobileBind.contains(NONE)) mobileBind.remove(NONE);
 	}
 
 	public static function loadDefaultKeys() {
 		defaultKeys = keyBinds.copy();
 		defaultButtons = gamepadBinds.copy();
+		defaultMobileBinds = mobileBinds.copy();
 	}
 
 	public static function saveSettings() {
@@ -297,14 +478,12 @@ class ClientPrefs {
 		save.bind('controls_v3', CoolUtil.getSavePath());
 		save.data.keyboard = keyBinds;
 		save.data.gamepad = gamepadBinds;
+		save.data.mobile = mobileBinds;
 		save.flush();
 		FlxG.log.add("Settings saved!");
 	}
 
 	public static function loadPrefs() {
-		if(data == null) data = new SaveVariables();
-		if(defaultData == null) defaultData = new SaveVariables();
-
 		for (key in Reflect.fields(data)) {
 			if (key != 'gameplaySettings' && Reflect.hasField(FlxG.save.data, key)) {
 				//trace('loaded variable: $key');
@@ -380,6 +559,11 @@ class ClientPrefs {
 					/*if(gamepadBinds.exists(control))*/ gamepadBinds.set(control, keys);
 				}
 			}
+			if(save.data.mobile != null) {
+				var loadedControls:Map<String, Array<String>> = save.data.mobile;
+				for (control => keys in loadedControls)
+					/*if(mobileBinds.exists(control))*/ mobileBinds.set(control, keys);
+			}
 			reloadVolumeKeys();
 		}
 
@@ -387,19 +571,21 @@ class ClientPrefs {
 	}
 
 	public static function getGameplaySetting(name:String, defaultValue:Dynamic = null, ?customDefaultValue:Bool = false):Dynamic {
-		if (data.gameplaySettings.get('scrollspeedbymania') && (name == 'scrollspeed' || name == 'scrolltype')) {
-			var v = ClientPrefs.getGameplaySetting(name + '_' + Note.maniaKeys + 'k');
-			if (v != null)
-				return v;
-			else {
-				switch (name) {
-					case 'scrollspeed':
-						return 1;
-					case 'scrolltype':
-						return 'multiplicative';
+		try {
+			if (data.gameplaySettings.get('scrollspeedbymania') && (name == 'scrollspeed' || name == 'scrolltype')) {
+				var v = ClientPrefs.getGameplaySetting(name + '_' + Note.maniaKeys + 'k');
+				if (v != null)
+					return v;
+				else {
+					switch (name) {
+						case 'scrollspeed':
+							return 1;
+						case 'scrolltype':
+							return 'multiplicative';
+					}
 				}
 			}
-		}
+		} catch(e:Dynamic) {}
 
 		if(!customDefaultValue) defaultValue = defaultData.gameplaySettings.get(name);
 		var daGameplaySetting:Dynamic = GameClient.isConnected() ? GameClient.getGameplaySetting(name) : data.gameplaySettings.get(name);
@@ -415,8 +601,8 @@ class ClientPrefs {
 		TitleState.volumeUpKeys = keyBinds.get('volume_up').copy();
 		toggleVolumeKeys(true);
 	}
-	public static function toggleVolumeKeys(turnOn:Bool) {
-		if(turnOn)
+	public static function toggleVolumeKeys(?turnOn:Bool = true) {
+		if(!Controls.instance.mobileControls && turnOn)
 		{
 			FlxG.sound.muteKeys = TitleState.muteKeys;
 			FlxG.sound.volumeDownKeys = TitleState.volumeDownKeys;
@@ -526,34 +712,45 @@ class ClientPrefs {
 	}
 
 	public static inline function genArrowColors(keys:Int, ?isPixel:Bool = false):Array<Array<FlxColor>> {
-		var colColors = isPixel ? [
-			'purple' => [0xFFE276FF, 0xFFFFF9FF, 0xFF60008D],
-			'blue' => [0xFF3DCAFF, 0xFFF4FFFF, 0xFF003060],
-			'odd' => [0xFFFFE600, 0xFFFFF5F0, 0xFF754D10],
-			'green' => [0xFF71E300, 0xFFF6FFE6, 0xFF003100],
-			'red' => [0xFFFF884E, 0xFFFFFAF5, 0xFF6C0000]
-		] : [
-			'purple' => [0xFFC24B99, 0xFFFFFFFF, 0xFF3C1F56],
-			'blue' => [0xFF00FFFF, 0xFFFFFFFF, 0xFF1542B7],
-			'odd' => [0xFFFFE600, 0xFFFFFFFF, 0xFF754D10],
-			'green' => [0xFF12FA05, 0xFFFFFFFF, 0xFF0A4447],
-			'red' => [0xFFF9393F, 0xFFFFFFFF, 0xFF651038]
-		];
 		var arr = [];
-		var colArray = Note.getColArrayFromKeys(keys);
-		for (key in 0...keys) {
-			arr.push(colColors.get(colArray[key]));
-		}
+		try {
+			var colColors = isPixel ? [
+				'purple' => [0xFFE276FF, 0xFFFFF9FF, 0xFF60008D],
+				'blue' => [0xFF3DCAFF, 0xFFF4FFFF, 0xFF003060],
+				'odd' => [0xFFFFE600, 0xFFFFF5F0, 0xFF754D10],
+				'green' => [0xFF71E300, 0xFFF6FFE6, 0xFF003100],
+				'red' => [0xFFFF884E, 0xFFFFFAF5, 0xFF6C0000]
+			] : [
+				'purple' => [0xFFC24B99, 0xFFFFFFFF, 0xFF3C1F56],
+				'blue' => [0xFF00FFFF, 0xFFFFFFFF, 0xFF1542B7],
+				'odd' => [0xFFFFE600, 0xFFFFFFFF, 0xFF754D10],
+				'green' => [0xFF12FA05, 0xFFFFFFFF, 0xFF0A4447],
+				'red' => [0xFFF9393F, 0xFFFFFFFF, 0xFF651038]
+			];
+			var colArray = Note.getColArrayFromKeys(keys);
+			for (key in 0...keys) {
+				arr.push(colColors.get(colArray[key]));
+			}
+		} catch(e:Dynamic) {}
 		return arr;
 	}
 
 	public static inline function genArrowColorsExtraMap(?isPixel:Bool = false):Map<String, Array<Array<FlxColor>>> {
 		var map = new Map();
-		for (keys in Note.maniaKeysList) {
-			if (keys == 4)
-				continue;
-			map.set('${keys}k', genArrowColors(keys, isPixel));
-		}
+		try {
+			for (keys in Note.maniaKeysList) {
+				if (keys == 4)
+					continue;
+				map.set('${keys}k', genArrowColors(keys, isPixel));
+			}
+		} catch(e:Dynamic) {}
 		return map;
+	}
+
+	public static function reloadKeyColors() {
+		ClientPrefs.data.arrowRGBMap = ClientPrefs.genArrowColorsExtraMap();
+		ClientPrefs.data.arrowRGBPixelMap = ClientPrefs.genArrowColorsExtraMap(true);
+		ClientPrefs.defaultData.arrowRGBMap = ClientPrefs.genArrowColorsExtraMap();
+		ClientPrefs.defaultData.arrowRGBPixelMap = ClientPrefs.genArrowColorsExtraMap(true);
 	}
 }

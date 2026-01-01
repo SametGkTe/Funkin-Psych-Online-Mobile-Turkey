@@ -24,6 +24,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 
 	public function new()
 	{
+		controls.isInSubstate = true;
 		super();
 
 		FlxG.mouse.visible = false;
@@ -97,6 +98,9 @@ class BaseOptionsMenu extends MusicBeatSubstate
 
 		changeSelection();
 		reloadCheckboxes();
+
+		mobileManager.addMobilePad("FULL", "A_B_C");
+		mobileManager.addMobilePadCamera();
 	}
 
 	public function addOption(option:Option) {
@@ -216,7 +220,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 				}
 			}
 
-			if(controls.RESET)
+			if(controls.RESET || mobileButtonJustPressed('C'))
 			{
 				var leOption:Option = optionsArray[curSelected];
 				leOption.setValue(leOption.defaultValue);

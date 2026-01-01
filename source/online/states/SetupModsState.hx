@@ -9,25 +9,25 @@ import openfl.events.KeyboardEvent;
 class SetupModsState extends MusicBeatState {
 	var items:FlxTypedSpriteGroup<FlxText>;
 
-    public function new(mods:Array<String>, fromOptions:Bool) {
-        super();
+	public function new(mods:Array<String>, fromOptions:Bool) {
+		super();
 
-        swagMods = mods;
+		swagMods = mods;
 		this.fromOptions = fromOptions;
-    }
+	}
 
 	var swagMods:Array<String> = [];
 
 	var curSelected = 0;
 	var inInput = false;
-    var modsInput:Array<String> = [];
+	var modsInput:Array<String> = [];
 
 	var selectLine:FlxSprite;
 	
 	var fromOptions:Bool = false;
 
-    override function create() {
-        super.create();
+	override function create() {
+		super.create();
 
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Menus", "Mods URL Setup");
@@ -74,9 +74,13 @@ class SetupModsState extends MusicBeatState {
 		items.screenCenter(Y);
 		add(items);
 
+		final accept:String = (controls.mobileControls) ? 'A' : 'ACCEPT, Paste links with CTRL + V';
+		final back:String = (controls.mobileControls) ? 'B' : 'BACK';
+		final shift:String = (controls.mobileControls) ? 'C' : 'SHIFT';
+
 		var title = new FlxText(0, 0, FlxG.width, 
-        "Before you play, it is recommended to set links for your mods!\nSelect mods with ACCEPT, Paste links with CTRL + V, Leave with BACK\nHold SHIFT while exiting to discard all changes"
-        );
+		"Before you play, it is recommended to set links for your mods!\nSelect mods with " + accept + ", Leave with " + back + "\nHold " + shift + " while exiting to discard all changes"
+		);
 		title.setFormat("VCR OSD Mono", 22, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		title.y = 50;
 		title.scrollFactor.set(0, 0);
@@ -95,26 +99,37 @@ class SetupModsState extends MusicBeatState {
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 
 		changeSelection(0);
-    }
 
-    override function update(elapsed:Float) {
-        super.update(elapsed);
+		mobileManager.addMobilePad('UP_DOWN', 'A_B_C');
+		mobileManager.addMobilePadCamera();
+	}
 
-        if (disableInput) return;
+	override function update(elapsed:Float) {
+		super.update(elapsed);
+
+		#if android
+		if (FlxG.android.justPressed.BACK) {
+			tempDisableInput();
+			inInput = FlxG.stage.window.textInputEnabled = false;
+			changeSelection(0);
+		}
+		#end
+
+		if (disableInput) return;
 
 		if (!inInput) {
-			if (controls.ACCEPT || FlxG.mouse.justPressed) {
-				inInput = true;
+			if (controls.ACCEPT || (!controls.mobileControls && FlxG.mouse.justPressed)) {
+				inInput = FlxG.stage.window.textInputEnabled = true;
 				changeSelection(0);
 			}
-            
+			
 			if (controls.UI_UP_P || FlxG.mouse.wheel == 1)
 				changeSelection(-1);
 			else if (controls.UI_DOWN_P || FlxG.mouse.wheel == -1)
 				changeSelection(1);
 
-			if (controls.BACK || FlxG.mouse.justPressedRight) {
-				if (!FlxG.keys.pressed.SHIFT) {
+			if (controls.BACK || (!controls.mobileControls && FlxG.mouse.justPressedRight)) {
+				if (!mobileButtonPressed('C') || !FlxG.keys.pressed.SHIFT) {
 					var i = 0;
 					for (mod in swagMods) {
 						OnlineMods.saveModURL(mod, modsInput[i]);
@@ -126,17 +141,17 @@ class SetupModsState extends MusicBeatState {
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 				states.TitleState.playFreakyMusic();
 			}
-        }
+		}
 		else {
-			if (FlxG.mouse.justPressedRight) {
+			if ((!controls.mobileControls && FlxG.mouse.justPressedRight)) {
 				tempDisableInput();
 				inInput = false;
 				changeSelection(0);
 			}
 		}
-    }
+	}
 
-    function changeSelection(difference:Int) {
+	function changeSelection(difference:Int) {
 		curSelected += difference;
 
 		if (curSelected >= swagMods.length) {
@@ -165,7 +180,7 @@ class SetupModsState extends MusicBeatState {
 				item.color = FlxColor.LIME;
 			item.screenCenter(X);
 		}
-    }
+	}
 
 	function getItemName(item:Int) {
 		if (item == curSelected && inInput)
@@ -194,7 +209,7 @@ class SetupModsState extends MusicBeatState {
 		}
 		else if (key == 13 || key == 27) { // enter or esc
 			tempDisableInput();
-			inInput = false;
+			inInput = FlxG.stage.window.textInputEnabled = false;
 			changeSelection(0);
 			return;
 		}
