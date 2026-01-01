@@ -59,7 +59,7 @@ class MobileOptionsSubState extends BaseOptionsMenu {
 		//HitboxTypes.insert(0, "Classic");
 		option = new Option('Hitbox Mode',
 			'Choose your Hitbox Style!',
-			'hitboxmode',
+			'hitboxMode',
 			'string',
 			HitboxTypes
 		);

@@ -1424,7 +1424,7 @@ class PlayState extends MusicBeatState
 			mobileManager.addMobilePad((replayData != null || cpuControlled) ? 'LEFT_RIGHT' : 'NONE',
 										(GameClient.isConnected()) ? 'P_C_T' : (replayData != null || cpuControlled) ? 'P_X_Y' : 'P_T');
 			mobileManager.addMobilePadCamera();
-			addPlayStateHitbox();
+			addPlayStateHitbox(null, true);
 		});
 
 		var loaderGroup = new online.objects.LoadingSprite(preloadTasks.length, camLoading);
@@ -1996,7 +1996,7 @@ class PlayState extends MusicBeatState
 			// if(ClientPrefs.data.middleScroll) opponentStrums.members[i].visible = false;
 		}
 
-		if (ClientPrefs.data.ogGameControls && Note.maniaKeys != 20 && Note.maniaKeys != 55) enableVSliceControls();
+		if (ClientPrefs.data.ogGameControls && Note.maniaKeys < 10) enableVSliceControls();
 	}
 
 	public var defaultPlayerNotePositions:Array<Dynamic> = [-360, -140, 140, 360];
@@ -2897,7 +2897,7 @@ class PlayState extends MusicBeatState
 
 		if (replayPlayer == null && ClientPrefs.data.noteUnderlayOpacity > 0 && strumGroup == getPlayerStrums() && ClientPrefs.data.noteUnderlayType == 'All-In-One') {
 			var vsliceControlFix:Float = 1;
-			if (ClientPrefs.data.ogGameControls && Note.maniaKeys != 20 && Note.maniaKeys != 55) {
+			if (ClientPrefs.data.ogGameControls && Note.maniaKeys < 10) {
 				switch (Note.maniaKeys) {
 					case 4: vsliceControlFix = 6.5 / 3.5;
 					case 5: vsliceControlFix = 6.5 / 5;
@@ -6715,12 +6715,12 @@ class PlayState extends MusicBeatState
 		addPlayStateHitbox(mode);
 	}
 
-	public function addPlayStateHitbox(?mode:String)
+	public function addPlayStateHitbox(?mode:String, ?makeInvinsibleFirst:Bool)
 	{
 		mobileManager.addHitbox(mode, ClientPrefs.data.hitboxHint);
 		mobileManager.addHitboxCamera();
 		if (replayData == null && !cpuControlled) connectControlToNotes(null, 'hitbox');
-		mobileManager.hitbox.visible = false;
+		if (makeInvinsibleFirst) mobileManager.hitbox.visible = false;
 		addHitboxDeadZone(null, ['buttonT', 'buttonC', 'buttonP']);
 	}
 

@@ -32,11 +32,15 @@ class FunkinHitbox extends Hitbox {
 		}
 		else
 		{
-			//Use Seperated Mania File like in JS Engine Shaggy Mod
-			if (MobileConfig.hitboxModes.exists('Mania $Note.maniaKeys') && Note.maniaKeys != 4)
-				mode = 'Mania $Note.maniaKeys';
-
 			var Custom:String = mode != null ? mode : ClientPrefs.data.hitboxMode;
+			//Use Seperated Mania File like in JS Engine Shaggy Mod
+			var maniaHitbox:String = 'Mania ${Note.maniaKeys}';
+			trace('maniaHitbox: $maniaHitbox');
+			if (MobileConfig.hitboxModes.exists(maniaHitbox) && Note.maniaKeys != 4) {
+				trace('maniaHitbox found');
+				Custom = maniaHitbox;
+			}
+
 			if (!MobileConfig.hitboxModes.exists(Custom))
 				throw 'The ${Custom} Hitbox File doesn\'t exists.';
 
@@ -161,7 +165,7 @@ class FunkinHitbox extends Hitbox {
 	{
 		var hint:MobileButton = new MobileButton(x, y, returned);
 		hint.loadGraphic(createHintGraphic(width, height, color));
-		var VSliceAllowed:Bool = (currentMode == 'V Slice' && Note.maniaKeys != 20 && Note.maniaKeys != 55);
+		var VSliceAllowed:Bool = (currentMode == 'V Slice' && Note.maniaKeys < 10);
 
 		if (showHints && !VSliceAllowed) {
 			var doHeightFix:Bool = false;
