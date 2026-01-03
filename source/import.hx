@@ -76,6 +76,7 @@ import online.backend.Deflection;
 // Spesificly Extended Mobile-Controls Library Objects For FNF
 import mobile.objects.FunkinMobilePad;
 import mobile.objects.FunkinHitbox;
+import mobile.objects.FunkinJoyStick;
 // Others
 import backend.FunkinFileSystem;
 import mobile.ScreenUtil;

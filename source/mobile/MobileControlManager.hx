@@ -4,7 +4,6 @@ import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
 import flixel.util.FlxDestroyUtil;
-import mobile.JoyStick;
 
 /**
  * A simple mobile manager for who doesn't want to create these manually
@@ -16,7 +15,7 @@ class MobileControlManager {
 	public var mobilePad:FunkinMobilePad;
 	public var mobilePadCam:FlxCamera;
 	public var joyStickCam:FlxCamera;
-	public var joyStick:JoyStick;
+	public var joyStick:FunkinJoyStick;
 	public var hitboxCam:FlxCamera;
 	public var hitbox:FunkinHitbox;
 
@@ -95,15 +94,16 @@ class MobileControlManager {
 		hitbox.cameras = [hitboxCam];
 	}
 
-	public function makeJoyStick(?stickPath:String, x:Float, y:Float, radius:Float = 0, ease:Float = 0.25, size:Float = 1):Void
+	public function makeJoyStick(x:Float = 0, y:Float = 0, ?graphic:String, ?onMove:Float->Float->Float->String->Void, size:Float = 1):Void
 	{
 		if (joyStick != null) removeJoyStick();
-		joyStick = new JoyStick(stickPath, x, y, radius, ease, size);
+		joyStick = new FunkinJoyStick(x, y, graphic, onMove);
+		joyStick.scale.set(size, size);
 	}
 
-	public function addJoyStick(?stickPath:String, x:Float, y:Float, radius:Float = 0, ease:Float = 0.25, size:Float = 1):Void
+	public function addJoyStick(x:Float = 0, y:Float = 0, ?graphic:String, ?onMove:Float->Float->Float->String->Void, size:Float = 1):Void
 	{
-		makeJoyStick(stickPath, x, y, radius, ease, size);
+		makeJoyStick(x, y, graphic, onMove, size);
 		currentState.add(joyStick);
 	}
 

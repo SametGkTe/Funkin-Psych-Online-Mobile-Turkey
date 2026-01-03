@@ -105,7 +105,7 @@ class Controls
 
 		try {
 			if (mobileControls)
-				return result || _myGamepadJustPressed(gamepadBinds[key]) == true || hitboxJustPressed(mobileBinds[key]) == true || mobilePadJustPressed(mobileBinds[key]) == true;
+				return result || _myGamepadJustPressed(gamepadBinds[key]) == true || hitboxJustPressed(mobileBinds[key]) == true || mobilePadJustPressed(mobileBinds[key]) == true || scriptedButtonJustPressed(mobileBinds[key]) == true;
 			else
 				return result || _myGamepadJustPressed(gamepadBinds[key]) == true;
 		} catch (e:haxe.Exception) {
@@ -125,7 +125,7 @@ class Controls
 
 		try {
 			if (mobileControls)
-				return result || _myGamepadPressed(gamepadBinds[key]) == true || hitboxPressed(mobileBinds[key]) == true || mobilePadPressed(mobileBinds[key]) == true;
+				return result || _myGamepadPressed(gamepadBinds[key]) == true || hitboxPressed(mobileBinds[key]) == true || mobilePadPressed(mobileBinds[key]) == true || scriptedButtonPressed(mobileBinds[key]) == true;
 			else
 				return result || _myGamepadPressed(gamepadBinds[key]) == true;
 		} catch (e:haxe.Exception) {
@@ -145,7 +145,7 @@ class Controls
 
 		try {
 			if (mobileControls)
-				return result || _myGamepadJustReleased(gamepadBinds[key]) == true || hitboxJustReleased(mobileBinds[key]) == true || mobilePadJustReleased(mobileBinds[key]) == true;
+				return result || _myGamepadJustReleased(gamepadBinds[key]) == true || hitboxJustReleased(mobileBinds[key]) == true || mobilePadJustReleased(mobileBinds[key]) == true || scriptedButtonJustReleased(mobileBinds[key]) == true;
 			else
 				return result || _myGamepadJustReleased(gamepadBinds[key]) == true;
 		} catch (e:haxe.Exception) {
@@ -257,6 +257,54 @@ class Controls
 		if (keys != null && requestedHitbox != null)
 			if (requestedHitbox.justReleased(keys) == true)
 				return true;
+
+		return false;
+	}
+
+	private function scriptedButtonPressed(keys:Array<String>):Bool
+	{
+		if (PlayState.instance != null) {
+			for (key => manager in PlayState.instance.customManagers) {
+				if (keys != null && manager[0] != null && manager[0].hitbox != null)
+					if (manager[0].hitbox.pressed(keys) == true)
+						return true;
+				if (keys != null && manager[0] != null && manager[0].mobilePad != null)
+					if (manager[0].mobilePad.pressed(keys) == true)
+						return true;
+			}
+		}
+
+		return false;
+	}
+
+	private function scriptedButtonJustPressed(keys:Array<String>):Bool
+	{
+		if (PlayState.instance != null) {
+			for (key => manager in PlayState.instance.customManagers) {
+				if (keys != null && manager[0] != null && manager[0].hitbox != null)
+					if (manager[0].hitbox.justPressed(keys) == true)
+						return true;
+				if (keys != null && manager[0] != null && manager[0].mobilePad != null)
+					if (manager[0].mobilePad.justPressed(keys) == true)
+						return true;
+			}
+		}
+
+		return false;
+	}
+
+	private function scriptedButtonJustReleased(keys:Array<String>):Bool
+	{
+		if (PlayState.instance != null) {
+			for (key => manager in PlayState.instance.customManagers) {
+				if (keys != null && manager[0] != null && manager[0].hitbox != null)
+					if (manager[0].hitbox.justReleased(keys) == true)
+						return true;
+				if (keys != null && manager[0] != null && manager[0].mobilePad != null)
+					if (manager[0].mobilePad.justReleased(keys) == true)
+						return true;
+			}
+		}
 
 		return false;
 	}

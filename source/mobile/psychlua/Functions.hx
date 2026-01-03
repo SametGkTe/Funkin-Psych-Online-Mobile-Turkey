@@ -23,17 +23,17 @@ class MobileFunctions
 		});
 
 		//JoyStick
-		Lua_helper.add_callback(lua, 'addJoyStick', function(?managerName:String, ?stickPath:String, x:Float, y:Float, radius:Float = 0, ease:Float = 0.25, size:Float = 1, ?addToCustomSubstate:Bool = false, ?posAtCustomSubstate:Int = -1):Void
+		Lua_helper.add_callback(lua, 'addJoyStick', function(?managerName:String, x:Float = 0, y:Float = 0, ?graphic:String, size:Float = 1, ?addToCustomSubstate:Bool = false, ?posAtCustomSubstate:Int = -1):Void
 		{
 			var manager = PlayState.checkManager(managerName);
 			if (addToCustomSubstate)
 			{
-				manager.makeJoyStick(stickPath, x, y, radius, ease, size);
+				manager.makeJoyStick(x, y, graphic, null, size);
 				if (manager.joyStick != null)
 					CustomSubstate.insertObject(posAtCustomSubstate, manager.joyStick);
 			}
 			else
-				manager.addJoyStick(stickPath, x, y, radius, ease, size);
+				manager.addJoyStick(x, y, graphic, null, size);
 			if(PlayState.instance.variables.exists(managerName + '_joyStick')) PlayState.instance.variables.set(managerName + '_joyStick', manager.joyStick);
 		});
 
