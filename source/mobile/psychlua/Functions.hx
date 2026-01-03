@@ -73,7 +73,7 @@ class MobileFunctions
 					CustomSubstate.insertObject(posAtCustomSubstate, manager.hitbox);
 			}
 			else if (managerName == null || managerName == '')
-				addPlayStateHitbox(mode, false, hints);
+				PlayState.instance.addPlayStateHitbox(mode, false, hints);
 			else
 				manager.addHitbox(mode, hints);
 			if(PlayState.instance.variables.exists(managerName + '_hitbox')) PlayState.instance.variables.set(managerName + '_hitbox', manager.hitbox);
