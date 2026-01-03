@@ -6715,9 +6715,12 @@ class PlayState extends MusicBeatState
 		addPlayStateHitbox(mode);
 	}
 
-	public function addPlayStateHitbox(?mode:String, ?makeInvinsibleFirst:Bool)
+	public function addPlayStateHitbox(?mode:String, ?makeInvinsibleFirst:Bool, ?hints:Null<Bool>)
 	{
-		mobileManager.addHitbox(mode, ClientPrefs.data.hitboxHint);
+		if (hints == null)
+			hints = ClientPrefs.data.hitboxHint;
+
+		mobileManager.addHitbox(mode, hints);
 		mobileManager.addHitboxCamera();
 		if (replayData == null && !cpuControlled) connectControlToNotes(null, 'hitbox');
 		if (makeInvinsibleFirst) mobileManager.hitbox.visible = false;

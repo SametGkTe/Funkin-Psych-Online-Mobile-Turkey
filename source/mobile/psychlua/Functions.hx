@@ -72,6 +72,8 @@ class MobileFunctions
 				if (manager.hitbox != null)
 					CustomSubstate.insertObject(posAtCustomSubstate, manager.hitbox);
 			}
+			else if (managerName == null || managerName == '')
+				addPlayStateHitbox(mode, false, hints);
 			else
 				manager.addHitbox(mode, hints);
 			if(PlayState.instance.variables.exists(managerName + '_hitbox')) PlayState.instance.variables.set(managerName + '_hitbox', manager.hitbox);
@@ -82,9 +84,19 @@ class MobileFunctions
 			PlayState.checkManager(managerName).addHitboxCamera(defaultDrawTarget);
 		});
 
+		Lua_helper.add_callback(lua, "addHitboxDeadZones", function(?managerName:String, buttons:Array<String>):Void
+		{
+			PlayState.instance.addHitboxDeadZone(managerName, buttons);
+		});
+
 		Lua_helper.add_callback(lua, "removeHitbox", function(?managerName:String):Void
 		{
-			PlayState.checkManager(managerName).removeHitbox();
+			var manager = PlayState.checkManager(managerName);
+			manager.hitbox.forEachAlive((button) ->
+			{
+				if (button.deadZones != []) button.deadZones = [];
+			});
+			manager.removeHitbox();
 		});
 
 		Lua_helper.add_callback(lua, 'hitboxPressed', function(?managerName:String, ?hint:String):Bool
