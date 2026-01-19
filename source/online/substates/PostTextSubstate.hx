@@ -29,7 +29,7 @@ class PostTextSubstate extends MusicBeatSubstate {
 		bg.scrollFactor.set(0, 0);
 		add(bg);
 
-		var title = new FlxText(0, 0, FlxG.width, this.title + "\n\n(Press ENTER to submit)");
+		var title = new FlxText(0, 0, FlxG.width, this.title + "\n\n(A Tuşuna basarak Gönderin)");
 		title.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		title.y = FlxG.height / 2 - title.height / 2 - 150;
 		title.scrollFactor.set();

@@ -8,8 +8,8 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 	var boyfriend:Character = null;
 	public function new()
 	{
-		title = 'Graphics and Performance';
-		rpcTitle = 'Graphics Settings Menu'; //for Discord Rich Presence
+		title = 'Grafik ve Performans';
+		rpcTitle = 'Grafik Ayarları Menüsünde'; //for Discord Rich Presence
 
 		boyfriend = new Character(840, 170, 'bf', true);
 		boyfriend.setGraphicSize(Std.int(boyfriend.width * 0.75));
@@ -19,36 +19,36 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 		boyfriend.visible = false;
 
 		//I'd suggest using "Low Quality" as an example for making your own option since it is the simplest here
-		var option:Option = new Option('Low Quality', //Name
-			'If checked, disables some background details,\ndecreases loading times and improves performance.', //Description
+		var option:Option = new Option('Düsük Kalite', //Name
+			'Aktif edilirse, bazı arka plan detaylarını devre dışı bırakır,\nyükleme sürelerini azaltır ve performansı artırır. ÖNERI: AÇIK', //Description
 			'lowQuality', //Save data variable name
 			'bool'); //Variable type
 		addOption(option);
 
-		var option:Option = new Option('Anti-Aliasing',
-			'If unchecked, disables anti-aliasing, increases performance\nat the cost of sharper visuals.',
+		var option:Option = new Option('Kenar Yumusatma',
+			'Aktif edilmezse, kenar yumuşatmayı (anti-aliasing) devre dışı bırakır, daha keskin görüntüler pahasına performansı artırır. ÖNERI: KAPALI',
 			'antialiasing',
 			'bool');
 		option.onChange = onChangeAntiAliasing; //Changing onChange is only needed if you want to make a special interaction after it changes the value
 		addOption(option);
 		antialiasingOption = optionsArray.length-1;
 
-		var option:Option = new Option('Shaders', //Name
-			"If unchecked, disables shaders.\nIt's used for some visual effects, and also CPU intensive for weaker devices.", //Description
+		var option:Option = new Option('Gölgeler', //Name
+			"Aktif edilmezse, gölgelendiricileri devre dışı bırakır.\nBunlar bazı görsel efektler için kullanılır ve zayıf bilgisayarlar için işlemciyi yorabilir. ÖNERI: KAPALI", //Description
 			'shaders',
 			'bool');
 		addOption(option);
 
-		// var option:Option = new Option('GPU Caching', //Name
-		// 	"If checked, allows the GPU to be used for caching textures, decreasing RAM usage.\nDon't turn this on if any of your mods modify pixels of sprites.", //Description
+		// var option:Option = new Option('GPU Önbellekleme', //Name
+		// 	"Aktif edilirse, dokuları (textures) önbelleğe almak için GPU'nun kullanılmasına izin verir, böylece RAM kullanımını azaltır. Modlarınızdan herhangi biri sprite'ların (grafik öğelerinin) piksellerini değiştiriyorsa bunu açmayın.", //Description
 		// 	'cacheOnGPU',
 		// 	'bool');
 		// addOption(option);
 
 		#if !html5 //Apparently other framerates isn't correctly supported on Browser? Probably it has some V-Sync shit enabled by default, idk
 
-		var option:Option = new Option('Framerate',
-			"Pretty self explanatory, isn't it?",
+		var option:Option = new Option('FPS Limiti',
+			"Oldukça açıklayıcı, değil mi?",
 			'framerate',
 			'int');
 		addOption(option);
@@ -59,27 +59,27 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 		option.onChange = onChangeFramerate;
 
 		var option:Option = new Option('Max FPS', //Name
-			"If checked, the FPS limit will be set to 1000.\nThis setting makes the input timing more accurate, but in cost of minor graphical issues.", //Description
+			"Aktif edilirse, Kare Hızı (FPS) sınırı 1000 olarak ayarlanacaktır.\nBu ayar, girdi zamanlamasını daha hassas hale getirir, ancak küçük grafiksel sorunlara neden olabilir.", //Description
 			'unlockFramerate',
 			'bool');
 		option.onChange = onChangeFramerate;
 		addOption(option);
 		#end
 
-		var option:Option = new Option('Disable Freeplay Icons', //Name
-			"If checked, freeplay menu song icons will not be shown, slightly decreases loading times.", //Description
+		var option:Option = new Option('Freeplay ikonlari', //Name
+			"Aktif edilirse, Serbest Oyun menüsü şarkı simgeleri gösterilmez, yükleme sürelerini bir miktar azaltır.", //Description
 			'disableFreeplayIcons',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Fast Freeplay Song Render', //Name
-			"If checked, freeplay songs will be render with the default HaxeFlixel font, greatly improving song loading time", //Description
+		var option:Option = new Option('Hizli Freeplay Sistemi', //Name
+			"Aktif edilirse, Serbest Oyun şarkıları varsayılan HaxeFlixel yazı tipiyle oluşturulur, bu da şarkı yükleme süresini büyük ölçüde iyileştirir.", //Description
 			'disableFreeplayAlphabet',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Combo Stacking',
-			"If unchecked, Ratings and Combo won't stack, saving on System Memory and making them easier to read",
+		var option:Option = new Option('Kombo Biriktirme',
+			"Aktif edilmezse, Derecelendirmeler (Ratings) ve Kombo üst üste birikmez: bu, sistem belleğinden tasarruf sağlar ve okunmalarını kolaylaştırır.",
 			'comboStacking',
 			'bool');
 		addOption(option);

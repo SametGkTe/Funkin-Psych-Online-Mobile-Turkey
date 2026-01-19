@@ -33,7 +33,7 @@ class FindRoomState extends MusicBeatState {
 		super.create();
 
 		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("Looking for a room.", null, null, false);
+		DiscordClient.changePresence("Oda arıyor.", null, null, false);
 		#end
 
 		camera.follow(camFollow = new FlxObject(FlxG.width / 2), 0.1);
@@ -52,7 +52,7 @@ class FindRoomState extends MusicBeatState {
 			refreshRooms(false);
 		}, 0);
 
-		tip = new FlxText(0, 0, 0, 'ACCEPT - Enter selected room.');
+		tip = new FlxText(0, 0, 0, 'A - Seçili Odaya Gir .');
 		tip.setFormat("VCR OSD Mono", 18, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		tip.scrollFactor.set(0, 0);
 		tip.screenCenter(X);
@@ -65,7 +65,7 @@ class FindRoomState extends MusicBeatState {
 		add(tipBg);
 		add(tip);
 
-		emptyMessage = new FlxText(0, 0, FlxG.width, 'No available rooms found!');
+		emptyMessage = new FlxText(0, 0, FlxG.width, 'Çevrimiçi Herhangi bir oda bulunamadı! Sanırım Yanlızsınız :D');
 		emptyMessage.setFormat("VCR OSD Mono", 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		emptyMessage.scrollFactor.set(0, 0);
 		emptyMessage.screenCenter();
@@ -116,7 +116,7 @@ class FindRoomState extends MusicBeatState {
 				items.clear();
 
                 if (err != null) {
-					Alert.alert("Couldn't connect!", "ERROR: " + ShitUtil.prettyStatus(err.code) + " - " + err.message + (GameClient.serverAddress.endsWith(".onrender.com") ? "\nTry again in a few minutes! The server is probably restarting!" : ""));
+					Alert.alert("Bağlanılamadı!", "HATA: " + ShitUtil.prettyStatus(err.code) + " - " + err.message + (GameClient.serverAddress.endsWith(".onrender.com") ? "\nBirkaç dakika sonra tekrar deneyin! Sunucu muhtemelen yeniden başlatılıyor!" : ""));
                     return;
                 }
 
@@ -142,7 +142,7 @@ class FindRoomState extends MusicBeatState {
 				selected += 0;
             });
         });
-    }
+	}
 
     public function getAddress() {
         return GameClient.serverAddress;
@@ -183,12 +183,11 @@ class RoomBox extends FlxSpriteGroup {
 		ping.setPosition(10, title.y);
 		add(ping);
 
-		detailsTxt = new FlxText(0, 0, bg.width - 20, '> Enter: $code < ');
+		detailsTxt = new FlxText(0, 0, bg.width - 20, '> Oda Kodu: $code < ');
 		detailsTxt.setFormat("VCR OSD Mono", 20, FlxColor.WHITE, CENTER);
 		detailsTxt.setPosition(10, title.y + title.height + 20);
 		add(detailsTxt);
 
-		// bg.scale.y = details ? detailsTxt.y + detailsTxt.height + 10 : title.y + title.height + 10;
 		bg.scale.y = title.y + title.height + 10;
 		bg.updateHitbox();
 		screenCenter(X);

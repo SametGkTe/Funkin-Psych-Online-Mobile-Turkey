@@ -14,13 +14,13 @@ import states.FreeplayState;
 class MasterEditorMenu extends MusicBeatState
 {
 	var options:Array<String> = [
-		'Chart Editor',
-		'Character Editor',
-		'Week Editor',
-		'Menu Character Editor',
-		'Dialogue Editor',
-		'Dialogue Portrait Editor',
-		'Note Splash Debug'
+		'Chart Editorü',
+		'Character Editorü',
+		'Hafta Editorü',
+		'Menü Karakter Editorü',
+		'Diaylog Editorü',
+		'Diyalog Portre Editorü',
+		'Nota Efekt Ayiklama'
 	];
 	private var grpTexts:FlxTypedGroup<Alphabet>;
 	private var directories:Array<String> = [null];
@@ -111,19 +111,19 @@ class MasterEditorMenu extends MusicBeatState
 		if (controls.ACCEPT)
 		{
 			switch(options[curSelected]) {
-				case 'Chart Editor'://felt it would be cool maybe
+				case 'Chart Editorü'://felt it would be cool maybe
 					LoadingState.loadAndSwitchState(new ChartingState(), false);
-				case 'Character Editor':
+				case 'Karakter Editorü':
 					LoadingState.loadAndSwitchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
-				case 'Week Editor':
+				case 'Hafta Editorü':
 					FlxG.switchState(() -> new WeekEditorState());
-				case 'Menu Character Editor':
+				case 'Menü Karakter Editorü':
 					FlxG.switchState(() -> new MenuCharacterEditorState());
-				case 'Dialogue Editor':
+				case 'Diyalog Editorü':
 					LoadingState.loadAndSwitchState(new DialogueEditorState(), false);
-				case 'Dialogue Portrait Editor':
+				case 'Diyalog Portre Editorü':
 					LoadingState.loadAndSwitchState(new DialogueCharacterEditorState(), false);
-				case 'Note Splash Debug':
+				case 'Nota Efekt Ayiklama':
 					LoadingState.loadAndSwitchState(new NoteSplashDebugState());
 			}
 			FlxG.sound.music.volume = 0;
@@ -176,11 +176,11 @@ class MasterEditorMenu extends MusicBeatState
 	
 		WeekData.setDirectoryFromWeek();
 		if(directories[curDirectory] == null || directories[curDirectory].length < 1)
-			directoryTxt.text = '< No Mod Directory Loaded >';
+			directoryTxt.text = '< Mod Dizini Yüklenmedi >';
 		else
 		{
 			Mods.currentModDirectory = directories[curDirectory];
-			directoryTxt.text = '< Loaded Mod Directory: ' + Mods.currentModDirectory + ' >';
+			directoryTxt.text = '< Yüklenen Mod Dizini: ' + Mods.currentModDirectory + ' >';
 		}
 		directoryTxt.text = directoryTxt.text.toUpperCase();
 	}

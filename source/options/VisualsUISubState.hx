@@ -18,8 +18,8 @@ class VisualsUISubState extends BaseOptionsMenu
 	public function new()
 	{
 		ClientPrefs.reloadKeyColors();
-		title = 'Visuals and UI';
-		rpcTitle = 'Visuals & UI Settings Menu'; //for Discord Rich Presence
+		title = 'Görünüs & Arayüz';
+		rpcTitle = 'Görünüş & Arayüz Ayarları'; //for Discord Rich Presence
 
 		NoteSkinData.reloadNoteSkins();
 
@@ -43,8 +43,8 @@ class VisualsUISubState extends BaseOptionsMenu
 			if(!NoteSkinData.noteSkinArray.contains(ClientPrefs.data.noteSkin))
 				ClientPrefs.data.noteSkin = ClientPrefs.defaultData.noteSkin; //Reset to default if saved noteskin couldnt be found
 
-			var option:Option = new Option('Note Skins:',
-				"Select your prefered Note skin.",
+			var option:Option = new Option('Nota Kostümü:',
+				"Tercih Ettiğiniz Nota Kostümünü Seçin.",
 				'noteSkin',
 				'string',
 				NoteSkinData.noteSkinArray);
@@ -60,16 +60,16 @@ class VisualsUISubState extends BaseOptionsMenu
 				ClientPrefs.data.splashSkin = ClientPrefs.defaultData.splashSkin; //Reset to default if saved splashskin couldnt be found
 
 			noteSplashes.insert(0, ClientPrefs.defaultData.splashSkin); //Default skin always comes first
-			var option:Option = new Option('Note Splashes:',
-				"Select your prefered Note Splash variation or turn it off.",
+			var option:Option = new Option('Nota Efektleri:',
+				"Tercih ettiğiniz Not Efekti varyasyonunu seçin veya kapatın.",
 				'splashSkin',
 				'string',
 				noteSplashes);
 			addOption(option);
 		}
 
-		var option:Option = new Option('Note Splash Opacity',
-			'How much transparent should the Note Splashes be.\n0% disables it.',
+		var option:Option = new Option('Nota Efekt Seffafligi',
+			'Nota Sıçramaları Efektleri ne kadar şeffaf (saydam) olmalıdır?\n%0 ayarı bunu devre dışı bırakır.',
 			'splashAlpha',
 			'percent');
 		option.scrollSpeed = 1.6;
@@ -79,8 +79,8 @@ class VisualsUISubState extends BaseOptionsMenu
 		option.decimals = 1;
 		addOption(option);
 
-		var option:Option = new Option('Note Hold Splash Opacity',
-			'How much transparent should the Note Hold Splash be.\n0% disables it.',
+		var option:Option = new Option('Nota Tutus Efekt Seffafligi',
+			'Uzun Nota Sıçramaları ne kadar şeffaf olmalıdır?\n%0 ayarı bunu devre dışı bırakır.',
 			'holdSplashAlpha',
 			'percent');
 		option.scrollSpeed = 1.6;
@@ -90,8 +90,8 @@ class VisualsUISubState extends BaseOptionsMenu
 		option.decimals = 1;
 		addOption(option);
 
-		var option:Option = new Option('Trail Note Opacity',
-			'How much transparent should the Note Trail be.',
+		var option:Option = new Option('Nota Kuyrugu Seffafligi',
+			'Nota Kuyruğunun ne kadar şeffaf olması gerekir?.',
 			'holdAlpha',
 			'percent');
 		option.scrollSpeed = 1.3;
@@ -101,39 +101,39 @@ class VisualsUISubState extends BaseOptionsMenu
 		option.decimals = 1;
 		addOption(option);
 
-		var option:Option = new Option('Hide HUD',
-			'If checked, hides most HUD elements.',
+		var option:Option = new Option('HUD yi Gizle',
+			'Aktif edilirse, ekran göstergelerinin (HUD) çoğunu gizler.',
 			'hideHud',
 			'bool');
 		addOption(option);
 		
-		var option:Option = new Option('Time Bar:',
-			"What should the Time Bar display?",
+		var option:Option = new Option('Zaman Bari:',
+			"Zaman Çubuğu neyi göstermelidir?",
 			'timeBarType',
 			'string',
-			['Time Left', 'Time Elapsed', 'Song Name', 'Disabled']);
+			['Kalan Süre', 'Geçen Süre', 'Sarki Adi', 'Kapali']);
 		addOption(option);
 
-		var option:Option = new Option('Flashing Lights',
-			"Uncheck this if you're sensitive to flashing lights!",
+		var option:Option = new Option('Yanip / Sönen Isıklar',
+			"Yanıp sönen ışıklara karşı hassassanız bu seçeneğin işaretini kaldırın!",
 			'flashing',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Camera Zooms',
-			"If unchecked, the camera won't zoom in on a beat hit.",
+		var option:Option = new Option('Kamera Zoomlari',
+			"Aktif Edilmezse, kamera vuruşta yakınlaştırma yapmaz..",
 			'camZooms',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Score Text Zoom on Hit',
-			"If unchecked, disables the Score text zooming\neverytime you hit a note.",
+		var option:Option = new Option('Skor Yakinlastirmasi',
+			"Aktif Edilmezse, her nota vuruşunda skor metninin\nyakınlaşmasını devre dışı bırakır.",
 			'scoreZoom',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Health Bar Opacity',
-			'How much transparent should the health bar and icons be.',
+		var option:Option = new Option('Can Bar Opakligi',
+			'Can Çubuğu ve Simgeler Ne Kadar Şeffaf Olmalı.',
 			'healthBarAlpha',
 			'percent');
 		option.scrollSpeed = 1.6;
@@ -143,69 +143,69 @@ class VisualsUISubState extends BaseOptionsMenu
 		option.decimals = 1;
 		addOption(option);
 		
-		var option:Option = new Option('FPS Counter',
-			'If unchecked, hides FPS Counter.',
+		var option:Option = new Option('FPS Sayaci',
+			'Aktif Edilmezse, FPS Sayacını gizler.',
 			'showFPS',
 			'bool');
 		addOption(option);
 		option.onChange = onChangeFPSCounter;
 
-		var option:Option = new Option('Disable Online Shaders',
-			'If checked, disables shaders that being used on online menus.',
+		var option:Option = new Option('Çevrimiçi Gölgelendiricileri Kapat',
+			'Aktif Edildiğinde, çevrimiçi menülerde kullanılan gölgelendiricileri devre dışı bırakır.',
 			'disableOnlineShaders',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Pause Screen Song:',
-			"What song do you prefer for the Pause Screen?",
+		var option:Option = new Option('Durdurma Ekrani Müziği:',
+			"Duraklama Ekranı için hangi şarkıyı tercih edersiniz?",
 			'pauseMusic',
 			'string',
-			['None', 'Breakfast', 'Tea Time']);
+			['Hiçbiri', 'Breakfast', 'Tea Time']);
 		addOption(option);
 		option.onChange = onChangePauseMusic;
 		
 		#if CHECK_FOR_UPDATES
-		var option:Option = new Option('Check for Updates',
-			'On Release builds, turn this on to check for updates when you start the game.',
+		var option:Option = new Option('Güncellemeleri Kontrol Et',
+			'Resmi sürümlerde, oyunu başlattığınızda güncellemeleri kontrol etmek için bunu etkinleştirin.',
 			'checkForUpdates',
 			'bool');
 		addOption(option);
 		#end
 
 		#if DISCORD_ALLOWED
-		var option:Option = new Option('Discord Rich Presence',
-			"Uncheck this to prevent accidental leaks, it will hide the Application from your \"Playing\" box on Discord",
+		var option:Option = new Option('Discord Durumu',
+			"Yanlışlıkla sızıntıları önlemek için bu seçeneğin işaretini kaldırın, bu işlem Discord'daki Oynuyor kutunuzdan Uygulamayı gizleyecektir.",
 			'discordRPC',
 			'bool');
 		addOption(option);
 		#end
 
-		var option:Option = new Option('Debug Mode',
-			"If checked, enables debug warnings etc.",
+		var option:Option = new Option('Hata Ayiklama',
+			"Aktif Edildiğinde, hata ayıklama uyarıları vb. etkinleştirilir.",
 			'debugMode',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Show Note timing',
-			'If checked, a timing of the hitted note will be shown on the screen (in miliseconds)',
+		var option:Option = new Option('Nota Zamanlamasini Göster',
+			'Aktif Edildiğinde, vurulan notanın zamanlaması ekranda gösterilir (milisaniye cinsinden).',
 			'showNoteTiming',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Disable Automatic Downloads',
-			'Disables automatic downloads of Mods and Skins from the opponent',
+		var option:Option = new Option('Otomatik Indirmeleri Kapat',
+			'Rakibin Mod ve Skin lerini otomatik olarak indirmeyi devre dışı bırakır.',
 			'disableAutoDownloads',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Disable Song Comments',
-			'Disables song comments on the replay viewer and (if visible, while playing)',
+		var option:Option = new Option('Sarki Yorumlarini Kapat',
+			'Yeniden oynatma görüntüleyicisinde şarkı yorumlarını devre dışı bırakır ve (görünürse, oynatma sırasında)',
 			'disableSongComments',
 			'bool');
 		addOption(option);
 		
-		var option:Option = new Option('Song Comments Opacity',
-			'How visible should the song comments be while you\'re playing a song',
+		var option:Option = new Option('Sarki Yorum Opakligi',
+			'Bir şarkıyı çalarken şarkı yorumları ne kadar görünür olmalı?',
 			'midSongCommentsOpacity',
 			'percent');
 		option.scrollSpeed = 1.6;
@@ -215,33 +215,27 @@ class VisualsUISubState extends BaseOptionsMenu
 		option.decimals = 1;
 		addOption(option);
 
-		var option:Option = new Option('Show Funkin Points Counter',
-			'If checked, the current FP count will be shown in the score text, can be toggled in-game with F7',
+		var option:Option = new Option('FP Sayacini Göster',
+			'Aktif Edildiğinde, mevcut FP sayısı puan metninde gösterilir, oyun içinde F7 tuşuyla değiştirilebilir.',
 			'showFP',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('FP V5 Preview',
-			'If enabled, new FP algorithm will be shown in the Counter',
-			'newFPPreview',
-			'bool');
-		addOption(option);
-
-		var option:Option = new Option('Group Songs:',
-			"How should songs on Freeplay menu be group by?",
+		var option:Option = new Option('Grup Sarkilari:',
+			"Freeplay menüsündeki şarkılar nasıl gruplandırılmalıdır?",
 			'groupSongsBy',
 			'string',
 			FreeplayState.GROUPS);
 		addOption(option);
 
-		var option:Option = new Option('Rating Color',
-			'If checked, the Rating text will be colored depending on your current... well... Rating, same with Combo.',
+		var option:Option = new Option('Derecelendirme Rengi',
+			'İşaretlendiğinde, Derecelendirme metni mevcut... şey... Derecelendirmenize göre renklendirilir, Combo ile aynı şekilde.',
 			'colorRating',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Favorite Tracks Menu Theme',
-			'If checked, the game will be picking your random favorite song as the main menu theme!',
+		var option:Option = new Option('Favori Sarkilar Menü Temasi',
+			'Aktif edilirse, oyun ana menü teması olarak rastgele seçtiğiniz favori şarkınızı seçecektir!',
 			'favsAsMenuTheme',
 			'bool');
 		option.onChange = () -> {
@@ -249,20 +243,20 @@ class VisualsUISubState extends BaseOptionsMenu
 		};
 		addOption(option);
 
-		var option:Option = new Option('Disable Combo Rating',
-			'If checked, the combo rating sprite will no longer show up.',
+		var option:Option = new Option('Kombolari Göster',
+			'Aktif edilirse, kombo (rating: Müq, İyi vs.) artık görünmeyecektir.',
 			'disableComboRating',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Disable Combo Counter',
-			'If checked, the combo counter sprite will no longer show up.',
+		var option:Option = new Option('Kombo Sayaci',
+			'Aktif edilirse, kombo sayacı artık görünmeyecektir.',
 			'disableComboCounter',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Nameplate Fade Time',
-			'After how many seconds should player nameplates be hidden?\nSet to 0 to instantly hide them.\nSet to -1 to never hide them.',
+		var option:Option = new Option('Ad Plakasi Solma Süresi',
+			'Oyuncu isim plakaları kaç saniye sonra gizlenmelidir? Anında gizlemek için 0 olarak ayarlayın. Asla gizlememek için -1 olarak ayarlayın.',
 			'nameplateFadeTime',
 			'int');
 		option.displayFormat = '%vs';

@@ -61,13 +61,13 @@ class SoFunkinSubstate extends MusicBeatSubstate {
 		searchUnderlay.alpha = 0.6;
 		add(searchUnderlay);
 
-		searchInput = new FlxText(0, 0, "PRESS " + buttonS + " TO SEARCH");
+		searchInput = new FlxText(0, 0, "buttonS" + " TUŞUNA BASARAK ARAYIN");
 		searchInput.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, RIGHT);
 		searchInput.scrollFactor.set();
 		add(searchInput);
 
 		// if (!ClientPrefs.data.disableFreeplayAlphabet)
-		groupTitle = new Alphabet(90, 320, "DEFAULT", true);
+		groupTitle = new Alphabet(90, 320, "RASTGELE", true);
 		// else
 		// 	groupTitle = new online.objects.AlphaLikeText(90, 320, "");
 		groupTitle.targetY = -1;
@@ -95,13 +95,13 @@ class SoFunkinSubstate extends MusicBeatSubstate {
 	function set_searchString(v) {
 		if (searchInputWait || v.length > 0) {
 			searchInput.alpha = searchInputWait ? 1.0 : 0.6;
-			searchInput.text = "SEARCH: '" + v + "'";
+			searchInput.text = "ARA: '" + v + "'";
 			reposSearch();
 			return searchString = v;
 		}
 
 		searchInput.alpha = 0.6;
-		searchInput.text = 'PRESS $buttonS TO SEARCH';
+		searchInput.text = '$buttonS TUŞUNA BASARAK ARAYIN';
 		reposSearch();
 		return searchString = v;
 	}
@@ -195,7 +195,7 @@ class SoFunkinSubstate extends MusicBeatSubstate {
 		if (grpTexts.length == 0 && searchString.length > 0) {
 			searchString = '';
 			search();
-			searchInput.text = "NOT FOUND!";
+			searchInput.text = "BULUNAMADI !";
 			return;
 		}
 

@@ -41,7 +41,7 @@ class ResetScoreSubState extends MusicBeatSubstate
 		add(bg);
 
 		var tooLong:Float = (name.length > 18) ? 0.8 : 1; //Fucking Winter Horrorland
-		var text:Alphabet = new Alphabet(0, 180, "Reset the score of", true);
+		var text:Alphabet = new Alphabet(0, 180, "SKORU SIFIRLA?", true);
 		text.screenCenter(X);
 		alphabetArray.push(text);
 		text.alpha = 0;
@@ -64,12 +64,12 @@ class ResetScoreSubState extends MusicBeatSubstate
 			add(icon);
 		}
 
-		yesText = new Alphabet(0, text.y + 150, 'Yes', true);
+		yesText = new Alphabet(0, text.y + 150, 'EVET', true);
 		yesText.screenCenter(X);
 		yesText.x -= 200;
 		yesText.scrollFactor.set();
 		add(yesText);
-		noText = new Alphabet(0, text.y + 150, 'No', true);
+		noText = new Alphabet(0, text.y + 150, 'HAYIR', true);
 		noText.screenCenter(X);
 		noText.x += 200;
 		noText.scrollFactor.set();

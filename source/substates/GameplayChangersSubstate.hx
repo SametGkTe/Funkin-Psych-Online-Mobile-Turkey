@@ -19,11 +19,11 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 	private var grpTexts:FlxTypedSpriteGroup<AttachedText>;
 
 	public static var chartKeys:Int = 4;
-
+	
 	function getOptions()
 	{
 		chartKeys = Song.updateManiaKeys(PlayState.SONG, true);
-
+		
 		var option:GameplayOption = new GameplayOption('Mania', 'mania', 'string', '(Chart)', [
 			'(Chart)'
 		].concat(Note.maniaKeysStringList));
@@ -32,10 +32,10 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		};
 		optionsArray.push(option);
 
-		var goption:GameplayOption = new GameplayOption('Scroll Type', 'scrolltype', 'string', 'multiplicative', ["multiplicative", "constant"]);
+		var goption:GameplayOption = new GameplayOption('Ok Hiz Türü', 'scrolltype', 'string', 'multiplicative', ["çarpici", "sabit"]);
 		optionsArray.push(goption);
 
-		var option:GameplayOption = new GameplayOption('Scroll Speed', 'scrollspeed', 'float', 1);
+		var option:GameplayOption = new GameplayOption('Ok Hizi', 'scrollspeed', 'float', 1);
 		option.scrollSpeed = 2.0;
 		option.minValue = 0.35;
 		option.changeValue = 0.05;
@@ -52,14 +52,14 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		}
 		optionsArray.push(option);
 
-		var option:GameplayOption = new GameplayOption('Scroll Speed By Mania', 'scrollspeedbymania', 'bool', false);
+		var option:GameplayOption = new GameplayOption('Mania Ok Hizi', 'scrollspeedbymania', 'bool', false);
 		option.onChange = () -> {
 			updateAll();
 		};
 		optionsArray.push(option);
 
 		#if !html5
-		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed', 'float', 1);
+		var option:GameplayOption = new GameplayOption('Sarki Hizi', 'songspeed', 'float', 1);
 		option.scrollSpeed = 1;
 		option.minValue = 0.5;
 		option.maxValue = 3.0;
@@ -73,7 +73,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 		#end
 
-		var option:GameplayOption = new GameplayOption('HP Gain Multiplier', 'healthgain', 'float', 1);
+		var option:GameplayOption = new GameplayOption('Can Kazanç Çarpani', 'healthgain', 'float', 1);
 		option.scrollSpeed = 2.5;
 		option.minValue = 0;
 		option.maxValue = 5;
@@ -81,7 +81,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		option.displayFormat = '%vX';
 		optionsArray.push(option);
 
-		var option:GameplayOption = new GameplayOption('HP Loss Multiplier', 'healthloss', 'float', 1);
+		var option:GameplayOption = new GameplayOption('Can Kaybi Çarpani', 'healthloss', 'float', 1);
 		option.scrollSpeed = 2.5;
 		option.minValue = 0.5;
 		option.maxValue = 5;
@@ -93,20 +93,20 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 
 		if (!GameClient.isConnected()) {
-			var option:GameplayOption = new GameplayOption('Instakill on Miss', 'instakill', 'bool', false);
+			var option:GameplayOption = new GameplayOption('Iskada Ani Ölüm', 'instakill', 'bool', false);
 			optionsArray.push(option);
 
-			var option:GameplayOption = new GameplayOption('Practice Mode', 'practice', 'bool', false);
+			var option:GameplayOption = new GameplayOption('Alistirma Modu', 'practice', 'bool', false);
 			optionsArray.push(option);
 
-			var option:GameplayOption = new GameplayOption('Play as Opponent', 'opponentplay', 'bool', false);
+			var option:GameplayOption = new GameplayOption('Karsi Taraf', 'opponentplay', 'bool', false);
 			optionsArray.push(option);
 		}
 
-		var option:GameplayOption = new GameplayOption('No Hurt Notes', 'nobadnotes', 'bool', false);
+		var option:GameplayOption = new GameplayOption('Acitan Notalar', 'nobadnotes', 'bool', false);
 		optionsArray.push(option);
 
-		GameClient.send("status", "In the Game Changers Menu");
+		GameClient.send("status", "Oyun Modifikasyonları Menüsünde");
 	}
 
 	public function getOptionByName(name:String)
@@ -397,7 +397,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			else {
 				var mania = Std.int(val.split('k')[0]);
 				if (Note.maniaKeysList.contains(mania) && !Note.rankedManiaKeysList.contains(mania)) {
-					option.text = option.text + ' (Unranked)';
+					option.text = option.text + ' (ranksiz)';
 				}
 			}
 		}

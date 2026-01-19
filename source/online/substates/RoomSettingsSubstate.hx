@@ -7,16 +7,17 @@ import flixel.util.FlxSpriteUtil;
 import states.ModsMenuState;
 
 class RoomSettingsSubstate extends MusicBeatSubstate {
-    var bg:FlxSprite;
+	var bg:FlxSprite;
 	var prevMouseVisibility:Bool = false;
 	var items:FlxTypedSpriteGroup<Option>;
 	var curSelectedID:Int = 0;
+	var lastSelectedID:Int = -1;
 
 	var blurFilter:BlurFilter;
 	var blackSprite:FlxSprite;
 	var coolCam:FlxCamera;
 
-    //options
+	//options
 	var skinSelect:Option;
 	var gameOptions:Option;
 	var stageSelect:Option;
@@ -32,6 +33,8 @@ class RoomSettingsSubstate extends MusicBeatSubstate {
 		bgCam.bgColor.alpha = 0;
 		FlxG.cameras.add(bgCam, false);
 
+		// Mobil/Shader desteği
+		#if !mobile
 		if (!ClientPrefs.data.disableOnlineShaders) {
 			blurFilter = new BlurFilter();
 			for (cam in FlxG.cameras.list) {
@@ -39,12 +42,14 @@ class RoomSettingsSubstate extends MusicBeatSubstate {
 					cam.filters = [];
 				cam.filters.push(blurFilter);
 			}
-		} else {
+		} else 
+		#end
+		{
 			blackSprite = new FlxSprite();
 			blackSprite.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 			blackSprite.alpha = 0.75;
 			add(blackSprite);
-			blackSprite.cameras = [bgCam]; // Lol
+			blackSprite.cameras = [bgCam];
 		}
 
 		coolCam = new FlxCamera();
@@ -54,7 +59,6 @@ class RoomSettingsSubstate extends MusicBeatSubstate {
 		cameras = [coolCam];
 
 		prevMouseVisibility = FlxG.mouse.visible;
-
 		FlxG.mouse.visible = true;
 
 		bg = new FlxSprite();
@@ -67,96 +71,89 @@ class RoomSettingsSubstate extends MusicBeatSubstate {
 
 		var i = 0;
 
-		items.add(publicRoom = new Option("Public Room", "If enabled, this room will be publicly listed in the FIND tab.", () -> {
+		items.add(publicRoom = new Option("Açık Oda", "Etkinleştirilirse, bu ODA BUL sekmesinde herkese açık olarak listelenecektir.", () -> {
 			GameClient.send("togglePrivate");
 		}, (elapsed) -> {
 			publicRoom.alpha = GameClient.hasPerms() ? 1 : 0.8;
-
 			publicRoom.checked = !GameClient.room.state.isPrivate;
 		}, 0, 80 * i, !GameClient.room.state.isPrivate));
 		publicRoom.ID = i++;
 
-		items.add(anarchyMode = new Option("Anarchy Mode", "This option gives other players host permissions.", () -> {
+		items.add(anarchyMode = new Option("Anarşi Modu", "Bu seçenek diğer oyunculara sunucu sahibi izinleri verir.", () -> {
 			GameClient.send("anarchyMode");
 		}, (elapsed) -> {
 			anarchyMode.alpha = GameClient.hasPerms() ? 1 : 0.8;
-
 			anarchyMode.checked = GameClient.room.state.anarchyMode;
 		}, 0, 80 * i, GameClient.room.state.anarchyMode));
 		anarchyMode.ID = i++;
 
-		items.add(swapSides = new Option("Boyfriend Side", "Play on Boyfriend's side.", () -> {
+		items.add(swapSides = new Option("Karşı Taraf", "Karşı Tarafta Oyna.", () -> {
 			GameClient.send("swapSides");
 		}, (elapsed) -> {
 			swapSides.alpha = GameClient.hasPerms() ? 1 : 0.8;
-
 			swapSides.checked = GameClient.getPlayerSelf().bfSide;
 		}, 0, 80 * i, GameClient.getPlayerSelf().bfSide));
 		swapSides.ID = i++;
 
-		items.add(teamMode = new Option("Team Mode", "Compete in Teams rather than individually! Your performance will be averaged with your teammate.", () -> {
+		items.add(teamMode = new Option("Takım Modu", "Bireysel olarak değil, takımlar halinde yarışın! Performansınız takım arkadaşınızla ortalaması alınacaktır.", () -> {
 			GameClient.send("teamMode");
 		}, (elapsed) -> {
 			teamMode.alpha = GameClient.hasPerms() ? 1 : 0.8;
-
 			teamMode.checked = GameClient.room.state.teamMode;
 		}, 0, 80 * i, GameClient.room.state.teamMode));
 		teamMode.ID = i++;
 
 		var hideGF:Option;
-		items.add(hideGF = new Option("Hide Girlfriend", "Hides GF from the stage.", () -> {
+		items.add(hideGF = new Option("Girlfriend'i Gizle", "GF'yi sahneden gizler.", () -> {
 			GameClient.send("toggleGF");
 		}, (elapsed) -> {
 			hideGF.alpha = GameClient.hasPerms() ? 1 : 0.8;
-
 			hideGF.checked = GameClient.room.state.hideGF;
 		}, 0, 80 * i, GameClient.room.state.hideGF));
 		hideGF.ID = i++;
 
 		var disableSkins:Option;
-		items.add(disableSkins = new Option("Disable Skins", "Forbids players from using skins.", () -> {
+		items.add(disableSkins = new Option("Kostümleri Kapat", "Oyuncuların skin kullanmasını yasaklar.", () -> {
 			GameClient.send("toggleSkins");
 		}, (elapsed) -> {
 			disableSkins.alpha = GameClient.hasPerms() ? 1 : 0.8;
-
 			disableSkins.checked = GameClient.room.state.disableSkins;
 		}, 0, 80 * i, GameClient.room.state.disableSkins));
 		disableSkins.ID = i++;
 
 		var prevCond:Int = -1;
 		var winCondition:Option;
-		items.add(winCondition = new Option("Win Condition", "...", () -> {
+		items.add(winCondition = new Option("Kazanma Koşulu", "...", () -> {
 			GameClient.send("nextWinCondition");
 		}, (elapsed) -> {
 			if (GameClient.room.state.winCondition != prevCond) {
 				switch (GameClient.room.state.winCondition) {
 					case 0:
-						winCondition.descText.text = 'Side with the highest Accuracy wins!';
+						winCondition.descText.text = 'En yüksek Doğruluk oranına sahip taraf kazanır!';
 					case 1:
-						winCondition.descText.text = 'Side with the highest Score wins!';
+						winCondition.descText.text = 'En yüksek Skoru olan taraf kazanır!';
 					case 2:
-						winCondition.descText.text = 'Side with the least Misses wins!';
+						winCondition.descText.text = 'En az Iskası olan taraf kazanır!';
 					case 3:
-						winCondition.descText.text = 'Side with the most FP wins!';
+						winCondition.descText.text = 'En fazla FP kazanan taraf kazanır!';
 					case 4:
-						winCondition.descText.text = 'Side with the highest Combo wins!';
+						winCondition.descText.text = 'En yüksek Kombo ya sahip taraf kazanır!';
 				}
-				winCondition.descText.text += ' (Click to Change)';
+				winCondition.descText.text += ' (Değiştirmek için tıklayın!)';
 				winCondition.box.makeGraphic(Std.int(winCondition.descText.x - winCondition.x + winCondition.descText.width) + 10, Std.int(winCondition.height), 0x81000000);
 			}
-
 			prevCond = GameClient.room.state.winCondition;
 		}, 0, 80 * i, false, true));
 		winCondition.ID = i++;
 
 		var modifers:Option;
-		items.add(modifers = new Option("Game Modifiers", "Set your Gameplay Modifiers here!", () -> {
+		items.add(modifers = new Option("Oyun Değiştiriciler", "Oyun Değiştiricilerini buradan ayarlayın!", () -> {
 			close();
 			FlxG.state.openSubState(new GameplayChangersSubstate());
 		}, null, 0, 80 * i, false, true));
 		modifers.ID = i++;
 
-		items.add(stageSelect = new Option("Select Stage", "Currently Selected: " + (GameClient.room.state.stageName == "" ? '(default)' : GameClient.room.state.stageName), () -> {
+		items.add(stageSelect = new Option("Arkaplan Seç", "Seçili Olan: " + (GameClient.room.state.stageName == "" ? '(default)' : GameClient.room.state.stageName), () -> {
 			if (GameClient.hasPerms()) {
 				close();
 				FlxG.state.openSubState(new SelectStageSubstate());
@@ -166,18 +163,18 @@ class RoomSettingsSubstate extends MusicBeatSubstate {
 		}, 0, 80 * i, false, true));
 		stageSelect.ID = i++;
 
-		items.add(skinSelect = new Option("Select Skin", "Select your Skin here!", () -> {
+		items.add(skinSelect = new Option("Kostüm Seç", "Burada Kostümünüzü seçin!", () -> {
 			if (!GameClient.room.state.disableSkins) {
 				controls.isInSubstate = false;
 				LoadingState.loadAndSwitchState(new SkinsState());
 			}
 			else {
-				Alert.alert('Skins are disabled!');
+				Alert.alert('Kostümler devre-dışı bırakıldı!');
 			}
 		}, null, 0, 80 * i, false, true));
 		skinSelect.ID = i++;
 
-		items.add(gameOptions = new Option("Game Options", "Open your Game Options here!", () -> {
+		items.add(gameOptions = new Option("Oyun Ayarları", "Oyun Ayarlarınızı buradan açın!", () -> {
 			controls.isInSubstate = false;
 			LoadingState.loadAndSwitchState(new OptionsState());
 			OptionsState.onPlayState = false;
@@ -186,7 +183,7 @@ class RoomSettingsSubstate extends MusicBeatSubstate {
 		gameOptions.ID = i++;
 
 		var mods:Option;
-		items.add(mods = new Option("Mods", "Check your installed Mods here!", () -> {
+		items.add(mods = new Option("Modlar", "Yüklediğiniz Modları buradan kontrol edin!", () -> {
 			controls.isInSubstate = false;
 			LoadingState.loadAndSwitchState(new ModsMenuState());
 			ModsMenuState.onOnlineRoom = true;
@@ -196,10 +193,9 @@ class RoomSettingsSubstate extends MusicBeatSubstate {
 		add(items);
 
 		var lastItem = items.members[items.length - 1];
-
 		coolCam.setScrollBounds(FlxG.width, FlxG.width, 0, lastItem.y + lastItem.height + 40 > FlxG.height ? lastItem.y + lastItem.height + 40 : FlxG.height);
 
-		GameClient.send("status", "In the Room Settings");
+		GameClient.send("status", "Oda Ayarlarında");
 
 		mobileManager.addMobilePad('NONE', 'B');
 		mobileManager.addMobilePadCamera();
@@ -210,7 +206,7 @@ class RoomSettingsSubstate extends MusicBeatSubstate {
 		super.closeSubState();
 		controls.isInSubstate = true;
 
-		GameClient.send("status", "In the Room Settings");
+		GameClient.send("status", "Oda Ayarlarında");
 	}
 
 	override function destroy() {

@@ -82,7 +82,7 @@ class SkinsState extends MusicBeatState {
 		Paths.clearStoredMemory();
 
 		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("Selects their Skin", null, null, false);
+		DiscordClient.changePresence("Kostüm seçiyor", null, null, false);
 		#end
 
 		Mods.loadTopMod();
@@ -375,7 +375,7 @@ class SkinsState extends MusicBeatState {
 		add(arrowRight);
 
 		charSelect = new FlxText(0, 0, FlxG.width);
-		charSelect.text = 'Press $accept to select!';
+		charSelect.text = 'Seçmek için A tuşuna basın!';
 		charSelect.setFormat("VCR OSD Mono", 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		charSelect.y = barDown.y + barDown.height / 2 - charSelect.height / 2;
 		charSelect.alpha = 0.8;
@@ -391,7 +391,7 @@ class SkinsState extends MusicBeatState {
 		charInfo.visible = false;
 		add(charInfo);
 
-		final fuckurself:String = (controls.mobileControls) ? "Use Arrow Buttons while pressing X to move!" : "Use Note keybinds while pressing SHIFT to move!";
+		final fuckurself:String = (controls.mobileControls) ? "X tuşuna basarken Ok tuşlarını kullanarak hareket ettirin!" : "SHIFT tuşuna basarken Ok tuşlarını kullanarak hareket ettirin!";
 
 		var swagText = new FlxText(0, charSelect.y + charSelect.height + 5, FlxG.width);
 		swagText.text = fuckurself;
@@ -403,7 +403,7 @@ class SkinsState extends MusicBeatState {
 		final tab:String = (controls.mobileControls) ? "C" : "TAB";
 		final eight:String = (controls.mobileControls) ? "D" : "8";
 		final ctrl:String = (controls.mobileControls) ? "V" : "CTRL";
-		var tip1 = new FlxText(20, 0, FlxG.width, '$tab - Flip skin\n$eight - Edit skin\n$ctrl - Open the Character List');
+		var tip1 = new FlxText(20, 0, FlxG.width, '$tab - Yönü Değiştir\n$eight - Kostümü Düzenle\n$ctrl - Karakter Listesini Aç');
 		tip1.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		tip1.y = charSelect.y - 10;
 		tip1.alpha = 0.5;
@@ -412,7 +412,7 @@ class SkinsState extends MusicBeatState {
 
 		var f1:String = (controls.mobileControls) ? "Y" : "F1";
 		var f2:String = (controls.mobileControls) ? "Z" : "F2";
-		var tip2 = new FlxText(-20, 0, FlxG.width, '$f1 for Help!\n$f2 to Browse Verified Skins');
+		var tip2 = new FlxText(-20, 0, FlxG.width, 'Yardım için Y\nOnaylanmış Kostümler için Z tuşuna basın');
 		tip2.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		tip2.y = tip1.y;
 		tip2.alpha = tip1.alpha;
@@ -433,7 +433,7 @@ class SkinsState extends MusicBeatState {
 		mobileManager.addMobilePad('FULL', 'A_B_C_D_V_X_Y_Z');
 		mobileManager.addMobilePadCamera();
 
-		GameClient.send("status", "Selects their skin");
+		GameClient.send("status", "Kostüm Seçiyor");
     }
 
     var acceptSound:FlxSound;
@@ -550,11 +550,11 @@ class SkinsState extends MusicBeatState {
             ClientPrefs.saveSettings();
             
 			if (isEquiped(charactersMod.get(charactersName[curCharacter]), charName)) {
-				charSelect.text = 'Selected!';
+				charSelect.text = 'Seçildi!';
 				charSelect.alpha = 1;
 			}
 			else {
-				charSelect.text = 'Press $accept to select!';
+				charSelect.text = 'Seçmek için A tuşuna basın!';
 				charSelect.alpha = 0.8;
 			}
 			if (acceptSound != null)
@@ -794,17 +794,17 @@ class SkinsState extends MusicBeatState {
 			title.x = FlxG.width / 2 - title.width / 2;
 
 			if (isEquiped(charactersMod.get(curCharName), curCharName)) {
-				charSelect.text = 'Selected!';
+				charSelect.text = 'Seçildi!';
 				charSelect.alpha = 1;
 			}
             else {
-				charSelect.text = 'Press $accept to select!';
+				charSelect.text = 'Seçmek için A tuşuna basın!';
 				charSelect.alpha = 0.8;
             }
 
 			charInfo.visible = false;
 			if (charactersWithWeeks.contains(curCharName + ' ' + charactersMod.get(curCharName))) {
-				charInfo.text = 'This character has custom MIXES!';
+				charInfo.text = 'Bu Karaktein Özel Şarkıları Var!';
 				charInfo.visible = true;
 			}
         }

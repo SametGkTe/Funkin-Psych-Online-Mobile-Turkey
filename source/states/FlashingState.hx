@@ -22,16 +22,16 @@ class FlashingState extends MusicBeatState
 		add(bg);
 
 		warnText = new FlxText(0, 0, FlxG.width,
-			"Hey, watch out!\n
-			This Mod contains some flashing lights!\n
-			Press " + enter + " to disable them now or go to Options Menu.\n
-			Press " + back + " to ignore this message.\n
-			You've been warned!",
+			"Hey, dikkatli olun!\n
+			Bu Oyun yanıp sönen ışıklar içeriyor!\n
+			Hemen şimdi devre dışı bırakmak için A Tuşuna basın veya Ayarlar'a gidin.\n
+			Bu mesajı görmezden gelmek için B tuşuna basın.\n
+			Uyarıldınız!
+			Psych Engine Türkiye - Online V1",
 			32);
 		warnText.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, CENTER);
 		warnText.screenCenter(Y);
 		add(warnText);
-
 		mobileManager.addMobilePad('NONE', 'A_B');
 	}
 

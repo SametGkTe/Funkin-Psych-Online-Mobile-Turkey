@@ -15,7 +15,7 @@ class MobileOptionsSubState extends BaseOptionsMenu {
 	var option:Option;
 	var HitboxTypes:Array<String>;
 	public function new() {
-		title = 'Mobile Options';
+		title = 'Mobil Ayarlar';
 		rpcTitle = 'Mobile Options Menu'; // for Discord Rich Presence, fuck it
 		#if android
 		storageTypes = storageTypes.concat(customPaths); //Get Custom Paths From File
@@ -24,8 +24,8 @@ class MobileOptionsSubState extends BaseOptionsMenu {
 
 		HitboxTypes = Mods.mergeAllTextsNamed('mobile/Hitbox/HitboxModes/hitboxModeList.txt');
 
-		option = new Option('MobilePad Opacity',
-			'Selects the opacity for the mobile buttons (careful not to put it at 0 and lose track of your buttons).', 'mobilePadAlpha', 'percent');
+		option = new Option('Mobil Buton Saydamligi',
+			'Mobil tuşların saydamlığını ayarlar (0 yapıp tuşları kaybetmemeye dikkat edin).', 'mobilePadAlpha', 'percent');
 		option.scrollSpeed = 1;
 		option.minValue = 0.001;
 		option.maxValue = 1;
@@ -37,8 +37,8 @@ class MobileOptionsSubState extends BaseOptionsMenu {
 		};
 		addOption(option);
 
-		var option:Option = new Option('Extra Controls',
-			'Allow Extra Controls',
+		var option:Option = new Option('Ekstra Kontroller',
+			'Mobil Ekstra Kontrolleri Etkinleştirir.',
 			'extraKeys',
 			'int');
 		option.scrollSpeed = 1;
@@ -48,45 +48,45 @@ class MobileOptionsSubState extends BaseOptionsMenu {
 		option.decimals = 0;
 		addOption(option);
 
-		option = new Option('Extra Control Location',
-			'Choose Extra Control Location',
+		option = new Option('Ekstra Kontrol Konumu',
+			'Ekstra Kontrol Konumunu Seçin',
 			'hitboxLocation',
 			'string',
-			['Bottom', 'Top', 'Middle']
+			['Alt', 'Üst', 'Orta']
 		);
 		addOption(option);
 		
 		//HitboxTypes.insert(0, "Classic");
-		option = new Option('Hitbox Mode',
-			'Choose your Hitbox Style!',
+		option = new Option('Hitbox Stili',
+			'Hitbox Stilinizi Seçin!',
 			'hitboxMode',
 			'string',
 			HitboxTypes
 		);
 		addOption(option);
 		
-		option = new Option('Hitbox Design',
-			'Choose how your hitbox should look like.',
+		option = new Option('Hitbox Görünümü',
+			'Hitbox kontrolünün nasıl gözükeceğini ayarlar.',
 			'hitboxType',
 			'string',
-			['Gradient', 'No Gradient' , 'No Gradient (Old)']
+			['Alt Renk', 'Gizli' , 'Alt Renk Yok (Eski)']
 		);
 		addOption(option);
 
-		option = new Option('Hitbox Hint',
-			'Hitbox Hint',
+		option = new Option('Hitbox Ipucusu',
+			'Hitbox İpucu Kontrolü',
 			'hitboxHint',
 			'bool');
 		addOption(option);
 
-		option = new Option('V Slice Controls',
-			'If checked, The game\'s control will be like original Friday Night Funkin\': Mobile.\n(WARNING: This Option can break the some mechanics, please use for simple mods)',
+		option = new Option('Orjinal Fnf Kontrolü',
+			'Aktif Edildiğinde, oyunun kontrolü orijinal Friday Night Funkin: Mobile gibi olacaktır.\n(UYARI: Bu seçenek bazı mekanikleri bozabilir, lütfen temel modlar için kullanın.)',
 			'ogGameControls',
 			'bool');
 		addOption(option);
 
-		option = new Option('Hitbox Opacity',
-			'Selects the opacity for the hitbox buttons.',
+		option = new Option('Hitbox Saydamligi',
+			'Hitbox düğmelerinin saydamlığını seçer.',
 			'hitboxAlpha',
 			'percent'
 		);
@@ -98,16 +98,16 @@ class MobileOptionsSubState extends BaseOptionsMenu {
 		addOption(option);
 
 		#if mobile
-		option = new Option('Wide Screen Mode',
-			'If checked, The game will stetch to fill your whole screen. (WARNING: Can result in bad visuals & break some mods that resizes the game/cameras)',
+		option = new Option('Tam Ekran Modu',
+			'Aktif Edildiğinde, oyun tüm ekranınızı kaplayacak şekilde genişler. (UYARI: Görüntü bozulmalarına neden olabilir ve oyunu/kameraları yeniden boyutlandıran bazı modları bozabilir)',
 			'wideScreen', 'bool');
 		option.onChange = () -> ScreenUtil.wideScreen.enabled = ClientPrefs.data.wideScreen;
 		addOption(option);
 		#end
 
 		#if android
-		option = new Option('Storage Type',
-			'Which folder Psych Online should use?',
+		option = new Option('Depolama Türü',
+			'Psych Engine Türkiye Online hangi klasörü kullanmalı?',
 			'storageType',
 			'string',
 			storageTypes
@@ -116,8 +116,8 @@ class MobileOptionsSubState extends BaseOptionsMenu {
 		#end
 
 		/* doesn't work fine for now
-		option = new Option('Tweak Menu',
-			'If checked, A mod menu for Psych Online will be shown.\n(WARNING: Do not use this use this for hacking)',
+		option = new Option('Hile Menüsü',
+			'Aktif Edildiğinde, Psych Online için bir mod menüsü gösterilecektir.\n(UYARI: Bunu hile yapmak için kullanmayın!)',
 			'showTweakMenu',
 			'bool');
 		option.onChange = () -> Main.toggleTweakMenu(ClientPrefs.data.showTweakMenu);

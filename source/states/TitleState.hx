@@ -14,11 +14,28 @@ import tjson.TJSON as Json;
 import openfl.Assets;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
+import openfl.utils.Assets as OpenFLAssets;
+
+#if VIDEOS_ALLOWED
+#if (hxCodec >= "3.0.0")
+import hxcodec.flixel.FlxVideo;
+#elseif (hxCodec >= "2.6.1")
+import hxcodec.flixel.FlxVideo;
+#elseif (hxCodec == "2.6.0")
+import hxcodec.flixel.FlxVideo;
+#else
+import hxcodec.flixel.FlxVideo;
+#end
+#end
 
 import shaders.ColorSwap;
 
 import states.StoryMenuState;
 import states.MainMenuState;
+
+import flixel.text.FlxText;
+import flixel.tweens.FlxTween;
+import flixel.tweens.FlxEase;
 
 #if MODS_ALLOWED
 import sys.FileSystem;
@@ -27,7 +44,6 @@ import sys.io.File;
 
 typedef TitleData =
 {
-
 	titlex:Float,
 	titley:Float,
 	startx:Float,
@@ -40,11 +56,16 @@ typedef TitleData =
 
 class TitleState extends MusicBeatState
 {
+	public static var instance:TitleState;
 	public static var muteKeys:Array<FlxKey> = [FlxKey.ZERO];
 	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
 	public static var volumeUpKeys:Array<FlxKey> = [FlxKey.NUMPADPLUS, FlxKey.PLUS];
 
 	public static var initialized:Bool = false;
+	
+	// P.E.T INTRO
+	public static var inGame:Bool = false;
+	var skipVideoText:FlxText;
 
 	var blackScreen:FlxSprite;
 	var credGroup:FlxGroup;
@@ -69,12 +90,12 @@ class TitleState extends MusicBeatState
 
 	public static var mustUpdate:Bool = false;
 	public static var inDev:Bool = false;
-	//public static var offlineMode:Bool = false;
 
 	var titleJSON:TitleData;
 
 	override public function create():Void
 	{
+		instance = this;
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
 
@@ -96,7 +117,7 @@ class TitleState extends MusicBeatState
 		titleJSON = Json.parse(Paths.getTextFromFile('images/gfDanceTitle.json'));
 
 		#if TITLE_SCREEN_EASTER_EGG
-		if (FlxG.save.data.psychDevsEasterEgg == null) FlxG.save.data.psychDevsEasterEgg = ''; //Crash prevention
+		if (FlxG.save.data.psychDevsEasterEgg == null) FlxG.save.data.psychDevsEasterEgg = '';
 		switch(FlxG.save.data.psychDevsEasterEgg.toUpperCase())
 		{
 			case 'SHADOW':
@@ -116,7 +137,6 @@ class TitleState extends MusicBeatState
 			if(FlxG.save.data != null && FlxG.save.data.fullscreen)
 			{
 				FlxG.fullscreen = FlxG.save.data.fullscreen;
-				//trace('LOADED FULLSCREEN SETTING!!');
 			}
 			persistentUpdate = true;
 			persistentDraw = true;
@@ -157,12 +177,12 @@ class TitleState extends MusicBeatState
 			FlxG.switchState(() -> new FlashingState());
 		} else {
 			if (initialized)
-				startIntro();
+				startCutscenesIn();
 			else
 			{
 				new FlxTimer().start(1, function(tmr:FlxTimer)
 				{
-					startIntro();
+					startCutscenesIn();
 				});
 			}
 		}
@@ -175,6 +195,89 @@ class TitleState extends MusicBeatState
 	var titleText:FlxSprite;
 	var swagShader:ColorSwap = null;
 
+	function startCutscenesIn()
+	{
+		#if VIDEOS_ALLOWED
+		if (inGame || ClientPrefs.data.disableIntroVideo) {
+			startIntro();
+			return;
+		}
+		startVideo('intro');
+		#else
+		startIntro();
+		#end
+	}
+
+	function startCutscenesOut()
+	{
+		inGame = true;
+		startIntro();
+	}
+	
+	#if VIDEOS_ALLOWED
+	var currentVideo:FlxVideo = null;
+	#end
+	
+	public function startVideo(name:String)
+	{
+		#if VIDEOS_ALLOWED
+		trace("========== VIDEO START ==========");
+
+		// Önce siyah arka plan ekle
+		var videoBackground = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		add(videoBackground);
+
+		// Skip text'i video başlamadan ÖNCE oluştur ve ekle
+		skipVideoText = new FlxText(0, FlxG.height - 50, FlxG.width, "GECMEK ICIN EKRANA DOKUN", 20);
+		skipVideoText.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		skipVideoText.borderSize = 2;
+		skipVideoText.scrollFactor.set();
+		skipVideoText.cameras = [FlxG.camera]; // Kamerayı açıkça belirt
+		add(skipVideoText);
+
+		// Şimdi videoyu başlat
+		currentVideo = new hxcodec.flixel.FlxVideo();
+	
+		// Video bittiğinde
+		currentVideo.onEndReached.add(function() {
+			trace("Video bitti!");
+			if (currentVideo != null) currentVideo.dispose();
+			if (skipVideoText != null) remove(skipVideoText);
+			remove(videoBackground);
+			videoEnd();
+		}, true);
+
+		// Videoyu oynat
+		currentVideo.play(Paths.video(name));
+
+		trace("========== VIDEO SETUP COMPLETE ==========");
+		#else
+		startIntro();
+		#end
+	}
+	
+	public function videoEnd()
+	{
+		trace("videoEnd() called!");
+
+		// Video'yu durdur ve temizle
+		if(currentVideo != null) {
+        currentVideo.stop();
+			currentVideo.dispose();
+			currentVideo = null;
+		}
+
+		// Skip text'i temizle
+		if(skipVideoText != null) {
+			FlxTween.cancelTweensOf(skipVideoText);
+			remove(skipVideoText);
+			skipVideoText.destroy();
+			skipVideoText = null;
+		}
+
+		startCutscenesOut();
+	}
+	
 	function startIntro()
 	{
 		if (!initialized)
@@ -196,8 +299,6 @@ class TitleState extends MusicBeatState
 			bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		}
 
-		// bg.setGraphicSize(Std.int(bg.width * 0.6));
-		// bg.updateHitbox();
 		add(bg);
 
 		logoBl = new FlxSprite(titleJSON.titlex, titleJSON.titley);
@@ -207,19 +308,16 @@ class TitleState extends MusicBeatState
 		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24, false);
 		logoBl.animation.play('bump');
 		logoBl.updateHitbox();
-		// logoBl.screenCenter();
-		// logoBl.color = FlxColor.BLACK;
 
 		if(ClientPrefs.data.shaders) swagShader = new ColorSwap();
 		gfDance = new FlxSprite(titleJSON.gfx, titleJSON.gfy);
 		gfDance.antialiasing = ClientPrefs.data.antialiasing;
 
 		var easterEgg:String = FlxG.save.data.psychDevsEasterEgg;
-		if(easterEgg == null) easterEgg = ''; //html5 fix
+		if(easterEgg == null) easterEgg = '';
 
 		switch(easterEgg.toUpperCase())
 		{
-			// IGNORE THESE, GO DOWN A BIT
 			#if TITLE_SCREEN_EASTER_EGG
 			case 'SHADOW':
 				gfDance.frames = Paths.getSparrowAtlas('ShadowBump');
@@ -236,9 +334,6 @@ class TitleState extends MusicBeatState
 			#end
 
 			default:
-			//EDIT THIS ONE IF YOU'RE MAKING A SOURCE CODE MOD!!!!
-			//EDIT THIS ONE IF YOU'RE MAKING A SOURCE CODE MOD!!!!
-			//EDIT THIS ONE IF YOU'RE MAKING A SOURCE CODE MOD!!!!
 				gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
 				gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
 				gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
@@ -275,16 +370,11 @@ class TitleState extends MusicBeatState
 		
 		titleText.animation.play('idle');
 		titleText.updateHitbox();
-		// titleText.screenCenter(X);
 		add(titleText);
 
 		var logo:FlxSprite = new FlxSprite().loadGraphic(Paths.image('logo'));
 		logo.antialiasing = ClientPrefs.data.antialiasing;
 		logo.screenCenter();
-		// add(logo);
-
-		// FlxTween.tween(logoBl, {y: logoBl.y + 50}, 0.6, {ease: FlxEase.quadInOut, type: PINGPONG});
-		// FlxTween.tween(logo, {y: logoBl.y + 50}, 0.6, {ease: FlxEase.quadInOut, type: PINGPONG, startDelay: 0.1});
 
 		credGroup = new FlxGroup();
 		add(credGroup);
@@ -295,9 +385,6 @@ class TitleState extends MusicBeatState
 
 		credTextShit = new Alphabet(0, 0, "", true);
 		credTextShit.screenCenter();
-
-		// credTextShit.alignment = CENTER;
-
 		credTextShit.visible = false;
 
 		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
@@ -314,8 +401,6 @@ class TitleState extends MusicBeatState
 			skipIntro();
 		else
 			initialized = true;
-
-		// credGroup.add(credTextShit);
 	}
 
 	function getIntroTextShit():Array<Array<String>>
@@ -339,14 +424,30 @@ class TitleState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		if (FlxG.keys.justPressed.P) {
-			online.gui.Alert.alert(
-				'A Very Long Title So I Can Test How Much Can It Fit On The Screen Oh Yeaaaah!!!1!', //44
-				'Do you believe in god? Because I think that this is a complicated question, it depends on which mean by god. ' + //233
-				'You see I believe, that we are here, implies to some degree, that there are forces larger than us, now, we can get into this menticality... ' +
-				'The very notion of belief itself can be rhetorically whittled to the bare knob of Its meaning.'
-			);
+		#if VIDEOS_ALLOWED
+		if (!inGame && !initialized && currentVideo != null) 
+		{
+			var pressedSkip:Bool = false;
+        
+			#if FLX_TOUCH
+			if (FlxG.touches.list != null) {
+				for (touch in FlxG.touches.list) {
+					if (touch.justPressed) {
+						pressedSkip = true;
+						break;
+					}
+				}
+			}
+			#end
+        
+			if (controls.ACCEPT || FlxG.mouse.justPressed || pressedSkip)
+			{
+				trace("User manually skipped video!");
+				videoEnd();
+				return;
+			}
 		}
+		#end
 
 		#if lumod
 		if (FlxG.keys.justPressed.DELETE) {
@@ -357,7 +458,6 @@ class TitleState extends MusicBeatState
 
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
-		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
 
 		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER #if desktop || controls.ACCEPT #end || FlxG.mouse.justPressed;
 
@@ -371,25 +471,23 @@ class TitleState extends MusicBeatState
 		}
 		#end
 
-		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
+    var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
 
-		if (gamepad != null)
-		{
-			if (gamepad.justPressed.START)
-				pressedEnter = true;
+    if (gamepad != null)
+    {
+        if (gamepad.justPressed.START)
+            pressedEnter = true;
 
-			#if switch
-			if (gamepad.justPressed.B)
-				pressedEnter = true;
-			#end
-		}
+        #if switch
+        if (gamepad.justPressed.B)
+            pressedEnter = true;
+        #end
+    }
 		
 		if (newTitle) {
 			titleTimer += FlxMath.bound(elapsed, 0, 1);
 			if (titleTimer > 2) titleTimer -= 2;
 		}
-
-		// EASTER EGG
 
 		if (initialized && !transitioning && skippedIntro)
 		{
@@ -416,22 +514,16 @@ class TitleState extends MusicBeatState
 				FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
 
 				transitioning = true;
-				// FlxG.sound.music.stop();
 
 				new FlxTimer().start(0.5, function(tmr:FlxTimer)
 				{
 					#if DEBUG_RESULTS
 					FlxG.switchState(() -> new online.states.ResultsScreen());
 					#else
-					// if (mustUpdate) {
-					// 	FlxG.switchState(() -> new OutdatedState());
-					// } else {
-						FlxG.switchState(() -> new MainMenuState());
-					//}
+					FlxG.switchState(() -> new MainMenuState());
 					#end
 					closedState = true;
 				});
-				// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 			}
 			#if TITLE_SCREEN_EASTER_EGG
 			else if (FlxG.keys.firstJustPressed() != FlxKey.NONE)
@@ -441,14 +533,12 @@ class TitleState extends MusicBeatState
 				if(allowedKeys.contains(keyName)) {
 					easterEggKeysBuffer += keyName;
 					if(easterEggKeysBuffer.length >= 32) easterEggKeysBuffer = easterEggKeysBuffer.substring(1);
-					//trace('Test! Allowed Key pressed!!! Buffer: ' + easterEggKeysBuffer);
 
 					for (wordRaw in easterEggKeys)
 					{
-						var word:String = wordRaw.toUpperCase(); //just for being sure you're doing it right
+						var word:String = wordRaw.toUpperCase();
 						if (easterEggKeysBuffer.contains(word))
 						{
-							//trace('YOOO! ' + word);
 							if (FlxG.save.data.psychDevsEasterEgg == word)
 								FlxG.save.data.psychDevsEasterEgg = '';
 							else
@@ -514,7 +604,7 @@ class TitleState extends MusicBeatState
 				shits: FlxG.random.int(0, 100),
 				misses: FlxG.random.int(0, 50),
 				score: FlxG.random.int(5, 999999999),
-				accuracy: 1, //FlxG.random.float(0, 1),
+				accuracy: 1,
 				character: (ClientPrefs.data.modSkin ?? [])[1],
 				difficultyName: 'nightmare',
 				points: FlxG.random.int(0, 100)
@@ -559,8 +649,9 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	private var sickBeats:Int = 0; //Basically curBeat but won't be skipped if you hold the tab or resize the screen
+	private var sickBeats:Int = 0;
 	public static var closedState:Bool = false;
+	
 	override function beatHit()
 	{
 		super.beatHit();
@@ -581,7 +672,6 @@ class TitleState extends MusicBeatState
 			switch (sickBeats)
 			{
 				case 1:
-					//FlxG.sound.music.stop();
 					states.TitleState.playFreakyMusic(0);
 					FlxG.sound.music.fadeIn(4, 0, 0.7);
 				case 2:
@@ -590,57 +680,38 @@ class TitleState extends MusicBeatState
 					#else
 					createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
 					#end
-				// credTextShit.visible = true;
 				case 4:
 					#if PSYCH_WATERMARKS
-					addMoreText('Snirozu', 40); // yall stop crediting porters for psych online
+					addMoreText('Snirozu', 40);
 					#else
-					addMoreText('present');
+					addMoreText('Sunar');
 					#end
-				// credTextShit.text += '\npresent...';
-				// credTextShit.addText();
 				case 5:
 					deleteCoolText();
-				// credTextShit.visible = false;
-				// credTextShit.text = 'In association \nwith';
-				// credTextShit.screenCenter();
 				case 6:
 					#if PSYCH_WATERMARKS
-					createCoolText(['Not associated', 'with'], -40);
+					createCoolText(['iliskisizdir', 'with'], -40);
 					#else
-					createCoolText(['In association', 'with'], -40);
+					createCoolText(['iliskilidir', 'with'], -40);
 					#end
 				case 8:
 					addMoreText('newgrounds', -40);
 					ngSpr.visible = true;
-				// credTextShit.text += '\nNewgrounds';
 				case 9:
 					deleteCoolText();
 					ngSpr.visible = false;
-				// credTextShit.visible = false;
-
-				// credTextShit.text = 'Shoutouts Tom Fulp';
-				// credTextShit.screenCenter();
 				case 10:
 					createCoolText([curWacky[0]]);
-				// credTextShit.visible = true;
 				case 12:
 					addMoreText(curWacky[1]);
-				// credTextShit.text += '\nlmao';
 				case 13:
 					deleteCoolText();
-				// credTextShit.visible = false;
-				// credTextShit.text = "Friday";
-				// credTextShit.screenCenter();
 				case 14:
 					addMoreText('Friday');
-				// credTextShit.visible = true;
 				case 15:
 					addMoreText('Night');
-				// credTextShit.text += '\nNight';
 				case 16:
-					addMoreText('Funkin'); // credTextShit.text += '\nFunkin';
-
+					addMoreText('Funkin');
 				case 17:
 					skipIntro();
 			}
@@ -653,7 +724,7 @@ class TitleState extends MusicBeatState
 	{
 		if (!skippedIntro)
 		{
-			if (playJingle) //Ignore deez
+			if (playJingle)
 			{
 				var easteregg:String = FlxG.save.data.psychDevsEasterEgg;
 				if (easteregg == null) easteregg = '';
@@ -669,7 +740,7 @@ class TitleState extends MusicBeatState
 					case 'BBPANZU':
 						sound = FlxG.sound.play(Paths.sound('JingleBB'));
 
-					default: //Go back to normal ugly ass boring GF
+					default:
 						remove(ngSpr);
 						remove(credGroup);
 						FlxG.camera.flash(FlxColor.WHITE, 2);

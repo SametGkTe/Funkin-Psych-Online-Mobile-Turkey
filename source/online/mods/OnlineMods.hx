@@ -25,7 +25,7 @@ class OnlineMods {
 	public static function checkMods() {
 		var needMods:Array<String> = [];
 		for (mod in Mods.getModDirectories()) {
-			if (!FunkinFileSystem.exists(Paths.mods(mod + "/mod_url.txt"))) {
+			if (!FileSystem.exists(Paths.mods(mod + "/mod_url.txt"))) {
 				needMods.push(mod);
 			}
 		}
@@ -38,11 +38,11 @@ class OnlineMods {
 	}
 
 	public static function getModURL(mod:String) {
-		if (!FunkinFileSystem.exists(Paths.mods(mod + "/mod_url.txt")) || StringTools.trim(FunkinFileSystem.getText(Paths.mods(mod + "/mod_url.txt"))) == "") {
+		if (!FileSystem.exists(Paths.mods(mod + "/mod_url.txt")) || StringTools.trim(File.getContent(Paths.mods(mod + "/mod_url.txt"))) == "") {
 			return null;
 		}
 
-		return StringTools.trim(FunkinFileSystem.getText(Paths.mods(mod + "/mod_url.txt")));
+		return StringTools.trim(File.getContent(Paths.mods(mod + "/mod_url.txt")));
 	}
 
 	public static function saveModURL(mod:String, url:String) {
@@ -87,7 +87,7 @@ class OnlineMods {
 			return;
 		}
 
-		RequestSubstate.requestDownload(url, "Do you want to download this mod?", onSuccess);
+		RequestSubstate.requestDownload(url, "Bu Modu İndirmek İstiyorumusunuz?", onSuccess);
 	}
 
 	static final vanillaSongs:Array<String> = [
@@ -162,7 +162,7 @@ class OnlineMods {
 				mode: LIST,
 				onError: (code, type) -> {
 					Waiter.putPersist(() -> {
-						Alert.alert("Listing RAR failed!", '$code\n$type');
+						Alert.alert("RAR listeleme Başarısız!", '$code\n$type');
 					});
 					rarFailed = true;
 				},
@@ -173,7 +173,7 @@ class OnlineMods {
 			});
 			#else
 			Waiter.putPersist(() -> {
-				Alert.alert("RAR is not supported on this platform!");
+				Alert.alert("RAR bu platformda desteklenmiyor!");
 			});
 			#end
 			if (rarFailed) {
@@ -189,7 +189,7 @@ class OnlineMods {
 				trace(exc, CallStack.toString(exc.stack));
 				file.close();
 				Waiter.putPersist(() -> {
-					Alert.alert("Mod's data is corrupted or invalid!", exc + "\n" + CallStack.toString(exc.stack) + "\n\n" + fileName);
+					Alert.alert("Modun Datası Bozuk!", exc + "\n" + CallStack.toString(exc.stack) + "\n\n" + fileName);
 				});
 				return;
 			}
@@ -205,7 +205,7 @@ class OnlineMods {
 			}
 			if (Math.min(fileSize, dataSize) < 0 || Math.max(fileSize, dataSize) >= 3000000000) {
 				Waiter.putPersist(() -> {
-					Alert.alert("Downloading Cancelled",
+					Alert.alert("İndirme İptal Edildi",
 						'Mod\'s archive file is WAY too big!\n${FlxMath.roundDecimal(Math.max(fileSize, dataSize) / 1000000000, 4)}GB');
 				});
 				return;
@@ -219,18 +219,18 @@ class OnlineMods {
 
 		if (beginFolder == null) {
 			Waiter.putPersist(() -> {
-				Alert.alert("Mod data not found inside of the archive!");
+				Alert.alert("Mod Datası Arşivin İçinde Bulunamadı!");
 			});
 			return;
 		}
 
-		if (FunkinFileSystem.exists(Paths.mods(modName))) {
+		if (FileSystem.exists(Paths.mods(modName))) {
 			try {
 				FileUtils.removeFiles(parentFolder);
 			}
 			catch (exc) {
 				Waiter.putPersist(() -> {
-					Alert.alert("Installation Error!", "It seems this mod directory is already being accessed\nby the game or another program!\n\nPlease try again by re-opening the game!");
+					Alert.alert("İndirme Başarısız!", "It seems this mod directory is already being accessed\nby the game or another program!\n\nPlease try again by re-opening the game!");
 				});
 				return;
 			}
@@ -243,9 +243,9 @@ class OnlineMods {
 				openPath: fileName,
 				mode: EXTRACT,
 				onError: (code, type) -> {
-					trace("RAR FAILED: " + code + " - " + type);
+					trace("RAR BAŞARISIZ OLDU!: " + code + " - " + type);
 					Waiter.putPersist(() -> {
-						Alert.alert("Extracting RAR failed!", '$code\n$type');
+						Alert.alert("RAR AYIKLAMA BAŞARISIZ!", '$code\n$type');
 					});
 					rarFailed = true;
 				},
@@ -264,7 +264,7 @@ class OnlineMods {
 			});
 			#else
 			Waiter.putPersist(() -> {
-				Alert.alert("RAR is not supported on this platform!");
+				Alert.alert("RAR bu platformda desteklenmiyor!");
 			});
 			#end
 			if (rarFailed) {
@@ -280,25 +280,25 @@ class OnlineMods {
 					continue;
 				}
 
-				if (!FunkinFileSystem.exists(Path.directory(Path.join([parentFolder, entry.fileName.substring(beginFolder.length)])))) {
+				if (!FileSystem.exists(Path.directory(Path.join([parentFolder, entry.fileName.substring(beginFolder.length)])))) {
 					FileSystem.createDirectory(Path.join([parentFolder, Path.directory(entry.fileName).substring(beginFolder.length)]));
 				}
 				File.saveBytes(Path.join([parentFolder, entry.fileName.substring(beginFolder.length)]), Reader.unzip(entry));
 			}
 		}
 
-		if ((gbMod != null ? gbMod.rootCategory == "Skins" : false) && !FunkinFileSystem.exists(Paths.mods(modName + '/pack.json'))) {
+		if ((gbMod != null ? gbMod.rootCategory == "Skins" : false) && !FileSystem.exists(Paths.mods(modName + '/pack.json'))) {
 			var isLegacy = false;
-			if (FunkinFileSystem.exists(Paths.mods(modName + '/images/BOYFRIEND.png'))) {
+			if (FileSystem.exists(Paths.mods(modName + '/images/BOYFRIEND.png'))) {
 				Sys.println("Legacy mod detected! (Converting)");
 
 				FileSystem.createDirectory(Paths.mods(modName + '/images/characters/'));
 				FileSystem.rename(Paths.mods(modName + '/images/BOYFRIEND.png'), Paths.mods(modName + '/images/characters/BOYFRIEND.png'));
-				if (FunkinFileSystem.exists(Paths.mods(modName + '/images/BOYFRIEND.xml')))
+				if (FileSystem.exists(Paths.mods(modName + '/images/BOYFRIEND.xml')))
 					FileSystem.rename(Paths.mods(modName + '/images/BOYFRIEND.xml'), Paths.mods(modName + '/images/characters/BOYFRIEND.xml'));
 
-				if (!FunkinFileSystem.exists(Paths.mods(modName + '/images/icons/icon-bf.png'))
-					&& FunkinFileSystem.exists(Paths.mods(modName + '/images/iconGrid.png'))) {
+				if (!FileSystem.exists(Paths.mods(modName + '/images/icons/icon-bf.png'))
+					&& FileSystem.exists(Paths.mods(modName + '/images/iconGrid.png'))) {
 					FileSystem.createDirectory(Paths.mods(modName + '/images/icons/'));
 					var iconGrid = BitmapData.fromBytes(File.getBytes(Paths.mods(modName + '/images/iconGrid.png')));
 					var byteArray:ByteArray = new ByteArray();
@@ -312,7 +312,7 @@ class OnlineMods {
 			File.saveContent(Paths.mods(modName + '/pack.json'), Json.stringify({
 				name: (gbMod != null ? gbMod.name : modName),
 				description: (gbMod != null ? gbMod.pageDownload : ""),
-				runsGlobally: FunkinFileSystem.exists(Paths.mods(modName + '/songs/')) ? false : isLegacy
+				runsGlobally: FileSystem.exists(Paths.mods(modName + '/songs/')) ? false : isLegacy
 			}));
 		}
 		else { // if (/*(gbMod != null ? gbMod.rootCategory == "Executables" : */isExecutable) { // sometimes dum dum people put their non-exe mods to that section
@@ -324,10 +324,10 @@ class OnlineMods {
 				}
 			}
 
-			if (FunkinFileSystem.exists(Paths.mods(modName + '/mods/pack.json')))
+			if (FileSystem.exists(Paths.mods(modName + '/mods/pack.json')))
 				FileSystem.deleteFile(Paths.mods(modName + '/mods/pack.json'));
 
-			if (FunkinFileSystem.exists(Paths.mods(modName + '/mods'))) {
+			if (FileSystem.exists(Paths.mods(modName + '/mods'))) {
 				for (file in FileSystem.readDirectory(Paths.mods(modName + '/mods'))) {
 					if (FileSystem.isDirectory(Path.join([Paths.mods(modName + '/mods'), file]))
 						&& !Mods.ignoreModFolders.contains(file)) {
@@ -338,31 +338,31 @@ class OnlineMods {
 				FileUtils.cut(Paths.mods(modName + '/mods'), Paths.mods(modName + "/"));
 			}
 
-			if (FunkinFileSystem.exists(Paths.mods(modName + '/assets')))
+			if (FileSystem.exists(Paths.mods(modName + '/assets')))
 				FileUtils.cut(Paths.mods(modName + '/assets'), Paths.mods(modName + "/"));
 
-			if (FunkinFileSystem.exists(Paths.mods(modName + '/shared')))
+			if (FileSystem.exists(Paths.mods(modName + '/shared')))
 				FileUtils.cut(Paths.mods(modName + '/shared'), Paths.mods(modName + "/"));
 
-			if (FunkinFileSystem.exists(Paths.mods(modName + '/data/songData'))) // special for mario madness hehe
+			if (FileSystem.exists(Paths.mods(modName + '/data/songData'))) // special for mario madness hehe
 				FileUtils.cut(Paths.mods(modName + '/data/songData'), Paths.mods(modName + "/data/"));
 
 			// exclude alphabets because they change like every psych engine version so they cause bugs
-			if (FunkinFileSystem.exists(Paths.mods(modName + "/images/alphabet.png")) || FunkinFileSystem.exists(Paths.mods(modName + "/images/alphabet.xml"))) {
+			if (FileSystem.exists(Paths.mods(modName + "/images/alphabet.png")) || FileSystem.exists(Paths.mods(modName + "/images/alphabet.xml"))) {
 				FileSystem.deleteFile(Paths.mods(modName + "/images/alphabet.png"));
 				FileSystem.deleteFile(Paths.mods(modName + "/images/alphabet.xml"));
 			}
 
 			//...and also health bar and time bar
-			if (FunkinFileSystem.exists(Paths.mods(modName + "/images/healthBar.png"))) {
+			if (FileSystem.exists(Paths.mods(modName + "/images/healthBar.png"))) {
 				FileSystem.deleteFile(Paths.mods(modName + "/images/healthBar.png"));
 			}
-			if (FunkinFileSystem.exists(Paths.mods(modName + "/images/timeBar.png"))) {
+			if (FileSystem.exists(Paths.mods(modName + "/images/timeBar.png"))) {
 				FileSystem.deleteFile(Paths.mods(modName + "/images/timeBar.png"));
 			}
 
 			//get yo ass outta here
-			if (FunkinFileSystem.exists(Paths.mods(modName + "/weeks/weekList.txt"))) {
+			if (FileSystem.exists(Paths.mods(modName + "/weeks/weekList.txt"))) {
 				FileSystem.deleteFile(Paths.mods(modName + "/weeks/weekList.txt"));
 			}
 
@@ -418,7 +418,7 @@ class OnlineMods {
 				diffsToAdd[_normalIndex] = "Normal";
 			}
 
-			if (!FunkinFileSystem.exists(Paths.mods(modName + "/weeks/"))) {
+			if (!FileSystem.exists(Paths.mods(modName + "/weeks/"))) {
 				FileSystem.createDirectory(Paths.mods(modName + "/weeks/"));
 			}
 			
@@ -434,7 +434,7 @@ class OnlineMods {
 							FileSystem.rename(path, path = Path.join(pathSplit));
 						}
 
-						var json = Json.parse(FunkinFileSystem.getText(path));
+						var json = Json.parse(File.getContent(path));
 						var songs:Array<Array<Dynamic>> = json.songs;
 						for (song in songs) {
 							songsToAdd.remove(formatSongName(song[0]));
@@ -462,7 +462,7 @@ class OnlineMods {
 			});
 		}
 
-		if (!FunkinFileSystem.exists(Paths.mods(modName + '/pack.json')))
+		if (!FileSystem.exists(Paths.mods(modName + '/pack.json')))
 			File.saveContent(Paths.mods(modName + '/pack.json'), Json.stringify({
 				name: (gbMod != null ? gbMod.name : modName),
 				description: (gbMod != null ? gbMod.pageDownload : ""),
@@ -475,7 +475,7 @@ class OnlineMods {
 
 		Waiter.putPersist(() -> {
 			if (!PlayState.redditMod)
-				Alert.alert("Mod Installation Successful!", "Downloaded mod: " + modName + "\nFrom: " + (modLink == null ? "Local Storage" : modLink));
+				Alert.alert("Mod İndirilmesi Başarılı!", "Downloaded mod: " + modName + "\nFrom: " + (modLink == null ? "Local Storage" : modLink));
 
 			try {
 				// between states crash can occur

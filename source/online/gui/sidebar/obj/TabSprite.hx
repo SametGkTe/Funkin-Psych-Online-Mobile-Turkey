@@ -39,7 +39,10 @@ class TabSprite extends Sprite {
 		if (!initialized) {
 			initialized = true;
 
-			tabBg = new Bitmap(new BitmapData(tabWidth, heightSpace, true, FlxColor.fromRGB(10, 10, 10)));
+			// SideUI.uiScale kullanarak genişliği ölçeklendiriyoruz
+			var scaledWidth = Std.int(tabWidth * SideUI.uiScale); 
+        
+			tabBg = new Bitmap(new BitmapData(scaledWidth, heightSpace, true, FlxColor.fromRGB(10, 10, 10)));
 			tabBg.alpha = 0.95;
 			addChild(tabBg);
 

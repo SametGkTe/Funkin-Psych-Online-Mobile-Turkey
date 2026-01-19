@@ -43,14 +43,15 @@ class VerifyCodeSubstate extends MusicBeatSubstate {
 		bg.scrollFactor.set(0, 0);
 		add(bg);
 
-		var title = new FlxText(0, 0, FlxG.width, 
-			'A Verification Code may have been sent to this email!\n' + 
-			'Please note, that the server will not tell you if this email is registered!\n' + 
-			'If you can\'t find it, check your spam inbox.\n' + 
-			'Enter it here, if you receive it!'
+		var title = new FlxText(0, 0, FlxG.width,
+			'Bu e-posta adresine bir Doğrulama Kodu gönderildi!\n' +
+			'Lütfen sunucunun bu e-postanın kayıtlı olup olmadığını size söylemeyeceğini unutmayın!\n' +
+			'Eğer kodu bulamıyorsanız, spam (istenmeyen) kutunuzu kontrol edin.\n' +
+			'Kodu aldıysanız, lütfen buraya girin!' +
+			' Eğer Kod gelmediyse Sunucu Bakımda / Dinlenmede Olabilir'
 		);
 		title.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		title.y = FlxG.height / 2 - title.height / 2 - 200;
+		title.y = FlxG.height / 2 - title.height / 2 - 225;
 		title.scrollFactor.set();
 		add(title);
 

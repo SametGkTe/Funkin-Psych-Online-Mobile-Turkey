@@ -205,14 +205,14 @@ class ResultsState extends MusicBeatState {
 			char.profileBoxXOffsetP2 = 270;
 			char.profileBoxYOffset = 200;
 			var pAccuracy = GameClient.getPlayerAccuracyPercent(player);
-			char.profileBox.desc.text = 'Accuracy: ${pAccuracy}%';
-			char.profileBox.desc.text += '\nScore: ${FlxStringUtil.formatMoney(player.score, false)} - ${player.songPoints}FP';
-			char.profileBox.desc.text += '\nMax Combo: ${player.maxCombo}';
-			char.profileBox.desc.text += '\nSick: ${player.sicks}';
-			char.profileBox.desc.text += '\nGoods: ${player.goods}';
-			char.profileBox.desc.text += '\nBad: ${player.bads}';
-			char.profileBox.desc.text += '\nShits: ${player.shits}';
-			char.profileBox.desc.text += '\nMisses: ${player.misses}';
+			char.profileBox.desc.text = 'Doğruluk: ${pAccuracy}%';
+			char.profileBox.desc.text += '\nSkor: ${FlxStringUtil.formatMoney(player.score, false)} - ${player.songPoints}FP';
+			char.profileBox.desc.text += '\nMax Kombo: ${player.maxCombo}';
+			char.profileBox.desc.text += '\nÜff: ${player.sicks}';
+			char.profileBox.desc.text += '\nIyi: ${player.goods}';
+			char.profileBox.desc.text += '\nKötü: ${player.bads}';
+			char.profileBox.desc.text += '\nBerbat: ${player.shits}';
+			char.profileBox.desc.text += '\nIska: ${player.misses}';
 			char.profileBox.visible = false;
 			characters.set(sid, char);
 			if (charactersLayer.members == null)

@@ -10,13 +10,19 @@ import openfl.display.Sprite;
 
 @:allow(online.gui.DownloadAlert)
 class DownloadAlerts extends Sprite {
-	static var instance:DownloadAlerts ;
+	static var instance:DownloadAlerts;
 	static var instances:Array<DownloadAlert> = [];
+	
+	static var isMobile:Bool = false;
+	static var scaleFactor:Float = 1.0;
 
 	public function new() {
 		super();
 		
 		instance = this;
+		
+		isMobile = Controls.instance.mobileControls;
+		scaleFactor = isMobile ? 2.5 : 1.0;
 	}
 
 	override function __enterFrame(delta) {
@@ -50,10 +56,10 @@ class DownloadAlerts extends Sprite {
 
 			if (downloader != null) {
 				if (downloader.client.cancelRequested) {
-					alert.cancelText.text = 'Cancelling...';
+					alert.cancelText.text = 'İptal Ediliyor...';
 				}
 				else {
-					alert.cancelText.text = 'Cancel: ALT + $i ';
+					alert.cancelText.text = 'İptal Et: İptal + $i ';
 					if (i >= 10) {
 						alert.cancelText.text = "";
 					}
@@ -61,47 +67,50 @@ class DownloadAlerts extends Sprite {
 
 				switch (downloader.status) {
 					case CONNECTING:
-						alert.setStatus("Connecting...");
+						alert.setStatus("Bağlanılıyor...");
 					case READING_HEADERS:
-						alert.setStatus("Reading Headers...");
+						alert.setStatus("Başlıklar Okunuyor...");
 					case READING_BODY:
 						alert.updateProgress(downloader.client.receivedBytes, downloader.client.contentLength);
 					case FAILED(exc):
-						alert.setStatus("Failed! " + exc);
+						alert.setStatus("Başarısız! " + exc);
 					case DOWNLOADED:
-						alert.setStatus("Preparing to instal...");
+						alert.setStatus("Kurulum hazırlanıyor...");
 					case INSTALLING:
-						alert.setStatus("Installing...");
+						alert.setStatus("Kuruluyor...");
 					case FINISHED:
-						alert.setStatus("Finished!");
+						alert.setStatus("Bitti!");
 					default:
-						alert.setStatus("Initializing...");
+						alert.setStatus("Başlatılıyor...");
 				}
 			}
 			else {
 				alert.setStatus("...");
 			}
 
+			var spacing = isMobile ? 25 : 10;
+			
 			if (prevAlert?.bg != null)
-				alert.bg.y = prevAlert.bg.y + prevAlert.bg.height + 10;
+				alert.bg.y = prevAlert.bg.y + prevAlert.bg.height + spacing;
 			else
-				alert.bg.y = 0;
-			alert.bg.x = Lib.application.window.width - alert.bg.width;
-			alert.text.x = alert.bg.x + 10;
-			alert.text.y = alert.bg.y;
+				alert.bg.y = isMobile ? 30 : 0;
+				
+			alert.bg.x = Lib.application.window.width - alert.bg.width - (isMobile ? 20 : 0);
+			alert.text.x = alert.bg.x + (isMobile ? 25 : 10);
+			alert.text.y = alert.bg.y + (isMobile ? 10 : 0);
 
-			alert.bar.y = alert.bg.y + alert.bg.height - 15;
-			alert.bar.x = alert.bg.x + 10;
+			alert.bar.y = alert.bg.y + alert.bg.height - (isMobile ? 30 : 15);
+			alert.bar.x = alert.bg.x + (isMobile ? 25 : 10);
 
 			alert.cancelText.width = alert.cancelText.textWidth;
 
-			alert.cancelBg.x = alert.bg.x - alert.cancelText.textWidth - 5;
+			alert.cancelBg.x = alert.bg.x - alert.cancelText.textWidth - (isMobile ? 20 : 5);
 			alert.cancelBg.y = alert.bg.y;
-			alert.cancelText.x = alert.cancelBg.x;
-			alert.cancelText.y = alert.cancelBg.y;
+			alert.cancelText.x = alert.cancelBg.x + (isMobile ? 10 : 0);
+			alert.cancelText.y = alert.cancelBg.y + (isMobile ? 10 : 0);
 
-			alert.cancelBg.scaleX = alert.cancelText.textWidth;
-			alert.cancelBg.scaleY = alert.cancelText.textHeight + 5;
+			alert.cancelBg.scaleX = alert.cancelText.textWidth + (isMobile ? 20 : 0);
+			alert.cancelBg.scaleY = alert.cancelText.textHeight + (isMobile ? 25 : 5);
 
 			if (Controls.instance.mobileControls && alert.cancelBg.getBounds(FlxG.stage).contains(FlxG.stage.mouseX, FlxG.stage.mouseY) && FlxG.mouse.justPressed)
 				downloader.client.cancel();
@@ -120,35 +129,45 @@ class DownloadAlert extends Sprite {
 
 	public var cancelBg:Bitmap;
 	public var cancelText:TextField;
+	
+	var isMobile:Bool = false;
 
     public function new(id:String) {
         super();
 
 		this.id = id;
+		isMobile = Controls.instance.mobileControls;
 
 		DownloadAlerts.instances.push(this);
 		DownloadAlerts.instance.addChild(this);
 
-		bg = new Bitmap(new BitmapData(600, 40, true, 0xFF000000));
+		var bgWidth = isMobile ? 900 : 600;
+		var bgHeight = isMobile ? 110 : 40;
+		
+		bg = new Bitmap(new BitmapData(bgWidth, bgHeight, true, 0xFF000000));
 		bg.alpha = 0.6;
         addChild(bg);
 
-		bar = new Bitmap(new BitmapData(1, 5, true, 0xFFFFFFFF));
+		var barHeight = isMobile ? 12 : 5;
+		bar = new Bitmap(new BitmapData(1, barHeight, true, 0xFFFFFFFF));
 		addChild(bar);
 
 		text = new TextField();
-		text.text = 'Waiting to download: $id';
+		text.text = 'İndirme bekleniyor: $id';
 		text.selectable = false;
-		text.defaultTextFormat = new TextFormat(Assets.getFont('assets/fonts/vcr.ttf').fontName, 15, 0xFFFFFFFF);
+		
+		var fontSize = isMobile ? 36 : 15;
+		text.defaultTextFormat = new TextFormat(Assets.getFont('assets/fonts/vcr.ttf').fontName, fontSize, 0xFFFFFFFF);
 		addChild(text);
 
-		text.y = 5;
+		var textPadding = isMobile ? 25 : 10;
+		text.y = isMobile ? 15 : 5;
 		text.wordWrap = false;
-		text.width = bg.width - text.y * 2;
+		text.width = bg.width - textPadding * 2;
 
-		bar.y = bg.y + bg.height - 15;
-		text.x = 10;
-		bar.x = 10;
+		bar.y = bg.y + bg.height - (isMobile ? 30 : 15);
+		text.x = textPadding;
+		bar.x = textPadding;
 
 		bar.visible = false;
 
@@ -157,12 +176,14 @@ class DownloadAlert extends Sprite {
 		addChild(cancelBg);
 
 		cancelText = new TextField();
-		cancelText.text = 'Cancel: ALT + ' + ModDownloader.downloaders.length;
+		cancelText.text = 'İptal: İptal + ' + ModDownloader.downloaders.length;
 		cancelText.selectable = false;
-		cancelText.defaultTextFormat = new TextFormat(Assets.getFont('assets/fonts/vcr.ttf').fontName, 13, 0xFFFFFFFF);
+		
+		var cancelFontSize = isMobile ? 30 : 13;
+		cancelText.defaultTextFormat = new TextFormat(Assets.getFont('assets/fonts/vcr.ttf').fontName, cancelFontSize, 0xFFFFFFFF);
 		addChild(cancelText);
 
-		setStatus('Initializing the Download...');
+		setStatus('İndirme Başlatılıyor...');
     }
 
     public function updateProgress(loaded:Float, total:Float) {
@@ -178,15 +199,15 @@ class DownloadAlert extends Sprite {
 			bar.visible = false;
 			bar.scaleX = 1;
 			total = 1;
-			text.text = 'Downloading $idCut: ${prettyBytes(loaded)} of ?MB';
+			text.text = 'İndiriliyor $idCut: ${prettyBytes(loaded)} of ?MB';
 			return;
 		}
 		
 		bar.visible = true;
-		text.text = 'Downloading $idCut: ${prettyBytes(loaded)} of ${prettyBytes(total)}';
+		text.text = 'İndiriliyor $idCut: ${prettyBytes(loaded)} of ${prettyBytes(total)}';
 
-		bar.scaleX = (bg.width - 20) * (loaded / total);
-		// bar.x = bg.x + bg.width / 2 - bar.width / 2;
+		var barWidth = isMobile ? (bg.width - 50) : (bg.width - 20);
+		bar.scaleX = barWidth * (loaded / total);
     }
 
 	public function setStatus(string:String) {

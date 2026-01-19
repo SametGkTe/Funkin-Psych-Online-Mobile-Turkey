@@ -2,6 +2,7 @@ package online.states;
 
 import backend.WeekData;
 import backend.Highscore;
+import backend.Achievements;
 import backend.Song;
 import haxe.io.Path;
 import shaders.WarpShader;
@@ -20,12 +21,14 @@ class OnlineState extends MusicBeatState {
 	var items:FlxTypedSpriteGroup<FlxText>;
 
 	var itms:Array<String> = [
-        "JOIN",
-        "HOST",
-        "FIND",
-		"OPTIONS",
-		"LEADERBOARD",
-		"MOD DOWNLOADER"
+        "Odaya Katıl",
+        "Oda Aç",
+        "Oda Bul",
+		"Ayarlar",
+		"Liderlik Tablosu",
+		"Mod Yükleyici",
+		"Destek",
+		"Aktif Sunucular",
     ];
 
 	// var networkPlayer:FlxText;
@@ -78,9 +81,9 @@ class OnlineState extends MusicBeatState {
     }
 
 	function getItemName(item:String) {
-		if (curSelected == 0 && item == "JOIN" && inputWait)
+		if (curSelected == 0 && (item == "Odaya Katıl" || item == "odaya katıl") && inputWait)
 		{
-			return "JOIN CODE: " + inputString;
+			return "Oda Kodu: " + inputString;
 		}
 		return item;
 	}
@@ -112,7 +115,7 @@ class OnlineState extends MusicBeatState {
 		OnlineMods.checkMods();
 
 		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("In the Menus", "Online Menu");
+		DiscordClient.changePresence("Menüde", "Online Menü");
 		#end
 
         var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
@@ -230,7 +233,7 @@ class OnlineState extends MusicBeatState {
 		playersOnline = new FlxText(0, 100);
 		playersOnline.setFormat("VCR OSD Mono", 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		playersOnline.alpha = 0.7;
-		playersOnline.text = "Fetching...";
+		playersOnline.text = "Bilgi Alınıyor...";
 		playersOnline.screenCenter(X);
 		add(playersOnline);
 
@@ -248,7 +251,7 @@ class OnlineState extends MusicBeatState {
 		// networkPlayer = new FlxText(30, 30);
 		// networkPlayer.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		// networkPlayer.alpha = 0.5;
-		// networkPlayer.text = FunkinNetwork.loggedIn ? "Logged in as " + FunkinNetwork.nickname : "Not logged in";
+		// networkPlayer.text = FunkinNetwork.loggedIn ? "Giriş Yapıldı " + FunkinNetwork.nickname : "Giriş Yapılmadı!";
 		// if (FunkinNetwork.loggedIn) {
 		// 	networkPlayer.text += "\nPoints:" + FunkinNetwork.points;
 		// }
@@ -278,14 +281,14 @@ class OnlineState extends MusicBeatState {
 			var data = FunkinNetwork.fetchFront();
 			Waiter.put(() -> {
 				if (data == null) {
-					playersOnline.text = "NETWORK OFFLINE";
+					playersOnline.text = "AĞ ÇEVRIMDIŞI";
 					profileBox.visible = false;
 					// networkPlayer.visible = false;
 					// networkBg.visible = false;
 				}
 				else {
-					playersOnline.text = 'Players Online: ' + data.online;
-					availableRooms.text = 'Available Rooms: ' + data.rooms;
+					playersOnline.text = 'Aktif Oyuncular: ' + data.online;
+					availableRooms.text = 'Aktif Odalar: ' + data.rooms;
 					frontMessage.text = data.sez;
 					frontMessage.y = FlxG.height - frontMessage.height - 20;
 				}
@@ -351,14 +354,14 @@ class OnlineState extends MusicBeatState {
 
 			if (controls.ACCEPT || (FlxG.mouse.justPressed && mouseInItems)) {
 				switch (itms[curSelected].toLowerCase()) {
-					case "join":
+					case "odaya katıl":
 						FlxG.stage.window.textInputEnabled = true;
 						inputWait = true;
-					case "find":
+					case "oda bul":
 						disableInput = true;
 						// FlxG.openURL(GameClient.serverAddress + "/rooms");
 						FlxG.switchState(() -> new FindRoomState());
-					case "host":
+					case "oda aç":
 						var count:Float = 0;
 						for (mod in Mods.getModDirectories()) {
 							var url = OnlineMods.getModURL(mod);
@@ -367,19 +370,26 @@ class OnlineState extends MusicBeatState {
 						}
 
 						if (count > 0) {
-							Alert.alert('WARNING', count + ' of your mods do not have a valid URL set!');
+							Alert.alert('Uyarı', 'Modlarınızın' + ' URL si Ayarlanmadı, Bu diğer oyuncularin bu modu yükleyememesine neden olacaktır!');
 						}
 
 						disableInput = true;
 						GameClient.createRoom(GameClient.serverAddress, onRoomJoin);
-					case "options":
+					case "ayarlar":
 						disableInput = true;
 						FlxG.switchState(() -> new OnlineOptionsState());
-					case "leaderboard":
+					case "liderlik tablosu":
 						openSubState(new TopPlayerSubstate());
-					case "mod downloader":
+					case "mod yükleyici":
 						disableInput = true;
 						FlxG.switchState(() -> new DownloaderState());
+					case "destek":
+                        disableInput = true;
+                        FlxG.openURL("https://www.tiktok.com/@gktegameplay?lang=en");
+                        tempDisableInput();
+					case "aktif sunucular":
+                        Alert.alert('BILGI', 'Aktif Sunucular şu anda devre dışı P.E.T Online V2 ile birlikte aktif olacaktır. Lütfen Sonraki Güncellemeyi Bekleyin :D');
+                        disableInput = false;
 				}
 			}
 
@@ -404,7 +414,7 @@ class OnlineState extends MusicBeatState {
 					discord.animation.play("active");
 					discord.offset.set(2, 2);
 
-					itemDesc.text = "Join Psych Online Discord Server!";
+					itemDesc.text = "Psych Online Discord Sunucusuna Katılın!";
 					itemDesc.screenCenter(X);
 
 					if (FlxG.mouse.justPressed) {
@@ -421,7 +431,7 @@ class OnlineState extends MusicBeatState {
 					github.alpha = 1;
 					github.animation.play("active");
 
-					itemDesc.text = "Documentation, FAQ and the Source Code!";
+					itemDesc.text = "Dokümanlar, SSS ve Kaynak Kodu!";
 					itemDesc.screenCenter(X);
 
 					if (FlxG.mouse.justPressed) {
@@ -431,7 +441,7 @@ class OnlineState extends MusicBeatState {
 							case 'codeberg':
 								RequestSubstate.requestURL("https://codeberg.org/Snirozu/Funkin-Psych-Online/wiki", true);
 							default:
-								Alert.alert('Offline.');
+								Alert.alert('ÇEVRİMDIŞI.');
 						}
 					}
 				}
@@ -445,7 +455,7 @@ class OnlineState extends MusicBeatState {
 						bsky.alpha = 1;
 						bsky.animation.play("active");
 
-						itemDesc.text = "Follow the official Psych Online Bluesky account!";
+						itemDesc.text = "Resmi Blusky hesabını takip et!";
 						itemDesc.screenCenter(X);
 
 						if (FlxG.mouse.justPressed) {
@@ -492,17 +502,21 @@ class OnlineState extends MusicBeatState {
 
 		switch (curSelected) {
 			case 0:
-				itemDesc.text = "Join a room using a room code";
+				itemDesc.text = "Oda Koduyla Bir Odaya Girin";
 			case 1:
-				itemDesc.text = "Creates a room";
+				itemDesc.text = "Oda Oluşturun, Verilen Oda Kodu ile diğer oyuncular odanıza girebilir.";
 			case 2:
-				itemDesc.text = "Opens a list of all available public rooms";
+				itemDesc.text = "Herkese açık ve Aktif olan odaların listesini aç";
 			case 3:
-				itemDesc.text = "Psych Online options, configure stuff here!";
+				itemDesc.text = "Psych Online Ayarları, Burada Online ile alakalı ayarları ayarla!";
 			case 4:
-				itemDesc.text = "The Funkin Points Leaderboard!";
+				itemDesc.text = "Funkin Puanı Liderlik Tablosu!";
 			case 5:
-				itemDesc.text = "Download mods from Gamebanana here!";
+				itemDesc.text = "Burada Gamebanana'dan Modlar indirin! Otomatik şekilde kurulacaktır";
+			case 6:
+				itemDesc.text = "Herhangi bir sorununuz varsa buradan iletişime geçin!";
+			case 7:
+				itemDesc.text = "Farklı bir Funkin' Online sunucusu seçmenizi sağlar";
 		}
 		itemDesc.screenCenter(X);
 
@@ -575,7 +589,7 @@ class OnlineState extends MusicBeatState {
 
 		if (inputString.length >= 0) {
 			switch (itms[curSelected].toLowerCase()) {
-				case "join":
+				case "odaya katıl":
 					disableInput = true;
 					FlxG.stage.window.textInputEnabled = false;
 					if (daCoomCode.toLowerCase() == "adachi") {
@@ -636,6 +650,177 @@ class OnlineState extends MusicBeatState {
 							states.TitleState.playFreakyMusic();
 						};
 						return;
+					}
+					else if (daCoomCode.toLowerCase() == "sans") {
+						FreeplayState.destroyFreeplayVocals();
+						FlxG.sound.playMusic(Paths.sound('sans'));
+						var image:FlxSprite = new FlxSprite();
+						image.loadGraphic('assets/images/sans.jpg'); 
+    
+						image.setGraphicSize(FlxG.width, FlxG.height);
+						image.updateHitbox();
+						add(image);
+
+						FlxG.sound.music.onComplete = function() {
+							remove(image);
+							image.destroy();
+							disableInput = false;
+							states.TitleState.playFreakyMusic();
+						};
+						return;
+					}
+					else if (daCoomCode.toLowerCase() == "nexus" || daCoomCode.toLowerCase() == "nexusifsa") {
+						#if VIDEOS_ALLOWED
+						FreeplayState.destroyFreeplayVocals();
+						FlxG.sound.music.stop();
+						var videoBackground = new FlxSprite();
+						videoBackground.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+						add(videoBackground);
+						var video = new hxcodec.flixel.FlxVideo();
+						video.play(Paths.video('nexus')); 
+						video.onEndReached.add(function() {
+							video.dispose();
+							remove(videoBackground);
+							disableInput = false;
+							states.TitleState.playFreakyMusic();
+						}, true);
+						return;
+						#end
+					}
+					else if (daCoomCode.toLowerCase() == "gkte" || daCoomCode.toLowerCase() == "femboy") {
+						#if VIDEOS_ALLOWED
+						FreeplayState.destroyFreeplayVocals();
+						FlxG.sound.music.stop();
+						var videoBackground = new FlxSprite();
+						videoBackground.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+						add(videoBackground);
+						var video = new hxcodec.flixel.FlxVideo();
+						video.play(Paths.video('samet')); 
+						video.onEndReached.add(function() {
+							video.dispose();
+							remove(videoBackground);
+							disableInput = false;
+							states.TitleState.playFreakyMusic();
+						}, true);
+						return;
+						#end
+					}
+					else if (daCoomCode.toLowerCase() == "turkiye") {
+						#if ACHIEVEMENTS_ALLOWED
+							backend.Achievements.unlock('turkiye');
+						#end
+						FreeplayState.destroyFreeplayVocals();
+						FlxG.sound.playMusic(Paths.sound('turk'));
+						var image:FlxSprite = new FlxSprite();
+						image.loadGraphic('assets/images/turkiye.jpg'); 
+    
+						image.setGraphicSize(FlxG.width, FlxG.height);
+						image.updateHitbox();
+						add(image);
+
+						FlxG.sound.music.onComplete = function() {
+							remove(image);
+							image.destroy();
+							disableInput = false;
+							states.TitleState.playFreakyMusic();
+						};
+						return;
+					}
+					else if (daCoomCode.toLowerCase() == "sillychef" || daCoomCode.toLowerCase() == "chef") {
+						#if VIDEOS_ALLOWED
+						FreeplayState.destroyFreeplayVocals();
+						FlxG.sound.music.stop();
+						var videoBackground = new FlxSprite();
+						videoBackground.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+						add(videoBackground);
+						var video = new hxcodec.flixel.FlxVideo();
+						video.play(Paths.video('silly')); 
+						video.onEndReached.add(function() {
+							video.dispose();
+							remove(videoBackground);
+							disableInput = false;
+							states.TitleState.playFreakyMusic();
+						}, true);
+						return;
+						#end
+					}
+					else if (daCoomCode.toLowerCase() == "aminogludublaj" || daCoomCode.toLowerCase() == "dublaj") {
+						#if VIDEOS_ALLOWED
+						FreeplayState.destroyFreeplayVocals();
+						FlxG.sound.music.stop();
+						var videoBackground = new FlxSprite();
+						videoBackground.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+						add(videoBackground);
+						var video = new hxcodec.flixel.FlxVideo();
+						video.play(Paths.video('dublaj')); 
+						video.onEndReached.add(function() {
+							video.dispose();
+							remove(videoBackground);
+							disableInput = false;
+							states.TitleState.playFreakyMusic();
+						}, true);
+						return;
+						#end
+					}
+					else if (daCoomCode.toLowerCase() == "sling" || daCoomCode.toLowerCase() == "slingo") {
+						#if VIDEOS_ALLOWED
+						FreeplayState.destroyFreeplayVocals();
+						FlxG.sound.music.stop();
+						var videoBackground = new FlxSprite();
+						videoBackground.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+						add(videoBackground);
+						
+						var video = new hxcodec.flixel.FlxVideo();
+						video.play(Paths.video('sling')); 
+						video.onEndReached.add(function() {
+							video.dispose();
+							remove(videoBackground);
+							disableInput = false;
+							states.TitleState.playFreakyMusic();
+						}, true);
+						return;
+						#end
+					}
+					else if (daCoomCode.toLowerCase() == "blink" || daCoomCode.toLowerCase() == "blinkemre") {
+						#if VIDEOS_ALLOWED
+						#if ACHIEVEMENTS_ALLOWED
+							backend.Achievements.unlock('abonem');
+						#end
+						FreeplayState.destroyFreeplayVocals();
+						FlxG.sound.music.stop();
+						var videoBackground = new FlxSprite();
+						videoBackground.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+						add(videoBackground);
+						
+						var video = new hxcodec.flixel.FlxVideo();
+						video.play(Paths.video('blink')); 
+						video.onEndReached.add(function() {
+							video.dispose();
+							remove(videoBackground);
+							disableInput = false;
+							states.TitleState.playFreakyMusic();
+						}, true);
+						return;
+						#end
+					}
+					else if (daCoomCode.toLowerCase() == "squidward" || daCoomCode.toLowerCase() == "squid") {
+						#if VIDEOS_ALLOWED
+						FreeplayState.destroyFreeplayVocals();
+						FlxG.sound.music.stop();
+						var videoBackground = new FlxSprite();
+						videoBackground.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+						add(videoBackground);
+						
+						var video = new hxcodec.flixel.FlxVideo();
+						video.play(Paths.video('shucks')); 
+						video.onEndReached.add(function() {
+							video.dispose();
+							remove(videoBackground);
+							disableInput = false;
+							states.TitleState.playFreakyMusic();
+						}, true);
+						return;
+						#end
 					}
 					else if (daCoomCode.toLowerCase() == "jackass" || daCoomCode.toLowerCase() == "mrbeansex") {
 						FlxG.sound.play(Paths.sound('jackass')).pitch = FlxG.random.float(0.8, 1.4);

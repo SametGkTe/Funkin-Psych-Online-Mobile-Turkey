@@ -160,7 +160,7 @@ class NoteOffsetState extends MusicBeatState
 		repositionCombo();
 
 		// Note delay stuff
-		beatText = new Alphabet(0, 0, 'Beat Hit!', true);
+		beatText = new Alphabet(0, 0, 'Vurus!', true);
 		beatText.setScale(0.6, 0.6);
 		beatText.x += 260;
 		beatText.alpha = 0;
@@ -209,7 +209,7 @@ class NoteOffsetState extends MusicBeatState
 		controllerPointer.cameras = [camHUD];
 		add(controllerPointer);
 
-		add(switchPlayerOption = new SwagOption("Switch Players", "Change to the right side offsets.", () -> {
+		add(switchPlayerOption = new SwagOption("Oyuncuları Değiştir", "Sağ taraftaki gecikmeleri değiştirin.", () -> {
 			if (!onComboMenu || !isOnline)
 				return;
 
@@ -232,7 +232,7 @@ class NoteOffsetState extends MusicBeatState
 		switchPlayerOption.x = 20;
 		switchPlayerOption.y = FlxG.height - switchPlayerOption.height - 20;
 
-		add(switchOnline = new SwagOption("Online Placements", "Online offsets will be used.", () -> {
+		add(switchOnline = new SwagOption("Çevrimiçi Yerleşim", "Çevrimiçi gecikmeleri kullanılacaktır.", () -> {
 			if (!onComboMenu)
 				return;
 
@@ -251,7 +251,7 @@ class NoteOffsetState extends MusicBeatState
 		switchOnline.x = switchPlayerOption.x;
 		switchOnline.y = switchPlayerOption.y - switchOnline.height - 10;
 
-		add(verticalPosOption = new SwagOption("Vertical Rating Offset", "Ratings for back players will be vertical.", () -> {
+		add(verticalPosOption = new SwagOption("Dikey Derecelendirme", "Arka oyuncuların Skorları dikey olacaktır.", () -> {
 			if (!onComboMenu || !isOnline)
 				return;
 
@@ -620,9 +620,9 @@ class NoteOffsetState extends MusicBeatState
 		{
 			switch(i)
 			{
-				case 0: dumbTexts.members[i].text = 'Rating Offset:';
+				case 0: dumbTexts.members[i].text = 'Derecelendirme Gecikmesi:';
 				case 1: dumbTexts.members[i].text = '[' + getComboOffset()[0] + ', ' + getComboOffset()[1] + ']';
-				case 2: dumbTexts.members[i].text = 'Numbers Offset:';
+				case 2: dumbTexts.members[i].text = 'Sayı Gecikmesi:';
 				case 3: dumbTexts.members[i].text = '[' + getComboOffset()[2] + ', ' + getComboOffset()[3] + ']';
 			}
 		}
@@ -631,7 +631,7 @@ class NoteOffsetState extends MusicBeatState
 	function updateNoteDelay()
 	{
 		ClientPrefs.data.noteOffset = Math.round(barPercent);
-		timeTxt.text = 'Current offset: ' + Math.floor(barPercent) + ' ms';
+		timeTxt.text = 'Şuanki Derecelendirme: ' + Math.floor(barPercent) + ' ms';
 	}
 
 	function updateMode()
@@ -658,21 +658,21 @@ class NoteOffsetState extends MusicBeatState
 		var str:String;
 		var str2:String;
 		if(onComboMenu) {
-			str = 'Combo Offset';
+			str = 'Kombo Gecikmesi';
 			mobileManager.addMobilePad('NONE', 'A_B_C');
 			mobileManager.addMobilePadCamera();
 		} else {
-			str = 'Note/Beat Delay';
+			str = 'Nota/Vuruş Gecikmesi';
 			mobileManager.addMobilePad('FULL', 'A_B_C');
 			mobileManager.addMobilePadCamera();
 		}
 
 		if(controls.mobileControls)
-			str2 = '(Press A to Switch)';
+			str2 = '(Degistirmek için A tusuna basin)';
 		else if(!controls.controllerMode)
-			str2 = '(Press Accept to Switch)';
+			str2 = '(Degistirmek için KABUL ET tusuna basin)';
 		else
-			str2 = '(Press Start to Switch)';
+			str2 = '(Degistirmek için START tusuna basin)';
 
 		changeModeText.text = '< ${str.toUpperCase()} ${str2.toUpperCase()} >';
 	}

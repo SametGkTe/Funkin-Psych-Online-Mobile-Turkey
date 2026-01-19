@@ -16,7 +16,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 
 		title = '';
 		//title = name;
-		rpcTitle = 'Mod Settings ($name)'; //for Discord Rich Presence
+		rpcTitle = 'Mod Ayarları ($name)'; //for Discord Rich Presence
 
 		if(FlxG.save.data.modSettings == null) FlxG.save.data.modSettings = new Map<String, Dynamic>();
 		else
@@ -32,7 +32,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 			{
 				var newOption = new Option(
 					option.name != null ? option.name : option.save,
-					option.description != null ? option.description : 'No description provided.',
+					option.description != null ? option.description : 'Açıklama Yok.',
 					option.save,
 					option.type,
 					option.options
@@ -127,7 +127,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 		}
 		catch(e:Dynamic)
 		{
-			var errorTitle = 'Mod name: ' + folder;
+			var errorTitle = 'Mod Adı: ' + folder;
 			var errorMsg = 'An error occurred: $e';
 			#if windows
 			lime.app.Application.current.window.alert(errorMsg, errorTitle);

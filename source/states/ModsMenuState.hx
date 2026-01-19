@@ -5,7 +5,6 @@ import online.gui.Alert;
 import online.gui.LoadingScreen;
 import online.mods.OnlineMods;
 import online.util.FileUtils;
-import haxe.io.Path;
 import backend.WeekData;
 import backend.Mods;
 
@@ -73,7 +72,7 @@ class ModsMenuState extends MusicBeatState
 
 		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("In the Menus", "Mods");
+		DiscordClient.changePresence("Menüde", "Modlar");
 		#end
 
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
@@ -81,8 +80,8 @@ class ModsMenuState extends MusicBeatState
 		add(bg);
 		bg.screenCenter();
 
-		noModsTxt = new FlxText(0, 0, FlxG.width, "NO MODS INSTALLED\nPRESS BACK TO EXIT AND INSTALL A MOD", 48);
-		if(FlxG.random.bool(0.1)) noModsTxt.text += '\nBITCH.'; //meanie
+		noModsTxt = new FlxText(0, 0, FlxG.width, "MOD BULUNAMADI\nB TUŞUNA BASARAK ÇIKIN VEYA MOD EKLEYIN", 48);
+		if(FlxG.random.bool(0.1)) noModsTxt.text += '\nYOK.'; //meanie
 		noModsTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		noModsTxt.scrollFactor.set();
 		noModsTxt.borderSize = 2;
@@ -104,7 +103,7 @@ class ModsMenuState extends MusicBeatState
 		//attached buttons
 		var startX:Int = 1120;
 
-		buttonToggle = new FlxButton(startX, 0, "ON", function()
+		buttonToggle = new FlxButton(startX, 0, "AÇIK", function()
 		{
 			if(mods[curSelected].restart)
 			{
@@ -151,7 +150,7 @@ class ModsMenuState extends MusicBeatState
 		setAllLabelsOffset(buttonDown, -15, 10);
 
 		startX -= 100;
-		buttonTop = new FlxButton(startX, 0, "TOP", function() {
+		buttonTop = new FlxButton(startX, 0, "EN ÜST", function() {
 			var doRestart:Bool = (mods[0].restart || mods[curSelected].restart);
 			for (i in 0...curSelected) //so it shifts to the top instead of replacing the top one
 			{
@@ -174,7 +173,7 @@ class ModsMenuState extends MusicBeatState
 
 
 		startX -= 190;
-		buttonDisableAll = new FlxButton(startX, 0, "DISABLE ALL", function() {
+		buttonDisableAll = new FlxButton(startX, 0, "HEPSINI KAPAT", function() {
 			for (i in modsList)
 			{
 				i[1] = false;
@@ -200,7 +199,7 @@ class ModsMenuState extends MusicBeatState
 		visibleWhenHasMods.push(buttonDisableAll);
 
 		startX -= 190;
-		buttonEnableAll = new FlxButton(startX, 0, "ENABLE ALL", function() {
+		buttonEnableAll = new FlxButton(startX, 0, "HEPSINI AÇ", function() {
 			for (i in modsList)
 			{
 				i[1] = true;
@@ -226,10 +225,10 @@ class ModsMenuState extends MusicBeatState
 		visibleWhenHasMods.push(buttonEnableAll);
 
 		startX -= 140;
-		buttonVerify = new FlxButton(startX, 0, "VERIFY", function() {
+		buttonVerify = new FlxButton(startX, 0, "DOĞRULA", function() {
 			var modURL = OnlineMods.getModURL(modsList[curSelected][0]);
 			if (modURL == null || modURL.trim() == "") {
-				Alert.alert("No mod URL provided!", "Other players will not be able to download this mod!\nPlease set it in the Setup Mods option!");
+				Alert.alert("URL BELIRTILMEDI!", "Diğer oyuncular bu modu indiremeyecekler.!\nLütfen Mod Ayarları seçeneğinde ayarlayın!");
 				FlxG.sound.play(Paths.sound('cancelMenu'), 0.6);
 				return;
 			}
@@ -260,7 +259,7 @@ class ModsMenuState extends MusicBeatState
 		visibleWhenHasMods.push(buttonVerify);
 
 		startX -= 100;
-		buttonDelete = new FlxButton(startX, 0, "DEL", function() {
+		buttonDelete = new FlxButton(startX, 0, "SIL", function() {
 			var path = haxe.io.Path.join([Paths.mods(), modsList[curSelected][0]]);
 			if(FunkinFileSystem.exists(path) && FileSystem.isDirectory(path))
 			{
@@ -322,7 +321,7 @@ class ModsMenuState extends MusicBeatState
 		buttonsArray.push(buttonToggleGlobal);
 		visibleWhenHasMods.push(buttonToggleGlobal);
 
-		buttonSettings = new FlxButton(startX, 70, "SETTINGS", function() {
+		buttonSettings = new FlxButton(startX, 70, "AYARLAR", function() {
 			if(mods[curSelected].settings != null && mods[curSelected].settings.length > 0)
 			{
 				openSubState(new ModSettingsSubState(mods[curSelected].settings, mods[curSelected].folder, mods[curSelected].name));
@@ -341,7 +340,7 @@ class ModsMenuState extends MusicBeatState
 		var startX:Int = 1100;
 
 		/*
-		installButton = new FlxButton(startX, 620, "Install Mod", function()
+		installButton = new FlxButton(startX, 620, "Mod indir", function()
 		{
 			installMod();
 		});
@@ -355,7 +354,7 @@ class ModsMenuState extends MusicBeatState
 		startX -= 180;
 		*/
 
-		// removeButton = new FlxButton(startX, 620, "Delete Selected Mod", function()
+		// removeButton = new FlxButton(startX, 620, "Seçilen Modu Sil", function()
 		// {
 		// 	var path = haxe.io.Path.join([Paths.mods(), modsList[curSelected][0]]);
 		// 	if(FunkinFileSystem.exists(path) && FileSystem.isDirectory(path))
@@ -481,12 +480,12 @@ class ModsMenuState extends MusicBeatState
 	{
 		if (modsList[curSelected][1])
 		{
-			buttonToggle.label.text = 'ON';
+			buttonToggle.label.text = 'AÇIK';
 			buttonToggle.color = FlxColor.GREEN;
 		}
 		else
 		{
-			buttonToggle.label.text = 'OFF';
+			buttonToggle.label.text = 'KAPALI';
 			buttonToggle.color = FlxColor.RED;
 		}
 	}
@@ -499,7 +498,7 @@ class ModsMenuState extends MusicBeatState
 		}
 		else
 		{
-			buttonToggleGlobal.label.text = 'LOCAL';
+			buttonToggleGlobal.label.text = 'YEREL';
 			buttonToggleGlobal.color = FlxColor.RED;
 		}
 	}
@@ -678,7 +677,7 @@ class ModsMenuState extends MusicBeatState
 				selector.sprTracker = mod.alphabet;
 				descriptionTxt.text = mod.description;
 				if (mod.restart){//finna make it to where if nothing changed then it won't reset
-					descriptionTxt.text += " (This Mod will restart the game!)";
+					descriptionTxt.text += " (Bu Mod Oyunu Tekrar Başlatır!)";
 				}
 
 				// correct layering
@@ -844,7 +843,7 @@ class ModMetadata
 	{
 		this.folder = folder;
 		this.name = folder;
-		this.description = "No description provided.";
+		this.description = "Açıklama Belirtilmedi.";
 		this.color = ModsMenuState.defaultColor;
 		this.restart = false;
 		this.runsGlobally = false;
@@ -865,7 +864,7 @@ class ModMetadata
 				if(pack.description != 'Description')
 					this.description = pack.description;
 				else
-					this.description = "No description provided.";
+					this.description = "Açıklama Belirtilmedi.";
 			}
 
 			if(pack.color != null)
@@ -879,15 +878,15 @@ class ModMetadata
 			var path:String = Paths.mods('$folder/data/settings.json');
 			if(FunkinFileSystem.exists(path))
 			{
-				var data:String = FunkinFileSystem.getText(path);
+				var data:String = File.getContent(path);
 				try
 				{
 					settings = tjson.TJSON.parse(data);
 				}
 				catch(e:Dynamic)
 				{
-					var errorTitle = 'Mod name: ' + name;
-					var errorMsg = 'An error occurred: $e';
+					var errorTitle = 'Mod adı: ' + name;
+					var errorMsg = 'Bir Hata Oluştu: $e';
 					trace('$errorTitle - $errorMsg');
 				}
 			}

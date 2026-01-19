@@ -35,7 +35,7 @@ import states.TitleState;
 	public var hitboxLocation:String = 'Bottom';
 	public var hitboxMode:String = 'Normal (New)';
 	public var mobileExtraKeyReturns:Array<String> = ['SHIFT', 'SPACE', 'Q', 'E'];
-
+	
 	public var downScroll:Bool = false;
 	public var middleScroll:Bool = false;
 	public var opponentStrums:Bool = true;
@@ -73,7 +73,7 @@ import states.TitleState;
 	public var comboStacking:Bool = true;
 	public var gameplaySettings:Map<String, Dynamic> = [
 		'scrollspeed' => 1.0,
-		'scrolltype' => 'multiplicative',
+		'scrolltype' => 'çarpici',
 		'songspeed' => 1.0,
 		'healthgain' => 1.0,
 		'healthloss' => 1.0,
@@ -103,13 +103,13 @@ import states.TitleState;
 	public var disableStrumMovement:Bool = false;
 	public var unlockFramerate:Bool = false;
 	public var debugMode:Bool = false;
-	public var disableReplays:Bool = false;
-	public var disableSubmiting:Bool = false;
+	public var disableReplays:Bool = true;
+	public var disableSubmiting:Bool = true;
 	public var showNoteTiming:Bool = false;
 	public var disableAutoDownloads:Bool = false;
 	public var disableSongComments:Bool = false;
 	public var disableFreeplayIcons:Bool = false;
-	public var showFP:Bool = false;
+	public var showFP:Bool = true;
 	public var disableFreeplayAlphabet:Bool = false;
 	public var disableLagDetection:Bool = false;
 	public var groupSongsBy:String = 'Default';
@@ -122,7 +122,7 @@ import states.TitleState;
 	public var disableRoomInvites:Bool = false;
 	public var verifySSL:Bool = false;
 	public var noteUnderlayOpacity:Float = 0;
-	public var noteUnderlayType:String = 'All-In-One';
+	public var noteUnderlayType:String = 'Hepsi-Bir-Arada';
 	public var favsAsMenuTheme:Bool = false;
 	public var disableComboRating:Bool = false;
 	public var disableComboCounter:Bool = false;
@@ -133,6 +133,13 @@ import states.TitleState;
 	public var midSongCommentsOpacity:Float = 0.5;
 	public var friendOnlineNotification:Bool = false;
 	public var newFPPreview:Bool = false;
+	
+	// PET AYARLARI
+	public var petwatermark:Bool = true;
+	public var petloadingscreen:Bool = true;
+	public var petwatermarklogo:String = 'ONLINE';
+	public var petloadingscreenimage:String = 'ONLINE';
+	public var disableIntroVideo:Bool = false;
 
 	public function new()
 	{

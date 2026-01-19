@@ -10,24 +10,26 @@ class TabButton extends Sprite implements ITabInteractable {
 	public var underlay:Bitmap;
 	public var border:Bitmap;
 
-    public function new(daIcon:String, onClick:Void->Void) {
-        super();
+	public function new(daIcon:String, onClick:Void->Void) {
+		super();
 
 		this.onClick = onClick;
 
+		var s:Float = SideUI.uiScale;
+
 		border = new Bitmap(GAssets.image('sidebar/button_border'));
-		border.smoothing = false;
-		border.width = 56;
-		border.height = 56;
+		border.smoothing = true; // Mobilde daha yumuşak görünmesi için
+		border.width = Std.int(56 * s); // 56 yerine ölçekli değer
+		border.height = Std.int(56 * s);
 
 		icon = new Bitmap(GAssets.image('sidebar/' + daIcon));
-		icon.smoothing = false;
-		icon.x = 3;
-		icon.y = 3;
-		icon.width = 50;
-		icon.height = 50;
+		icon.smoothing = true;
+		icon.x = 3 * s;
+		icon.y = 3 * s;
+		icon.width = Std.int(50 * s); // 50 yerine ölçekli değer
+		icon.height = Std.int(50 * s);
 
-		underlay = new Bitmap(new BitmapData(50, 50, true, FlxColor.fromRGB(100, 100, 100)));
+		underlay = new Bitmap(new BitmapData(Std.int(50 * s), Std.int(50 * s), true, FlxColor.fromRGB(100, 100, 100)));
 		underlay.x = icon.x;
 		underlay.y = icon.y;
 
@@ -36,8 +38,7 @@ class TabButton extends Sprite implements ITabInteractable {
 		addChild(border);
 
 		updateVisual();
-    }
-
+	}
 	private function mouseDown(event:MouseEvent) {
 		if (this.overlapsMouse()) {
 			onClick();

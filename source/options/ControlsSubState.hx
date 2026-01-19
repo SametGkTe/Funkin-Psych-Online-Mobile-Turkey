@@ -20,9 +20,9 @@ class ControlsSubState extends MusicBeatSubstate
 	var options:Array<Dynamic> = [];
 	var curOptions:Array<Int>;
 	var curOptionsValid:Array<Int>;
-	static var defaultKey:String = 'Reset to Default Keys';
-	static var switchInput:String = 'Switch Input Device';
-	static var switchMania:String = 'Switch Note Mania';
+	static var defaultKey:String = 'VARSAYILAN TUSLARA SIFIRLA';
+	static var switchInput:String = 'GIRIS AYGITINI DEGISTIR';
+	static var switchMania:String = 'MANIA MODU';
 
 	var bg:FlxSprite;
 	var grpDisplay:FlxTypedGroup<Alphabet>;
@@ -44,7 +44,7 @@ class ControlsSubState extends MusicBeatSubstate
 
 		FlxG.mouse.visible = false;
 		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("Controls Menu", null);
+		DiscordClient.changePresence("Kontroller", "Ayarlar");
 		#end
 
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
@@ -91,7 +91,7 @@ class ControlsSubState extends MusicBeatSubstate
 	var lastID:Int = 0;
 	function createTexts()
 	{
-		options = [[true, 'NOTES ${Note.maniaKeys}k']];
+		options = [[true, 'NOTALAR ${Note.maniaKeys}k']];
 
 		if (Note.maniaKeys != 4) {
 			for (key in 1...Note.maniaKeys + 1) {
@@ -105,37 +105,37 @@ class ControlsSubState extends MusicBeatSubstate
 		}
 		else {
 			options = options.concat([
-				[true, 'Left', 'note_left', 'Note Left'],
-				[true, 'Down', 'note_down', 'Note Down'],
-				[true, 'Up', 'note_up', 'Note Up'],
-				[true, 'Right', 'note_right', 'Note Right'],
+				[true, 'Sol', 'note_left', 'Nota Sol'],
+				[true, 'Asagi', 'note_down', 'Nota Asagi'],
+				[true, 'Yukari', 'note_up', 'Nota Yukari'],
+				[true, 'Sag', 'note_right', 'Nota Sag'],
 			]);
 		}
 
 		options = options.concat([
 			[true],
-			[true, 'UI'],
-			[true, 'Left', 'ui_left', 'UI Left'],
-			[true, 'Down', 'ui_down', 'UI Down'],
-			[true, 'Up', 'ui_up', 'UI Up'],
-			[true, 'Right', 'ui_right', 'UI Right'],
+			[true, 'ARAYÜZ'],
+			[true, 'Sol', 'ui_left', 'UI Sol'],
+			[true, 'Asagi', 'ui_down', 'UI Asagi'],
+			[true, 'Yukari', 'ui_up', 'UI Yukari'],
+			[true, 'Sag', 'ui_right', 'UI Sag'],
 			[true],
-			[true, 'Taunt', 'taunt', 'Taunt'],
+			[true, 'Alay', 'taunt', 'Alay'],
 			[true, 'Reset', 'reset', 'Reset'],
-			[true, 'Accept', 'accept', 'Accept'],
-			[true, 'Back', 'back', 'Back'],
-			[true, 'Pause', 'pause', 'Pause'],
-			[true, 'Sidebar', 'sidebar', 'Sidebar'],
-			[true, 'Favor', 'fav', 'Favor'],
+			[true, 'Kabul Et', 'accept', 'Kabul Et'],
+			[true, 'Geri', 'back', 'Geri'],
+			[true, 'Durdur', 'pause', 'Durdur'],
+			[true, 'Yan Çubuk', 'sidebar', 'Yan Çubuk'],
+			[true, 'Favori', 'fav', 'Favori'],
 			[false],
-			[false, 'VOLUME'],
-			[false, 'Mute', 'volume_mute', 'Volume Mute'],
-			[false, 'Up', 'volume_up', 'Volume Up'],
-			[false, 'Down', 'volume_down', 'Volume Down'],
+			[false, 'SES'],
+			[false, 'Sustur', 'volume_mute', 'Sustur'],
+			[false, 'Ses Arttir', 'volume_up', 'Ses Arttir'],
+			[false, 'Ses Azalt', 'volume_down', 'Ses Azalt'],
 			[false],
-			[false, 'DEBUG'],
-			[false, 'Key 1', 'debug_1', 'Debug Key #1'],
-			[false, 'Key 2', 'debug_2', 'Debug Key #2']
+			[false, 'HATA AYIKLAMA'],
+			[false, 'Tus 1', 'debug_1', 'Debug Key #1'],
+			[false, 'Tus 2', 'debug_2', 'Debug Key #2']
 		]);
 
 		options.push([true]);

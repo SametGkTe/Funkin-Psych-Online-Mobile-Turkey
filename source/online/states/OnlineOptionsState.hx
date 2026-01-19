@@ -31,7 +31,7 @@ class OnlineOptionsState extends MusicBeatState {
 		camera.follow(camFollow = new FlxObject(), 0.1);
 
 		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("In the Menus", "Online Options");
+		DiscordClient.changePresence("Menüde", "Online Ayarlar"); 
 		#end
 
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
@@ -44,12 +44,12 @@ class OnlineOptionsState extends MusicBeatState {
 
 		var i = 0;
 
-		var section = new FlxText(0, 0, FlxG.width, "General");
+		var section = new FlxText(0, 0, FlxG.width, "Genel");
 		section.setFormat("VCR OSD Mono", 25, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(section);
 
 		var nicknameOption:InputOption;
-		items.add(nicknameOption = new InputOption("Nickname", "Set your nickname here!", ["Boyfriend"], (text, _) -> {
+		items.add(nicknameOption = new InputOption("Kullanıcı İsmi", "Adını Buraya Yaz!", ["Boyfriend"], (text, _) -> {
 			curOption.inputs[0].text = curOption.inputs[0].text.trim().substr(0, 14);
 			ClientPrefs.setNickname(curOption.inputs[0].text);
 			ClientPrefs.saveSettings();
@@ -60,7 +60,7 @@ class OnlineOptionsState extends MusicBeatState {
 		nicknameOption.ID = i++;
 
 		// var titleOption:InputOption;
-		// items.add(titleOption = new InputOption("Title", "This will be shown below your name! (Max 20 characters)", ClientPrefs.data.playerTitle, text -> {
+		// items.add(titleOption = new InputOption("Title", "Bu isminizin altında gözükecektir! (Maksimum 20 karakter)", ClientPrefs.data.playerTitle, text -> {
 		// 	curOption.input.text = curOption.input.text.trim().substr(0, 20);
 		// 	ClientPrefs.data.playerTitle = curOption.input.text;
 		// 	ClientPrefs.saveSettings();
@@ -71,7 +71,7 @@ class OnlineOptionsState extends MusicBeatState {
 		// titleOption.ID = i++;
 
 		var skinsOption:InputOption;
-		items.add(skinsOption = new InputOption("Skin", "Choose your skin here!", null, () -> {
+		items.add(skinsOption = new InputOption("Skin", "Kostümünüzü Seçin!", null, () -> {
 			LoadingState.loadAndSwitchState(new SkinsState());
 		}));
 		skinsOption.y = nicknameOption.y + nicknameOption.height + 50;
@@ -79,7 +79,7 @@ class OnlineOptionsState extends MusicBeatState {
 		skinsOption.ID = i++;
 
 		var modsOption:InputOption;
-		items.add(modsOption = new InputOption("Setup Mods", "Set the URL's of your mods here!", null, () -> {
+		items.add(modsOption = new InputOption("Mod Ayarlama", "Modların URL ve Linkini buradan ayarla!", null, () -> {
 			FlxG.switchState(() -> new SetupModsState(Mods.getModDirectories(), true));
 		}));
 		modsOption.y = skinsOption.y + skinsOption.height + 50;
@@ -115,13 +115,13 @@ class OnlineOptionsState extends MusicBeatState {
 		var serverOption:InputOption;
 		var appendText = "";
 		if (GameClient.serverAddresses.length > 0) {
-			appendText += "\nOfficial Servers:";
+			appendText += "Resmi Sunucular:";
 			for (address in GameClient.serverAddresses) {
 				if (address != "ws://localhost:2567")
 					appendText += "\n" + address;
 			}
 		}
-		items.add(serverOption = new InputOption("Server Address", "The server that hosts Game Rooms.\nSet to empty if you want to use the default server.\n\nLocal Address: 'localhost'" + appendText, [GameClient.getDefaultServer()], (text, _) -> {
+		items.add(serverOption = new InputOption("Sunucu Adresi", "Oyun Odalarını barındıran sunucu.\nVarsayılan sunucuyu kullanmak için boş bırakın.\n\nLokal Adres: 'localhost'" + appendText, [GameClient.getDefaultServer()], (text, _) -> {
 			curOption.inputs[0].text = prepareAddress(curOption.inputs[0].text);
 			GameClient.serverAddress = curOption.inputs[0].text;
 		}));
@@ -131,7 +131,7 @@ class OnlineOptionsState extends MusicBeatState {
 		serverOption.ID = i++;
 
 		var networkServerOption:InputOption;
-		items.add(networkServerOption = new InputOption("Network Server Address", "The server for Network social features.\nSet to empty if you want to use the default server.\n\nDefault Server: " + GameClient.getDefaultServer()
+		items.add(networkServerOption = new InputOption("Ağ Sunucu Adresi", "Sosyal bilgiler için ağ sunucusu.\nVarsayılan sunucuyu kullanmak için boş bırakın.\n\nVarsayılan Sunucu: " + GameClient.getDefaultServer()
 		, [GameClient.getDefaultServer()], (text, _) -> {
 			curOption.inputs[0].text = prepareAddress(curOption.inputs[0].text);
 			GameClient.networkServerAddress = curOption.inputs[0].text;
@@ -148,10 +148,10 @@ class OnlineOptionsState extends MusicBeatState {
 		networkServerOption.ID = i++;
 
 		var trustedOption:InputOption;
-		items.add(trustedOption = new InputOption("Clear Trusted Domains", "Clear the list of all trusted domains!", null, () -> {
+		items.add(trustedOption = new InputOption("Güvenilir Alanları Sıfırla", "Güvenilir alan adlarının listesini sıfırlayın!", null, () -> {
 			ClientPrefs.data.trustedSources = ["https://gamebanana.com/"];
 			ClientPrefs.saveSettings();
-			Alert.alert("Cleared the trusted domains list!", "");
+			Alert.alert("Güvenilir alanlar sıfırlandı!", "");
 		}));
 		trustedOption.y = networkServerOption.y + networkServerOption.height + 50;
 		trustedOption.screenCenter(X);
@@ -159,7 +159,7 @@ class OnlineOptionsState extends MusicBeatState {
 
 		var lastOption:InputOption;
 		var recentOption:InputOption;
-		items.add(recentOption = new InputOption("Enable SSL Verification", "If checked, the game will check for valid SSL Certifications, which can lead to safer connections with downloads or rooms.\n(But It's not recommended because of Haxe\'s flawed sockets implementation.)", 
+		items.add(recentOption = new InputOption("SSL Doğrulamasını Etkinleştir", "Aktif Edildiğinde, oyun geçerli SSL Sertifikalarını kontrol eder ve bu da indirmeler veya odalarla daha güvenli bağlantılar sağlar.\n(Ancak Haxe nin hatalı soket uygulaması nedeniyle bu önerilmez.)",
 		ClientPrefs.data.verifySSL,
 		() -> {
 			recentOption.checked = !recentOption.checked;
@@ -172,13 +172,13 @@ class OnlineOptionsState extends MusicBeatState {
 		recentOption.ID = i++;
 
 		if (Auth.authID == null && Auth.authToken == null) {
-			var section = new FlxText(0, recentOption.y + recentOption.height + 100, FlxG.width, "Account");
+			var section = new FlxText(0, recentOption.y + recentOption.height + 100, FlxG.width, "Hesap");
 			section.setFormat("VCR OSD Mono", 25, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			add(section);
 
 			var registerOption:InputOption;
-			items.add(registerOption = new InputOption("Register to the Network",
-					"Join the Psych Online Network and submit your song replays\nto the leaderboards!", ["Username", "Email"], (text, input) -> {
+			items.add(registerOption = new InputOption("Ağa Katılın",
+					"Psych Online Network'e katılın ve şarkı tekrarlarınızı\nliderlik tablolarına gönderin!" + (!Main.UNOFFICIAL_BUILD ? '\n(UYARI: Resmi olmayan bir sürümde oynuyorsunuz.)' : ''), ["Kullanıcı", "E-posta"], (text, input) -> {
 					if (input == 0) {
 						registerOption.inputs[0].hasFocus = false;
 						registerOption.inputs[1].hasFocus = true;
@@ -190,7 +190,7 @@ class OnlineOptionsState extends MusicBeatState {
 					registerOption.inputs[1].text = registerOption.inputs[1].text.trim();
 
 					if (registerOption.inputs[0].text.length <= 0) {
-						Alert.alert('No username set!');
+						Alert.alert('Kullanıcı adı ayarlanmadı!');
 						return;
 					}
 
@@ -204,7 +204,7 @@ class OnlineOptionsState extends MusicBeatState {
 					if (FunkinNetwork.requestRegister(registerOption.inputs[0].text, registerOption.inputs[1].text)) {
 						openSubState(new VerifyCodeSubstate(code -> {
 							if (FunkinNetwork.requestRegister(registerOption.inputs[0].text, registerOption.inputs[1].text, code)) {
-								Alert.alert("Successfully registered!");
+								Alert.alert("Başarıyla kayıt olundu!");
 								FlxG.resetState();
 							}
 						}));
@@ -218,12 +218,12 @@ class OnlineOptionsState extends MusicBeatState {
 			}
 
 			var loginOption:InputOption;
-			items.add(loginOption = new InputOption("Login to the Network",
-				"Input your email address here and wait for your One-Time Login Code!", ["me@example.org"], (mail, _) -> {
+			items.add(loginOption = new InputOption("Ağa Giriş Yapın",
+				"E-posta adresinizi buraya girin ve Tek Kullanımlık Giriş Kodunuzu bekleyin!" + (!Main.UNOFFICIAL_BUILD ? '' : ''), ["ben@örnek.com"], (mail, _) -> {
 					if (FunkinNetwork.requestLogin(mail)) {
 						openSubState(new VerifyCodeSubstate(code -> {
 							if (FunkinNetwork.requestLogin(mail, code)) {
-								Alert.alert("Successfully logged in!");
+								Alert.alert("Başarıyla giriş yapıldı!");
 								FlxG.resetState();
 							}
 						}));
@@ -236,8 +236,8 @@ class OnlineOptionsState extends MusicBeatState {
 		else {
 			lastOption = recentOption;
 			var recentOption:InputOption;
-			items.add(recentOption = new InputOption("Network Chat Notifications", 
-			'If checked, all messages from the Network Chat will be notified to you.\nCan be toggled with "/notify" Network command.', 
+			items.add(recentOption = new InputOption("Ağ Sohbeti Bildirimleri",
+			'Aktif Edildiğinde, Ağ Sohbetinden gelen tüm mesajlar size bildirilir.\n /notify komutuyla değiştirilebilir.',
 			ClientPrefs.data.notifyOnChatMsg,
 			() -> {
 				recentOption.checked = !recentOption.checked;
@@ -250,8 +250,8 @@ class OnlineOptionsState extends MusicBeatState {
 
 			lastOption = recentOption;
 			var recentOption:InputOption;
-			items.add(recentOption = new InputOption("Mute PM Notifications",
-				'If checked, PM notifications are muted.\nCan be toggled with "/notify pm" Network command.',
+			items.add(recentOption = new InputOption("ÖM Bildirimlerini Sessize Al",
+				'Aktif Edildiğinde, Özel Mesaj bildirimleri sessize alınır.\n /notify pm Ağ komutuyla değiştirilebilir.',
 				ClientPrefs.data.disablePMs, () -> {
 					recentOption.checked = !recentOption.checked;
 					ClientPrefs.data.disablePMs = recentOption.checked;
@@ -263,8 +263,8 @@ class OnlineOptionsState extends MusicBeatState {
 
 			lastOption = recentOption;
 			var recentOption:InputOption;
-			items.add(recentOption = new InputOption("Mute Room Invites",
-				'If checked, room invites are muted.\nCan be toggled with "/notify roominvite" Network command.',
+			items.add(recentOption = new InputOption("Oda Davetlerini Sessize Al",
+				'Aktif Edildiğinde, oda davetleri sessize alınır.\n /notify roominvite ağ komutuyla değiştirilebilir.',
 				ClientPrefs.data.disableRoomInvites, () -> {
 					recentOption.checked = !recentOption.checked;
 					ClientPrefs.data.disableRoomInvites = recentOption.checked;
@@ -276,8 +276,8 @@ class OnlineOptionsState extends MusicBeatState {
 
 			lastOption = recentOption;
 			var recentOption:InputOption;
-			items.add(recentOption = new InputOption("Notify when Friend is Online",
-				'If checked, you\'ll receive a notification when your friend goes online.\nCan be toggled with "/notify friend" Network command.',
+			items.add(recentOption = new InputOption("Arkadaş Çevrimiçi Bildirimi",
+				'Aktif Edildiğinde, arkadaşınız çevrimiçi olduğunda bir bildirim alırsınız.\n /notify friend ağ komutuyla etkinleştirilebilir.',
 				ClientPrefs.data.friendOnlineNotification, () -> {
 					recentOption.checked = !recentOption.checked;
 					ClientPrefs.data.friendOnlineNotification = recentOption.checked;
@@ -288,7 +288,7 @@ class OnlineOptionsState extends MusicBeatState {
 			recentOption.ID = i++;
 
 			var sezOption:InputOption;
-			items.add(sezOption = new InputOption("Leave a Global Message", "Leave a message for others to see in the Online Menu!\n(Please keep it English)", ["Message"],
+			items.add(sezOption = new InputOption("Global Mesaj Yaz", "Başkalarına sizin çevrimiçi hesabınızda görebileceği bir mesaj yazın!\n(Lütfen İngilizce yaz.)", ["Mesaj"],
 				(message, _) -> {
 					if (FunkinNetwork.postFrontMessage(message))
 						FlxG.switchState(() -> new OnlineState());
@@ -298,19 +298,19 @@ class OnlineOptionsState extends MusicBeatState {
 			sezOption.ID = i++;
 
 			var sidebarOption:InputOption;
-			items.add(sidebarOption = new InputOption("Open Sidebar", "Open the Network Sidebar" + ((!controls.mobileControls) ? ", if you aren't able to.\n(Press " + InputFormatter.getKeyName(cast(ClientPrefs.keyBinds.get('sidebar')[0], FlxKey)) + " to open it at any time!)" : ""), null, () -> {
+			items.add(sidebarOption = new InputOption("Yan Barı Aç", "Ağ yan barını aç, eğer yapamıyorsanız.\n(Yan barı istediğiniz zaman açmak için " + InputFormatter.getKeyName(cast(ClientPrefs.keyBinds.get('sidebar')[0], FlxKey)) + " tuşuna basın!)", null, () -> {
 				online.gui.sidebar.SideUI.instance.active = true;
 			}));
 			sidebarOption.y = sezOption.y + sezOption.height + 50;
 			sidebarOption.screenCenter(X);
 			sidebarOption.ID = i++;
 
-			var section = new FlxText(0, sidebarOption.y + sidebarOption.height + 100, FlxG.width, "Account");
+			var section = new FlxText(0, sidebarOption.y + sidebarOption.height + 100, FlxG.width, "Hesap");
 			section.setFormat("VCR OSD Mono", 25, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			add(section);
 
 			var loginBrowserOption:InputOption;
-			items.add(loginBrowserOption = new InputOption("Login to Browser", "Authenticates you to the network in your default web browser", null, () -> {
+			items.add(loginBrowserOption = new InputOption("Tarayıcıda Giriş Yap", "Varsayılan web tarayıcınızda ağa kimliğinizi doğrular.", null, () -> {
 				FlxG.openURL(FunkinNetwork.client.getURL("/api/auth/cookie?id=" + Auth.authID + "&token=" + Auth.authToken));
 			}));
 			loginBrowserOption.y = section.y + 100;
@@ -318,12 +318,12 @@ class OnlineOptionsState extends MusicBeatState {
 			loginBrowserOption.ID = i++;
 
 			var emailOption:InputOption;
-			items.add(emailOption = new InputOption("Change Email Address",
+			items.add(emailOption = new InputOption("E-posta Adresini Değiştir",
 				"Use the following format:\n<new_mail> from <old_mail>", ["new@example.org from old@example.org"], (mail, _) -> {
 					if (FunkinNetwork.setEmail(mail)) {
 						openSubState(new VerifyCodeSubstate(code -> {
 							if (FunkinNetwork.setEmail(mail, code)) {
-								Alert.alert("Email Successfully Added!");
+								Alert.alert("Email Başarıyla Eklendi!");
 							}
 						}));
 					}
@@ -333,12 +333,12 @@ class OnlineOptionsState extends MusicBeatState {
 			emailOption.ID = i++;
 			
 			var deleteOption:InputOption;
-			items.add(deleteOption = new InputOption("Delete Network Account", "Bye!", null, () -> {
-				RequestSubstate.request('Are you sure you want to delete your account?\n(This action is irreversible!)', '', _ -> {
+			items.add(deleteOption = new InputOption("Hesabınızı Silin", "Psych Online Hesabınızı SİLİN, (UYARI: BU İŞLEM GERİ ALINAMAZ)!", null, () -> {
+				RequestSubstate.request('Hesabınızı silmek istediğinizden emin misiniz?\n(Bu işlem geri alınamaz!)', '', _ -> {
 					if (FunkinNetwork.deleteAccount()) {
 						openSubState(new VerifyCodeSubstate(code -> {
 							if (FunkinNetwork.deleteAccount(code)) {
-								Alert.alert("Account Deleted");
+								Alert.alert("Hesap Silindi!");
 							}
 						}));
 					}
@@ -349,8 +349,8 @@ class OnlineOptionsState extends MusicBeatState {
 			deleteOption.ID = i++;
 
 			var logoutOption:InputOption;
-			items.add(logoutOption = new InputOption("Logout of the Network", "Logout of the Psych Online Network", null, () -> {
-				RequestSubstate.request('Are you sure you want to logout?', '', _ -> {
+			items.add(logoutOption = new InputOption("Hesaptan Çık", "Pysch Online Ağından Çıkın, hesabınıza tekrar girebilirsiniz.", null, () -> {
+				RequestSubstate.request('Çıkış yapmak istediğinizden emin misiniz?', '', _ -> {
 					FunkinNetwork.logout();
 					FlxG.resetState();
 				}, null, true);
@@ -390,7 +390,7 @@ class OnlineOptionsState extends MusicBeatState {
 			if (!controls.mobileControls && (FlxG.mouse.deltaScreenX != 0 || FlxG.mouse.deltaScreenY != 0 || FlxG.mouse.justPressed)) {
                 curSelected = -1;
                 var i = 0;
-                 for (item in items) {
+                for (item in items) {
                     if (!controls.mobileControls && FlxG.mouse.overlaps(item, camera)) {
                         curSelected = i;
                         break;
@@ -603,7 +603,6 @@ class InputOption extends FlxSpriteGroup {
 		add(borderline);
     }
 
-	//var targetScale:Float = 1;
 	override function update(elapsed) {
 		super.update(elapsed);
 
@@ -625,7 +624,6 @@ class InputOption extends FlxSpriteGroup {
 					check.scale.set(FlxMath.lerp(check.scale.x, 0.01, elapsed * 15), FlxMath.lerp(check.scale.y, 0.01, elapsed * 15));
 			}
 		}
-
 		//targetScale = alpha == 1 ? 1.02 : 1;
 		//scale.set(FlxMath.lerp(scale.x, targetScale, elapsed * 10), FlxMath.lerp(scale.y, targetScale, elapsed * 10));
 	}

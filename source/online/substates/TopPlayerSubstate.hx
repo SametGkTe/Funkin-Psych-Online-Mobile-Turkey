@@ -6,7 +6,7 @@ import openfl.filters.BlurFilter;
 import online.network.Leaderboard;
 
 class TopPlayerSubstate extends MusicBeatSubstate {
-	var topShit:Scoreboard = new Scoreboard(FlxG.width - 300, 35, 15, ["PLAYER", "POINTS"]);
+	var topShit:Scoreboard = new Scoreboard(FlxG.width - 300, 35, 15, ["OYUNCU", "PUANLAR"]);
 
 	var blurFilter:BlurFilter;
 	var blackSprite:FlxSprite;

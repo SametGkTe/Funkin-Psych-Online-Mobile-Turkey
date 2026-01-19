@@ -49,7 +49,7 @@ class SelectStageSubstate extends MusicBeatSubstate {
         stageNames = stages[0];
         stageMods = stages[1];
 
-        stageNames.unshift('(default)');
+        stageNames.unshift('(varsayılan)');
         stageMods.unshift('');
 
         add(options = new FlxTypedGroup<StageText>());
@@ -59,13 +59,13 @@ class SelectStageSubstate extends MusicBeatSubstate {
         for (i in 0...stageNames.length) {
             var text = new StageText(this, 50, 50 + 50 * i, stageNames[i]);
             if (stageNames[i] == "(default)")
-                text.createDetails('Default option uses the stage of the currently selected song');
+                text.createDetails('Varsayılan seçenek, Oynanan Şarkıda seçili olan şarkının sahnesini kullanır');
             else {
                 if (stageMods[i] != '') {
-                    text.createDetails(' from ' + stageMods[i].substr(0, 40) + (stageMods[i].length > 40 ? '...' : ''));
+                    text.createDetails(' Kaynak: ' + stageMods[i].substr(0, 40) + (stageMods[i].length > 40 ? '...' : ''));
                 }
                 else {
-                    text.createDetails(' from Vanilla');
+                    text.createDetails(' Kaynak: Varsayılan');
                 }
             }
 			text.ID = i;
@@ -126,7 +126,7 @@ class SelectStageSubstate extends MusicBeatSubstate {
                 stageURL = OnlineMods.getModURL(stageMods[curSelected]);
             }
             GameClient.send("setStage", [stageNames[curSelected], stageMods[curSelected], stageURL]);
-            Alert.alert("Stage set to " + stageNames[curSelected] + "!");
+            Alert.alert("Sahne " + stageNames[curSelected] + " olarak ayarlandı!");
             close();
         }
     }

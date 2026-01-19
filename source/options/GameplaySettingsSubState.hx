@@ -4,49 +4,49 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 {
 	public function new()
 	{
-		title = 'Gameplay';
-		rpcTitle = 'Gameplay Settings Menu'; //for Discord Rich Presence
+		title = 'Oynanis';
+		rpcTitle = 'Oynanış Ayarları Menüsünde'; //for Discord Rich Presence
 
 		//I'd suggest using "Downscroll" as an example for making your own option since it is the simplest here
-		var option:Option = new Option('Downscroll', //Name
-			'If checked, notes go Down instead of Up, simple enough.', //Description
+		var option:Option = new Option('Asagi Oklar', //Name
+			'Aktif Edildiğinde, notalarınız aşağıya sıralanır.', //Description
 			'downScroll', //Save data variable name
 			'bool'); //Variable type
 		addOption(option);
 
-		var option:Option = new Option('Middlescroll',
-			'If checked, your notes get centered.',
+		var option:Option = new Option('Orta Oklar',
+			'Aktif Edildiğinde, notalarınız ortalanır.',
 			'middleScroll',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Opponent Notes',
-			'If unchecked, opponent notes get hidden.',
+		var option:Option = new Option('Rakip Notalari',
+			'Aktif Edilmezse, rakibin notları gizlenir.',
 			'opponentStrums',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Ghost Tapping',
-			"If checked, you won't get misses from pressing keys\nwhile there are no notes able to be hit.",
+		var option:Option = new Option('Hayalet Dokunus',
+			"Aktif Edildiğinde, çalınabilecek nota olmadığı halde\ntuşlara basarak kaçırma yapmazsınız.",
 			'ghostTapping',
 			'bool');
 		addOption(option);
 		
-		var option:Option = new Option('Auto Pause',
-			"If checked, the game automatically pauses if the screen isn't on focus.",
+		var option:Option = new Option('Otomatik Durdurma',
+			"Aktif Edildiğinde, ekran odaklanmadığında oyun otomatik olarak duraklatılır.",
 			'autoPause',
 			'bool');
 		addOption(option);
 		option.onChange = onChangeAutoPause;
 
-		var option:Option = new Option('Disable Reset Button',
-			"If checked, pressing Reset won't do anything.",
+		var option:Option = new Option('Reset Butonunu Kapat',
+			"Aktif Edildiğinde, Sıfırla düğmesine basmak hiçbir şey yapmaz.",
 			'noReset',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Hitsound Volume',
-			'Funny notes does \"Tick!\" when you hit them."',
+		var option:Option = new Option('Tus Sesi',
+			'Notalara Basıldığında \"Tik!\" Sesi çıkarır"',
 			'hitsoundVolume',
 			'percent');
 		addOption(option);
@@ -57,8 +57,8 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.decimals = 1;
 		option.onChange = onChangeHitsoundVolume;
 
-		var option:Option = new Option('Rating Offset',
-			'Changes how late/early you have to hit for a "Sick!"\nHigher values mean you have to hit later.',
+		var option:Option = new Option('Derece Ayari',
+			'"Sick!"\nİçin ne kadar geç/erken vurmanız gerektiğini değiştirir. Daha yüksek değerler, daha geç vurmanız gerektiği anlamına gelir.',
 			'ratingOffset',
 			'int');
 		option.displayFormat = '%vms';
@@ -99,8 +99,8 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		// option.maxValue = 135;
 		// addOption(option);
 
-		var option:Option = new Option('Safe Frames',
-			'Changes how many frames you have for\nhitting a note earlier or late.',
+		var option:Option = new Option('Güvenli Kareler',
+			'Notaya erken veya geç vurmak için sahip olunan\nkare (frame) sayısını değiştirir.',
 			'safeFrames',
 			'float');
 		option.scrollSpeed = 5;
@@ -109,37 +109,37 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.changeValue = 0.1;
 		addOption(option);
 
-		var option:Option = new Option('Disable Note Modchart',
-			'If checked, strum notes will no longer move or change their opacity to invisible.',
+		var option:Option = new Option('Oynamaz Notalar',
+			'Seçilirse, vuruş notaları artık hareket etmeyecek veya görünürlükleri değişmeyecek.',
 			'disableStrumMovement',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Disable Recording Replays',
-			'If checked, the game will no longer record your gameplay, this will cause your scores to not be submitted to the leaderboard!',
+		var option:Option = new Option('Tekrarlari Kaydet',
+			'Aktif edilirse, oyun oynanışınızı kaydeder ve skorlarınız liderlik tablosuna gönderilir (V1 Sürümünde Çalışmayabilir).',
 			'disableReplays',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Disable Leaderboard Submiting',
-			'If checked, the game will no longer submit your replays to the leaderboard\nCan be toggled in-game with F2',
+		var option:Option = new Option('Istatislik Gönder',
+			'Aktif Edilirse, oyun tekrarlarınızı liderlik tablosuna gönderir. Oyun sırasında F2 tuşu ile açılıp kapatılabilir. (V1 Sürümünde Çalışmayabilir)',
 			'disableSubmiting',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Disable Lag Detection',
-			'If checked, the game will no longer rewind 3 seconds when a lag is detected',
+		var option:Option = new Option('Gecikme Algilamayi Kapat',
+			'Aktif edilirse, oyunda veya modda bir gecikme (lag) algıladığında 3 saniye geri sarma yapmayacaktır.',
 			'disableLagDetection',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Modchart Skin Changes',
-			'If enabled, the song events will change the character of your active skin',
+		var option:Option = new Option('Mod Kostüm Degisikligi',
+			'Aktif edilirse, şarkı olayları (song events) aktif olan görünümünüzdeki (skin) karakteri değiştirecektir.',
 			'modchartSkinChanges',
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Note Underlay Opacity', 'If higher than 0%, an underlay will be displayed behind player notes.', 'noteUnderlayOpacity', 'percent');
+		var option:Option = new Option('Alt Nota Opakligi', 'If higher than 0%, an underlay will be displayed behind player notes.', 'noteUnderlayOpacity', 'percent');
 		addOption(option);
 		option.scrollSpeed = 1.6;
 		option.minValue = 0.0;
@@ -147,11 +147,11 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.changeValue = 0.05;
 		option.decimals = 2;
 
-		var option:Option = new Option('Note Underlay Type:',
-			"How should the game render note underlays.",
+		var option:Option = new Option('Alt Nota Tipi:',
+			"Oyun notaların altını nasıl göstermeli?",
 			'noteUnderlayType',
 			'string',
-			['All-In-One', 'By Note']);
+			['Hepsi-Bir-Arada', 'Notaya Göre']);
 		addOption(option);
 
 		super();

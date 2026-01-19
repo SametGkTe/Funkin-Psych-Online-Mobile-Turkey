@@ -10,4 +10,5 @@ import openfl.Lib;
 import openfl.display.Bitmap;
 import openfl.display.Sprite;
 import online.gui.sidebar.obj.*;
+import online.gui.sidebar.SideUI.uiScale as S;
 #end

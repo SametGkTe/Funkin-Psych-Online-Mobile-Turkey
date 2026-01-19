@@ -20,12 +20,13 @@ import options.OptionsState;
 #end
 class MainMenuState extends MusicBeatState
 {
-	public static var psychEngineVersion:String = '0.7.1h'; // This is also used for Discord RPC
+	public static var psychEngineVersion:String = '0.7.1h';
+// This is also used for Discord RPC
 	public static var curSelected:Int = 0;
 
 	var menuItems:FlxTypedGroup<FlxSprite>;
 	private var camGame:FlxCamera;
-	private var camAchievement:FlxCamera;
+private var camAchievement:FlxCamera;
 	
 	var optionShit:Array<String> = [
 		'story_mode',
@@ -40,8 +41,7 @@ class MainMenuState extends MusicBeatState
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 	var updatEBg:FlxSprite;
-
-	public function new() {
+public function new() {
 		super();
 	}
 
@@ -52,13 +52,14 @@ class MainMenuState extends MusicBeatState
 		#end
 		Mods.loadTopMod();
 
-		#if DISCORD_ALLOWED
+		// OPTİMİZASYON: Discord RPC mobil cihazlarda gereksizdir.
+		#if DISCORD_ALLOWED && !mobile
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("In the Menus", null);
+		DiscordClient.changePresence("Menüde", null);
 		#end
 
 		camGame = new FlxCamera();
-		camAchievement = new FlxCamera();
+camAchievement = new FlxCamera();
 		camAchievement.bgColor.alpha = 0;
 
 		FlxG.cameras.reset(camGame);
@@ -67,26 +68,24 @@ class MainMenuState extends MusicBeatState
 
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
-
-		persistentUpdate = persistentDraw = true;
+persistentUpdate = persistentDraw = true;
 
 		var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1);
-		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
+var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
 		bg.antialiasing = ClientPrefs.data.antialiasing;
 		bg.scrollFactor.set(0, yScroll);
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.updateHitbox();
 		bg.screenCenter();
 		add(bg);
-
-		camFollow = new FlxObject(0, 0, 1, 1);
+camFollow = new FlxObject(0, 0, 1, 1);
 		add(camFollow);
 
 		magenta = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
 		magenta.antialiasing = ClientPrefs.data.antialiasing;
 		magenta.scrollFactor.set(0, yScroll);
 		magenta.setGraphicSize(Std.int(magenta.width * 1.175));
-		magenta.updateHitbox();
+magenta.updateHitbox();
 		magenta.screenCenter();
 		magenta.visible = false;
 		magenta.color = 0xFFfd719b;
@@ -98,62 +97,62 @@ class MainMenuState extends MusicBeatState
 		add(menuItems);
 
 		var scale:Float = 1;
-		/*if(optionShit.length > 6) {
+/*if(optionShit.length > 6) {
 			scale = 6 / optionShit.length;
 		}*/
 
 		for (i in 0...optionShit.length)
 		{
 			var offset:Float = 108 - (Math.max(optionShit.length, 4) - 4) * 80;
-			var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset);
+var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset);
 			menuItem.antialiasing = ClientPrefs.data.antialiasing;
 			menuItem.scale.x = scale;
 			menuItem.scale.y = scale;
-			menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
+menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
 			menuItem.animation.addByPrefix('idle', optionShit[i] + " basic", 24);
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
 			menuItem.animation.play('idle');
-			menuItem.ID = i;
+menuItem.ID = i;
 			menuItem.screenCenter(X);
 			menuItems.add(menuItem);
 			var scr:Float = (optionShit.length - 4) * 0.135;
 			if(optionShit.length < 6) scr = 0;
-			menuItem.scrollFactor.set(0, scr);
+menuItem.scrollFactor.set(0, scr);
 			//menuItem.setGraphicSize(Std.int(menuItem.width * 0.58));
 			menuItem.updateHitbox();
 		}
 
 		FlxG.camera.follow(camFollow, null, 0.15);
 
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 64, 0, "Psych Online v" + Main.PSYCH_ONLINE_VERSION, 12);
-		versionShit.scrollFactor.set();
+		var versionShit:FlxText = new FlxText(12, FlxG.height - 64, 0, "P.E.T Online v" + Main.PSYCH_ONLINE_VERSION, 12);
+versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 0, !Main.UNOFFICIAL_BUILD ? "(OFFICIAL BUILD)" : "(NOT AN OFFICIAL BUILD)", 12);
-		if (Main.UNOFFICIAL_BUILD)
+var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 0, !Main.UNOFFICIAL_BUILD ? "(RESMI SÜRÜM)" : "(RESMI SÜRÜM DEGIL)", 12);
+if (Main.UNOFFICIAL_BUILD)
 			versionShit.color = FlxColor.RED;
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "Psych Engine v" + psychEngineVersion + "*", 12);
+var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "Psych Engine v" + psychEngineVersion + "*", 12);
 		versionShit.scrollFactor.set();
-		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
 
 		if (Main.wankyUpdate != null) {
 			var updatE:FlxText = new FlxText(12, FlxG.height - 64, 0, Main.wankyUpdate, 12);
-			updatE.scrollFactor.set();
+updatE.scrollFactor.set();
 			updatE.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			updatE.setPosition(FlxG.width - updatE.width - 40, 40);
 
 			updatEBg = new FlxSprite();
 			updatEBg.scrollFactor.set();
-			updatEBg.makeGraphic(Std.int(updatE.width) + 40, Std.int(updatE.height) + 40, FlxColor.BLACK);
+updatEBg.makeGraphic(Std.int(updatE.width) + 40, Std.int(updatE.height) + 40, FlxColor.BLACK);
 			updatEBg.alpha = 0.5;
 			updatEBg.setPosition(updatE.x - 20, updatE.y - 20);
 			add(updatEBg);
 			add(updatE);
-		}
+}
 
 		FlxG.mouse.visible = true;
 
@@ -162,9 +161,14 @@ class MainMenuState extends MusicBeatState
 		changeItem();
 
 		var leDate = Date.now();
-
+		
 		#if ACHIEVEMENTS_ALLOWED
-		// Unlocks "Freaky on a Friday Night" achievement if it's a Friday and between 18:00 PM and 23:59 PM
+		if (FlxG.save.data.hasPlayedBefore == null || !FlxG.save.data.hasPlayedBefore) {
+			backend.Achievements.unlock('peto');
+			FlxG.save.data.hasPlayedBefore = true;
+			FlxG.save.flush();
+		}
+		
 		if (leDate.getDay() == 5 && leDate.getHours() >= 18) {
 			online.backend.DateEvent.isFridayNight = true;
 			Achievements.unlock('friday_night_play');
@@ -185,8 +189,7 @@ class MainMenuState extends MusicBeatState
 	}
 
 	var selectedSomethin:Bool = false;
-
-	override function update(elapsed:Float)
+override function update(elapsed:Float)
 	{
 		if (FlxG.sound.music.volume < 0.8)
 		{
@@ -194,7 +197,7 @@ class MainMenuState extends MusicBeatState
 
 			for (v in [FreeplayState.vocals, FreeplayState.opponentVocals]) {
 				if (v == null) continue;
-				v.volume += 0.5 * elapsed;
+v.volume += 0.5 * elapsed;
 			}
 		}
 		//FlxG.camera.followLerp = FlxMath.bound(elapsed * 9 / (FlxG.updateFramerate / 60), 0, 1);
@@ -205,7 +208,7 @@ class MainMenuState extends MusicBeatState
 			{
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 				changeItem(-1);
-			}
+}
 
 			if (controls.UI_DOWN_P)
 			{
@@ -213,6 +216,9 @@ class MainMenuState extends MusicBeatState
 				changeItem(1);
 			}
 
+			// OPTİMİZASYON: Mobil cihazlarda fare tekerleği (mouse wheel) ve 'deltaY' (hover/sürükleme) kontrolü gereksiz/verimsiz.
+			// Bu kontrolleri sadece masaüstü için ayırıyoruz.
+			#if !mobile
 			if (FlxG.mouse.deltaScreenY != 0) {
 				menuItems.forEach(function(spr:FlxSprite) {
 					if (FlxG.mouse.overlaps(spr, spr.camera) && spr.ID - curSelected != 0) {
@@ -225,15 +231,30 @@ class MainMenuState extends MusicBeatState
 			if (FlxG.mouse.wheel != 0) {
 				changeItem(-FlxG.mouse.wheel);
 			}
+			#end
 
 			if (controls.BACK)
 			{
 				selectedSomethin = true;
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 				FlxG.switchState(() -> new TitleState());
+}
+			var tappedToConfirm:Bool = false;
+			if (FlxG.mouse.justPressed)
+			{
+				menuItems.forEach(function(spr:FlxSprite) {
+					if (FlxG.mouse.overlaps(spr, spr.camera)) {
+						if(curSelected != spr.ID) // Yeni bir öğeye dokunuldu
+						{
+							FlxG.sound.play(Paths.sound('scrollMenu'));
+							changeItem(spr.ID - curSelected);
+						}
+						tappedToConfirm = true;
+					}
+				});
 			}
 
-			if (controls.ACCEPT #if desktop || (FlxG.mouse.justPressed && FlxG.mouse.overlaps(menuItems.members[curSelected])) #end)
+			if (controls.ACCEPT || tappedToConfirm #if desktop || (FlxG.mouse.justPressed && FlxG.mouse.overlaps(menuItems.members[curSelected])) #end)
 			{
 				if (optionShit[curSelected] == 'donate')
 				{
@@ -243,8 +264,7 @@ class MainMenuState extends MusicBeatState
 				{
 					selectedSomethin = true;
 					FlxG.sound.play(Paths.sound('confirmMenu'));
-
-					if(ClientPrefs.data.flashing) FlxFlicker.flicker(magenta, 0.5, 0.15, false);
+if(ClientPrefs.data.flashing) FlxFlicker.flicker(magenta, 0.5, 0.15, false);
 
 					menuItems.forEach(function(spr:FlxSprite)
 					{
@@ -280,7 +300,7 @@ class MainMenuState extends MusicBeatState
 										FlxG.switchState(() -> new CreditsState());
 									case 'options':
 										LoadingState.loadAndSwitchState(new OptionsState());
-										OptionsState.onPlayState = false;
+OptionsState.onPlayState = false;
 										OptionsState.onOnlineRoom = false;
 										if (PlayState.SONG != null)
 										{
@@ -289,7 +309,7 @@ class MainMenuState extends MusicBeatState
 										}
 									case 'online':
 										FlxG.switchState(() -> new OnlineState());
-								}
+}
 							});
 						}
 					});
@@ -299,7 +319,7 @@ class MainMenuState extends MusicBeatState
 			{
 				selectedSomethin = true;
 				FlxG.switchState(() -> new MasterEditorMenu());
-			}
+}
 
 			if (FlxG.mouse.justPressed && updatEBg != null && FlxG.mouse.overlaps(updatEBg)) {
 				if (TitleState.mustUpdate)
@@ -316,10 +336,14 @@ class MainMenuState extends MusicBeatState
 
 		super.update(elapsed);
 
+		// OPTİMİZASYON: Bu döngü her karede çalışarak tüm menü öğelerini gereksiz yere yeniden ortalıyordu.
+		// Öğeler X ekseninde hareket etmediği için bu tamamen gereksizdir ve CPU israfıdır.
+		/*
 		menuItems.forEach(function(spr:FlxSprite)
 		{
 			spr.screenCenter(X);
 		});
+		*/
 	}
 
 	function changeItem(huh:Int = 0)
@@ -328,7 +352,7 @@ class MainMenuState extends MusicBeatState
 
 		if (curSelected >= menuItems.length)
 			curSelected = 0;
-		if (curSelected < 0)
+if (curSelected < 0)
 			curSelected = menuItems.length - 1;
 
 		menuItems.forEach(function(spr:FlxSprite)
@@ -347,5 +371,5 @@ class MainMenuState extends MusicBeatState
 				spr.centerOffsets();
 			}
 		});
-	}
+}
 }

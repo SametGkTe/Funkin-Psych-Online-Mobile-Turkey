@@ -80,7 +80,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 
 	function registerMessages() {
 		if (GameClient.getPlayerSelf() == null) {
-			GameClient.leaveRoom('Self not in the room.');
+			GameClient.leaveRoom('Oda içinde bulunmayan kişi.');
 			return;
 		}
 
@@ -251,7 +251,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 		super.create();
 
 		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("In the Lobby", null, null, false);
+		DiscordClient.changePresence("Lobide", null, null, false);
 		#end
 
 		WeekData.reloadWeekFiles(false);
@@ -341,7 +341,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 						var anims = "";
 						for (anim in @:privateAccess getCharacterSelf().animation._animations)
 							anims += '"${anim.name}" ';
-						ChatBox.addMessage("> Please enter the animation you want to play!\nAvailable animations: " + anims);
+						ChatBox.addMessage("> Oynatmak istediğiniz animasyonu girin!\nMevcut animasyonlar:" + anims);
 					}
 					return true;
 				case "results":
@@ -351,7 +351,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 					checkStage();
 					return true;
 				case "help":
-					ChatBox.addMessage("> Room Commands: /pa <anim>, /results, /restage");
+					ChatBox.addMessage("> Oda Komutları: /pa <anim>, /results, /restage");
 			}
 			return false;
 		});
@@ -413,7 +413,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 		playIcon.ID = 2;
 		items.add(playIcon);
 
-		roomCode = new FlxText(0, 0, 0, "Room Code: ????");
+		roomCode = new FlxText(0, 0, 0, "Oda Kodu: ????");
 		roomCode.setFormat("VCR OSD Mono", 18, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		roomCode.x = settingsIconBg.x + settingsIconBg.width - roomCode.width;
 		roomCode.y = settingsIconBg.y - roomCode.height - 10;
@@ -429,7 +429,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 		groupHUD.add(roomCodeBg);
 		items.add(roomCode);
 
-		songName = new FlxText(0, 0, 0, "Selected Song: ????");
+		songName = new FlxText(0, 0, 0, "Seçilen Şarkı: ????");
 		songName.setFormat("VCR OSD Mono", 18, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		songName.x = roomCodeBg.x + roomCodeBg.width - songName.width;
 		songName.y = roomCodeBg.y - songName.height - 10;
@@ -487,7 +487,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 		if (stage != null)
 			stage.createPost();
 
-		GameClient.send("status", "In the Lobby");
+		GameClient.send("status", "Lobide");
 
 		mobileManager.addMobilePad('FULL', 'B_C_Y_T_M');
 		mobileManager.addMobilePadCamera();
@@ -547,7 +547,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 	override function closeSubState() {
 		super.closeSubState();
 
-		GameClient.send("status", "In the Lobby");
+		GameClient.send("status", "Lobide");
 	}
 
 	var optionShake:FlxTween;
@@ -578,15 +578,15 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 
 		if (lastFocused != (chatBox.focused && chatBox.typeText.text.length > 0)) {
 			if (!lastFocused) // is now typing
-				GameClient.send("status", "Typing...");
+				GameClient.send("status", "Yazıyor...");
 			else
-				GameClient.send("status", "In the Lobby");
+				GameClient.send("status", "Lobide");
 		}
 
 		lastFocused = chatBox.focused && chatBox.typeText.text.length > 0;
 		
 		// if (FlxG.keys.justPressed.SPACE) {
-		// 	Alert.alert("Camera Location:", '${cum.scroll.x},${cum.scroll.y} x ${cum.zoom}');
+		// 	Alert.alert("Kamera Konumu:", '${cum.scroll.x},${cum.scroll.y} x ${cum.zoom}');
 		// }
 		// if (FlxG.keys.pressed.U) {
 		// 	cum.zoom -= elapsed * 0.5;
@@ -710,7 +710,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 				}
 				if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.C) {
 					Clipboard.text = GameClient.getRoomSecret(true);
-					Alert.alert("Room code copied!");
+					Alert.alert("Oda Kodu Kopyalandı!");
 				}
 
 				if (FlxG.keys.justPressed.SHIFT) {
@@ -733,7 +733,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 								GameClient.send("verifyChart", Md5.encode(Song.loadRawSong(GameClient.room.state.song, GameClient.room.state.folder)));
 							}
 							catch (exc) {
-								Alert.alert("Caught an exception!", ShitUtil.readableError(exc));
+								Alert.alert("Bir Hata Oluştu!", ShitUtil.readableError(exc));
 								if (optionShake != null)
 									optionShake.cancel();
 								optionShake = FlxTween.shake(playIcon, 0.05, 0.3, FlxAxes.X);
@@ -743,7 +743,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 							checkStage();
 
 							if (!hasStage) {
-								Alert.alert("You don't have the current stage!");
+								Alert.alert("Mevcut arkaplana sahip değilsiniz!");
 							}
 							else {
 								GameClient.send("startGame");
@@ -754,7 +754,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 								Alert.alert("Song isn't selected!");
 							}
 							else {
-								Alert.alert("You don't have the current song/mod!");
+								Alert.alert("Mevcut şarkıya veya moda sahip değilsiniz!");
 							}
 							var sond = FlxG.sound.play(Paths.sound('badnoise' + FlxG.random.int(1, 3)));
 							sond.pitch = 1.1;
@@ -763,7 +763,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 							optionShake = FlxTween.shake(playIcon, 0.05, 0.3, FlxAxes.X);
 						}
 					case 3:
-						roomCode.text = 'Room Code: "' + GameClient.getRoomSecret() + '"';
+						roomCode.text = 'Oda Kodu: "' + GameClient.getRoomSecret() + '"';
 						roomCode.x = settingsIconBg.x + settingsIconBg.width - roomCode.width;
 						roomCodeBg.scale.set(roomCode.width, roomCode.height);
 						roomCodeBg.updateHitbox();
@@ -771,21 +771,21 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 						if (revealTimer != null)
 							revealTimer.cancel();
 						revealTimer = new FlxTimer().start(10, (t) -> {
-							roomCode.text = "Room Code: ????";
+							roomCode.text = "Oda Kodu: ????";
 							roomCode.x = settingsIconBg.x + settingsIconBg.width - roomCode.width;
 							roomCodeBg.scale.set(roomCode.width, roomCode.height);
 							roomCodeBg.updateHitbox();
 							roomCodeBg.x = roomCode.x;
 						});
 						Clipboard.text = GameClient.getRoomSecret(true);
-						Alert.alert("Room code copied!");
+						Alert.alert("Oda Kodu Kopyalandı!");
 					case 4:
 						if (GameClient.hasPerms()) {
 							FlxG.switchState(() -> new FreeplayState());
 							FlxG.mouse.visible = false;
 						}
 						else {
-							Alert.alert("Only the host can do that!");
+							Alert.alert("Bunu Sadece Oda Sahibi Yapabilir!");
 							var sond = FlxG.sound.play(Paths.sound('badnoise' + FlxG.random.int(1, 3)));
 							sond.pitch = 1.1;
 							if (optionShake != null)
@@ -818,7 +818,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 				if (GameClient.hasPerms())
 					return true;
 
-				Alert.alert("Song isn't selected!");
+				Alert.alert("Şarkı seçilmedi!");
 				var sond = FlxG.sound.play(Paths.sound('badnoise' + FlxG.random.int(1, 3)));
 				sond.pitch = 1.1;
 				if (optionShake != null)
@@ -833,7 +833,7 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 				if (GameClient.hasPerms())
 					return true;
 
-				Alert.alert("You already have this song installed!");
+				Alert.alert("Bu şarkı zaten yüklü!");
 				var sond = FlxG.sound.play(Paths.sound('badnoise' + FlxG.random.int(1, 3)));
 				sond.pitch = 1.1;
 				if (optionShake != null)
@@ -871,10 +871,10 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 			}
 			else if (!ignoreAlert) {
 				if (GameClient.room.state.modURL == null || GameClient.room.state.modURL == "") {
-					Alert.alert("Mod couldn't be found!", "Host didn't specify the URL of this mod");
+					Alert.alert("Mod bulunamadı!", "Sunucu bu modun URL'sini belirtmedi.");
 				}
 				else if (Mods.getModDirectories().contains(GameClient.room.state.modDir)) {
-					Alert.alert("Mod couldn't be found!", "Expected mod data to exist in this path: " + (GameClient.room.state.modDir ?? #if mobile Sys.getCwd() + #end "mods/"));
+					Alert.alert("Mod bulunamadı!", "Bu yolda olması beklenen mod verileri: " + (GameClient.room.state.modDir ?? #if mobile Sys.getCwd() + #end "mods/"));
 				}
 				var sond = FlxG.sound.play(Paths.sound('badnoise' + FlxG.random.int(1, 3)));
 				sond.pitch = 1.1;
@@ -908,16 +908,16 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 		}
 
 		if (daModName == "" || GameClient.room.state.song == "") {
-			verifyMod.text = "No chosen mod.";
+			verifyMod.text = "Mod seçilmedi.";
 		}
 		else if (selfPlayer.hasSong) {
 			verifyMod.text = "Mod: " + daModName;
 		}
 		else {
 			if (GameClient.room.state.modURL == null || GameClient.room.state.modURL == "")
-				verifyMod.text = "No mod named: " + daModName + " (Unknown; Host didn't specify mod's URL)";
+				verifyMod.text = "İsimsiz Mod: " + daModName + " (Bilinmiyor; Sunucu modun URL'sini belirtmedi)";
 			else 
-				verifyMod.text = "No mod named: " + daModName + " (Download/Verify it here!)";
+				verifyMod.text = "İsimsiz Mod: " + daModName + " (Buradan indirin/doğrulayın!)";
 		}
 
 		verifyMod.x = songNameBg.x + songNameBg.width - verifyMod.width;
@@ -925,38 +925,33 @@ class RoomState extends MusicBeatState /*#if interpret implements interpret.Inte
 		verifyModBg.updateHitbox();
 		verifyModBg.x = verifyMod.x;
 
-		songName.text = "Selected Song: " + GameClient.room.state.song;
+		songName.text = "Seçilen Şarkı: " + GameClient.room.state.song;
 		if (GameClient.room.state.song == null || GameClient.room.state.song.trim() == "")
-			songName.text += "(None)";
+			songName.text += "(Yok)";
 		else if (!selfPlayer.hasSong)
-			songName.text += " (Not found!)";
+			songName.text += " (Bulunamadı!)";
 		songName.x = roomCodeBg.x + roomCodeBg.width - songName.width;
 		songNameBg.scale.set(songName.width, songName.height);
 		songNameBg.updateHitbox();
 		songNameBg.x = songName.x;
 
 		updateCharacters();
-
-		final settingsBind:String = !controls.mobileControls ? "\n\n(Keybind: SHIFT)" : "";
-		final chatBind:String = !controls.mobileControls ? "\n\n(Keybind: TAB)" : "";
-		final roomBind:String = !controls.mobileControls ? "\n\nACCEPT - Reveals the code and\ncopies it to your clipboard.\n\nCTRL + C - Copies the code without\nrevealing it on the screen." : "\n\nTOUCH - Reveals the code and\ncopies it to your clipboard.";
-		final modBind:String = !controls.mobileControls ? "\n\nRIGHT CLICK - Open Mod Downloader" : "\n\nTOUCH - Open Mod Downloader";
-		final lobbyBind:String = !controls.mobileControls ? "\nPress UI keybinds\nor use your mouse\nto select an option!" : "\nTouch UI keybinds\nto select an option!";
+		
 		switch (curSelected) {
 			case 0:
-				itemTip.text = " - SETTINGS - \nOpens server settings." + settingsBind;
+				itemTip.text = " - AYARLAR - \nSunucu ayarlarını açar\n\n(Kısayol: SHIFT)";
 			case 1:
-				itemTip.text = " - CHAT - \nOpens chat." + chatBind;
+				itemTip.text = " - SOHBET - \nSohbeti açar.\n\n(Kısayol: TAB)";
 			case 2:
-				itemTip.text = " - START GAME/READY - \nToggles your READY status.\n\nPlayers also need to have the\ncurrently selected mod installed.\n\n(Both sides can only\nhave up to 2 players).";
+				itemTip.text = " - OYUNU BASLAT - \nHAZIRLIK durumunuzu değiştirir.\n\nOyuncuların ayrıca şunlara sahip olması gerekir\nşu anda seçili mod yüklü.\n\n(Her iki taraf da sadece\nen fazla 2 oyuncu olabilir).";
 			case 3:
-				itemTip.text = " - ROOM CODE - \nUnique code of this room." + roomBind;
+				itemTip.text = " - ODA KODU - \nBu odanın benzersiz kodu.\n\nKABUL ET - Kodu gösterir ve\npanoya kopyalar.\n\nCTRL + C - Kod kopyalanır\nekranda göstererek.";
 			case 4:
-				itemTip.text = " - SELECT SONG - \nSelects the song.\n\n(Players with host permissions\ncan only do that)";
+				itemTip.text = " - ŞARKI SEÇIMI - \nŞarkıyı seçer.\n\n(Ev sahibi izinleri olan oyuncular\nyapabilir)";
 			case 5:
-				itemTip.text = " - MOD - \nDownloads the currently selected mod\nif it isn't installed.\n\nAfter you install it\npress this button again!" + modBind;
+				itemTip.text = " - MOD - \nSeçili modu indirir\neğer yüklü değilse.\n\nYükledikten sonra\nButona tekrar bas\n\nSağ tıklama - Mod indiriciyi aç";
 			default:
-				itemTip.text = " - LOBBY - " + lobbyBind;
+				itemTip.text = " - LOBI - \nUI tuş atamalarını basın\nveya farenizi kullanın\nSeçeneği seçmek için!";
 		}
 
 		itemTip.x = settingsIconBg.x + settingsIconBg.width - itemTip.width;
@@ -1080,7 +1075,7 @@ class LobbyCharacter extends FlxTypedGroup<FlxObject> {
 		profileBox.camera = camHUD;
 		add(profileBox);
 
-		dlSkinTxt = new FlxText(0, 0, 0, "DOWNLOAD SKIN");
+		dlSkinTxt = new FlxText(0, 0, 0, "KOSTÜMÜ İNDİR");
 		dlSkinTxt.setFormat("VCR OSD Mono", 18, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 
 		loadCharacter();
@@ -1146,13 +1141,12 @@ class LobbyCharacter extends FlxTypedGroup<FlxObject> {
 		, [yellowMarker]);
 
 		profileBox.desc.applyMarkup(
-			(player.verified && profileBox.profileData != null ? 
-				"Rank: " + ShitUtil.toOrdinalNumber(profileBox.profileData.rank) + "\n"
-			 : "") +
+		(player.verified && profileBox.profileData != null ? 
+		"Rütbe: " + ShitUtil.toOrdinalNumber(profileBox.profileData.rank) + "\n": "") +
 			"Ping: <p>" + player.ping + "ms<p>\n\n" +
 			player.status + "\n" +
-			(!player.isReady ? "NOT " : "") + "READY" +
-			(noSkin ? "\n(Unloaded Skin)" : "")
+			(player.isReady ? "HAZIR" : "HAZIR DEĞİL") +
+			(noSkin ? "\n(Yüklenmemiş Kostüm)" : "")
 		, [pingMarker]);
 
 		profileBox.updatePositions();

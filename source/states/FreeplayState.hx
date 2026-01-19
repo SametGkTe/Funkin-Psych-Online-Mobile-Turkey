@@ -90,7 +90,7 @@ class FreeplayState extends MusicBeatState
 	private var initSongs:Array<SongMetadata> = [];
 	private var initSongItems:Array<Array<Dynamic>> = [];
 
-	public static final GROUPS:Array<String> = ['Default', 'Alphabetically', 'Modpack', 'Character Mix'];
+	public static final GROUPS:Array<String> = ['Varsayılan', 'Alfabeye Göre', 'Modlara Göre', 'Karakter Mixleri'];
 
 	public static var overChartChar:Array<String> = [];
 	public static var overChart:Map<String, Array<String>> = new Map<String, Array<String>>();
@@ -120,11 +120,11 @@ class FreeplayState extends MusicBeatState
 	var selectedScore(default, set):Int = -1;
 	function set_selectedScore(v) {
 		if (v == -1 && selectedItem == 4) {
-			infoText.text = "LEFT or RIGHT to Switch Time / ACCEPT to view this leaderboard in browser";
+			infoText.text = "Zamanı Değiştirmek için SOL veya SAĞ / Lider tablosunu tarayıcıda görmek için A tuşuna basın";
 			topCategory.alpha = 1;
 		}
 		else {
-			infoText.text = "LEFT or RIGHT to Flip Pages / ACCEPT to view Player's replay of this song";
+			infoText.text = "Sayfaları Çevirmek için SOL veya SAĞ / Oyuncunun tekrarını izlemek için A tuşuna basın";
 			topCategory.alpha = 0.6;
 		}
 
@@ -139,35 +139,39 @@ class FreeplayState extends MusicBeatState
 	// var dTime:Alphabet = new Alphabet(0, 0, "0:00", false);
 	// var dShots:FlxTypedGroup<FlxEffectSprite> = new FlxTypedGroup<FlxEffectSprite>();
 	var diffSelect:Alphabet = new Alphabet(0, 0, "< ? >", true);
-	var modifiersSelect:Alphabet = new Alphabet(0, 0, !GameClient.isConnected() ? "GAMEPLAY MODIFIERS" : "MODIFIERS UNAVAILABLE HERE", true);
-	var replaysSelect:Alphabet = new Alphabet(0, 0, !GameClient.isConnected() ? "LOAD REPLAY" : "REPLAYS UNAVAILABLE", true);
-	var resetSelect:Alphabet = new Alphabet(0, 0, "RESET SCORE", true);
+	var modifiersSelect:Alphabet = new Alphabet(0, 0, !GameClient.isConnected() ? "OYNANIS MODIFIKASYONLARI" : "MODIFIKASYONLAR BURADA KULLANILAMAZ", true);
+	var replaysSelect:Alphabet = new Alphabet(0, 0, !GameClient.isConnected() ? "OYUN TEKRARI YÜKLE" : "TEKRARLAR KULLANILAMAZ", true);
+	var resetSelect:Alphabet = new Alphabet(0, 0, "SKORU SIFIRLA", true);
 
-	var topTitle:Alphabet = new Alphabet(0, 0, "LEADERBOARD", true);
-	var topCategory:Alphabet = new Alphabet(0, 0, "< ALL TIME >", true);
-	var topLoading:Alphabet = new Alphabet(0, 0, "LOADING", true);
-	var topShit:Scoreboard = new Scoreboard(FlxG.width - 200, 32, 15, ["PLAYER", "SCORE", "ACCURACY"]);
+	var topTitle:Alphabet = new Alphabet(0, 0, "LIDERLIK TABLOSU", true);
+	var topCategory:Alphabet = new Alphabet(0, 0, "< TÜM ZAMANLAR >", true);
+	var topLoading:Alphabet = new Alphabet(0, 0, "YÜKLENIYOR", true);
+	var topShit:Scoreboard = new Scoreboard(FlxG.width - 200, 32, 15, ["OYUNCU", "SKOR", "DOGRULUK"]);
 
 	var touchingAndEmotionalQuotes:Array<Dynamic> = [
 		[80, [
-			"PROTECT YO NUTS BOYFRIEND",
-			"DON'T STOP BOYFRIEND",
-			"FUNK 'EM UP BOYFRIEND",
+			"AYRAN İÇ BOYFRIEND",
+			"DURMA BOYFRIEND",
+			"YAP ŞU İŞİ BOYFRIEND",
 		]],
 		[18, [
-			"GO FOR A 100% BOYFRIEND",
-			"GO WITH THE RHYTHM BOYFRIEND",
-			"STAY FUNKY BOYFRIEND",
+			"%100 SKORU HEDEFLE BOYFRIEND",
+			"MÜKEMMELSIN BOYFRIEND!",
+			"EĞLENCELI KAL BOYFRIEND",
+			"YATAĞINDAYIM BOYFRIEND",
+			"ÇAYIN ŞEKERLİMİ BOYFRIEND?",
 		]],
 		[1.99, [
-			"GET LAID BOYFRIEND",
-			"DON'T KNOCK UP BOYFRIEND",
-			"BEHIND YOU BOYFRIEND",
+			"HADI BOYFRIEND",
+			"ÖYLE BIRAKMA BOYFRIEND",
+			"RITIMLE DANS ET BOYFRIEND",
+			"ARKANDAYIM BOYFRIEND",
+			"TOPLARINI KORU BOYFRIEND",
 		]],
 		[0.01, [
-			"DRINK PISS BOYFRIEND",
-			"COME TO BRAZIL BOYFRIEND",
-			"FUNK THEIR BRAINS OUT BOYFRIEND",
+			"SAMETGKTE BURADAYDI",
+			"TURNUVALARA HAZIRLAN BOYFRIEND",
+			"TEŞEKKÜRLER BOYFRIEND",
 		]]
 	];
 	var randomMessage(get, default):String = null;
@@ -276,7 +280,7 @@ class FreeplayState extends MusicBeatState
 		add(grpHearts);
 
 		// if (!ClientPrefs.data.disableFreeplayAlphabet)
-			randomText = new Alphabet(90, 320, "RANDOM", true);
+			randomText = new Alphabet(90, 320, "RASTGELE", true);
 		// else
 		// 	randomText = new online.objects.AlphaLikeText(90, 320, "RANDOM");
 		randomText.scaleX = Math.min(1, 980 / randomText.width);
@@ -377,7 +381,7 @@ class FreeplayState extends MusicBeatState
 		scoreBG.scrollFactor.set();
 		scoreBG.cameras = [hudCamera];
 
-		searchInput = new FlxText(scoreText.x, scoreText.y + 36, 0, "PRESS F TO SEARCH", 24);
+		searchInput = new FlxText(scoreText.x, scoreText.y + 36, 0, "ARAMAK İÇİN A TUŞUNA BASIN", 24);
 		searchInput.font = scoreText.font;
 		searchInput.scrollFactor.set();
 
@@ -519,7 +523,7 @@ class FreeplayState extends MusicBeatState
 		gainedText.cameras = [hudCamera];
 		add(gainedText);
 
-		gainedRanksText = new FlxText(0, 0, 0, '+ 0 RANK');
+		gainedRanksText = new FlxText(0, 0, 0, '+ 0 RÜTBE');
 		var shakeTimer:ShakeTween = null;
 		var swagRank = null;
 		var endRank = gainedRanks;
@@ -556,12 +560,12 @@ class FreeplayState extends MusicBeatState
 				swagRank = Math.floor(v);
 
 				if (swagRank < 0) {
-					gainedRanksText.text = '- ${Math.abs(swagRank)} RANKS' + (swagRank < -1 ? 'S' : '');
+					gainedRanksText.text = '- ${Math.abs(swagRank)} RÜTBE' + (swagRank < -1 ? 'S' : '');
 					var sound = FlxG.sound.play(Paths.sound('scrollMenu'), 0.2);
 					sound.pitch = 1 - Math.abs(swagRank) * 0.01;
 				}
 				else {
-					gainedRanksText.text = '+ ${swagRank} RANK' + (swagRank > 1 ? 'S' : '');
+					gainedRanksText.text = '+ ${swagRank} RÜTBE' + (swagRank > 1 ? 'S' : '');
 					var sound = FlxG.sound.play(Paths.sound('scrollMenu'), 0.2);
 					sound.pitch = 1 + Math.abs(swagRank) * 0.01;
 				}
@@ -618,7 +622,7 @@ class FreeplayState extends MusicBeatState
 		if (GameClient.isConnected()) {
 			add(chatBox = new ChatBox(camera));
 			chatBox.cameras = [hudCamera];
-			GameClient.send("status", "Choosing a Song");
+			GameClient.send("status", "Şarkı Seçiyor");
 		}
 		
 		changeSelection();
@@ -639,11 +643,11 @@ class FreeplayState extends MusicBeatState
 	function updateGroups(?refresh:Bool = false) {
 		var newGroup:GroupType = null;
 		switch (ClientPrefs.data.groupSongsBy) {
-			case 'Alphabetically':
+			case 'Alfabeye Göre':
 				newGroup = ALPHABET;
-			case 'Modpack':
+			case 'Modlara Göre':
 				newGroup = MOD;
-			case 'Character Mix':
+			case 'Karakter Mixleri':
 				newGroup = MIX;
 			default:
 				newGroup = DEFAULT;
@@ -661,7 +665,7 @@ class FreeplayState extends MusicBeatState
 			case MIX:
 				searchGroupVList = ['default'].concat([for (char in charsWeeksLoaded.keys()) char]);
 			default:
-				searchGroupVList = ['All', 'Favorites', 'Hidden'];
+				searchGroupVList = ['Tümü', 'Favoriler', 'Gizli'];
 		}
 
 		if (!refresh) {
@@ -866,7 +870,7 @@ class FreeplayState extends MusicBeatState
 		if (curSelected == -1)
 			scoreText.text = randomMessage;
 		else
-			scoreText.text = 'PERSONAL BEST: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
+			scoreText.text = 'EN İYİ SKOR: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
 		positionHighscore();
 
 		if ((chatBox != null && chatBox.focused) || searchInputWait || transToPlayState) {
@@ -1485,22 +1489,22 @@ class FreeplayState extends MusicBeatState
 		itemsCamera.targetOffset.set(0, 0);
 
 		if (curSelected == -1) {
-			infoText.text = "ACCEPT to select a random song / SPACE to select without loading / CTRL to select song group";
+			infoText.text = "RASTGELE bir şarkı seçmek için A / Dinlemek  için X / Şarkı grubunu seçmek için G";
 			if (chatBox == null)
-				infoText.text += ' / TAB to select your character!';
+				infoText.text += ' / Karakterinizi seçmek için Y tuşuna basın!';
 			return;
 		}
 
 		switch (selectedItem) {
 			case 0:
 				if (selected) {
-					infoText.text = "ACCEPT to enter the Song / Use your Arrow Keys to change the Difficulty";
+					infoText.text = "Şarkıya girmek için A / Zorluk seviyesini değiştirmek için ok tuşlarını kullanın";
 					itemsCamera.targetOffset.y += 200;
 				}
 				else {
-					infoText.text = "ACCEPT to select the Song / SPACE to listen to the Song / RESET to " + (searchGroup == DEFAULT && searchGroupValue == 2 ? 'show' : 'hide') + " the Song";
+					infoText.text = "Şarkıya girmek için A / Şarkıyı Dinlemek İçin X / 	Gizlemek için " + (searchGroup == DEFAULT && searchGroupValue == 2 ? 'R' : 'R') + " Tuşuna";
 					if (chatBox == null)
-						infoText.text += ' / TAB to select your character!';
+						infoText.text += ' / Karakterinizi seçmek için Y tuşuna basın!';
 				}
 
 				if (centerPoint == null)
@@ -1516,7 +1520,7 @@ class FreeplayState extends MusicBeatState
 				topCategory.alpha = 0.6;
 				topLoading.alpha = 0.6;
 			case 1:
-				infoText.text = "ACCEPT to open Gameplay Modifers Menu";
+				infoText.text = "Oyun Modifikasyonları Menüsünü açmak için A Tuşuna basın";
 
 				itemsCamera.follow(modifiersSelect, null, 0.15);
 				itemsCamera.targetOffset.y += 200;
@@ -1530,7 +1534,7 @@ class FreeplayState extends MusicBeatState
 				topCategory.alpha = 0.6;
 				topLoading.alpha = 0.6;
 			case 2:
-				infoText.text = "ACCEPT to load a Replay data file";
+				infoText.text = "Oyun Tekrarı yüklemek için A Tuşuna basın";
 				
 				itemsCamera.follow(replaysSelect, null, 0.15);
 				itemsCamera.targetOffset.y += 200;
@@ -1544,7 +1548,7 @@ class FreeplayState extends MusicBeatState
 				topCategory.alpha = 0.6;
 				topLoading.alpha = 0.6;
 			case 3:
-				infoText.text = "ACCEPT to reset Score and Accuracy of this Song";
+				infoText.text = "Bu şarkının Puanını ve Doğruluğunu sıfırlamak için A";
 
 				itemsCamera.follow(resetSelect, null, 0.15);
 				itemsCamera.targetOffset.y += 200;
@@ -1558,7 +1562,7 @@ class FreeplayState extends MusicBeatState
 				topCategory.alpha = 0.6;
 				topLoading.alpha = 0.6;
 			case 4:
-				infoText.text = "LEFT or RIGHT to Flip Pages / ACCEPT to view Player's replay of this song";
+				infoText.text = "Sayfaları çevirmek için SOL veya SAĞ / Bu şarkının oynatıcı tekrarını görüntülemek için A tuşuna basın";
 
 				itemsCamera.follow(topShit.background, null, 0.15);
 				itemsCamera.targetOffset.y -= 120 + topTitle.height;
@@ -1577,7 +1581,7 @@ class FreeplayState extends MusicBeatState
 		}
 
 		if (selected)
-			infoText.text += " / BACK to return to Songs";
+			infoText.text += " / Şarkılara geri dönmek için B tuşuna basın";
 
 		if (GameClient.isConnected()) {
 			replaysSelect.alpha -= 0.4;
@@ -2068,7 +2072,7 @@ class FreeplayState extends MusicBeatState
 		}
 
 		FreeplayState.instance.searchInput.alpha = 0.6;
-		FreeplayState.instance.searchInput.text = 'PRESS F TO SEARCH';
+		FreeplayState.instance.searchInput.text = 'ARAMAK İÇİN S TUŞUNA BASIN';
 		return searchString = v;
 	}
 

@@ -1,14 +1,26 @@
 package online.gui.sidebar.tabs;
 
 import haxe.ds.Either;
+import haxe.Json;
+import sys.thread.Thread;
 import com.yagp.GifDecoder;
 import com.yagp.GifPlayer;
 import com.yagp.GifPlayerWrapper;
 import openfl.geom.Rectangle;
+import openfl.display.Bitmap;
+import openfl.display.BitmapData;
+import openfl.display.Sprite;
+import openfl.text.TextField;
+import openfl.events.MouseEvent;
+import openfl.events.KeyboardEvent;
+import flixel.util.FlxColor;
+import online.gui.sidebar.SideUI;
+import online.gui.sidebar.SideUI.uiScale as S;
 import online.gui.sidebar.obj.TabSprite.ITabInteractable;
 
-class FriendsTab extends TabSprite {
+using StringTools;
 
+class FriendsTab extends TabSprite {
 	var data:FriendsResponseData;
 
 	var loading(default, set):Bool = false;
@@ -24,101 +36,96 @@ class FriendsTab extends TabSprite {
 	var realHeight:Float = 0;
 
     public function new() {
-        super('Friends', 'friends');
+        super('Arkadaşlar', 'friends');
     }
 
     override function create() {
         super.create();
 
-		scrollRect = new Rectangle(0, 0, tabWidth, heightSpace);
+		scrollRect = new Rectangle(0, 0, tabWidth * S, heightSpace);
 
-		loadingTxt = this.createText(20, 20, 40);
-		loadingTxt.setText('Fetching...');
+		loadingTxt = this.createText(20 * S, 20 * S, Std.int(40 * S));
+		loadingTxt.setText('Bilgi Alınıyor...');
 		loadingTxt.visible = false;
 		addChild(loadingTxt);
-
-		friendsTxt = this.createText(0, 0, 25, FlxColor.WHITE);
-		friendsTxt.setText('My Friends');
-		friendsTxt.x = tabWidth / 2 - friendsTxt.width / 2;
-		friendsTxt.y = 10;
+	
+		friendsTxt = this.createText(10 * S, 10 * S, Std.int(25 * S), FlxColor.WHITE);
+		friendsTxt.setText('Arkadaşlarım');
 		addChild(friendsTxt);
 
-		requestsTxt = this.createText(0, 0, 25, FlxColor.WHITE);
-		requestsTxt.setText('Incoming Friend Invites');
-		requestsTxt.x = tabWidth / 2 - requestsTxt.width / 2;
+		requestsTxt = this.createText(10 * S, 0, Std.int(25 * S), FlxColor.WHITE);
+		requestsTxt.setText('Arkadaşlık İstekleri');
+		requestsTxt.visible = false;
 		addChild(requestsTxt);
 
-		pendingTxt = this.createText(0, 0, 25, FlxColor.WHITE);
-		pendingTxt.setText('Pending Friend Invites from You');
-		pendingTxt.x = tabWidth / 2 - pendingTxt.width / 2;
+		pendingTxt = this.createText(10 * S, 0, Std.int(25 * S), FlxColor.WHITE);
+		pendingTxt.setText('Bekleyen İstekler');
+		pendingTxt.visible = false;
 		addChild(pendingTxt);
-    }
+	}
 
 	function renderData() {
 		for (profile in friendsList) {
+			profile.isAction = false;
 			trashedProfiles.push(profile);
-			removeChild(profile);
+			if (contains(profile)) removeChild(profile);
 		}
 		friendsList = [];
 
+		if (data == null) return;
+
 		data.friends.sort((a, b) -> {
-			if (a.status == b.status)
-				return 0;
+			if (a.status == b.status) return 0;
 			return a.status.toLowerCase() != 'offline' ? -1 : 1;
 		});
 
-		for (i => friend in data.friends) {
+		var nextY:Float = friendsTxt.y + friendsTxt.height + (10 * S);
+
+		// Arkadaşlar Listesi
+		for (friend in data.friends) {
 			var profile = trashedProfiles.length > 0 ? trashedProfiles.pop() : new SmolProfile();
 			profile.create(friend);
-			profile.y = i * profile.underlay.height + friendsTxt.getTextHeight() + 20;
+			profile.y = nextY;
+			nextY += profile.underlay.height + (5 * S);
 			friendsList.push(profile);
 			addChild(profile);
 		}
 
-		var lastProfile = friendsList.length > 0 ? friendsList[friendsList.length - 1] : friendsTxt;
-		requestsTxt.y = lastProfile.y + lastProfile.height;
-
-		for (i => name in data.requests) {
-			var profile = trashedProfiles.length > 0 ? trashedProfiles.pop() : new SmolProfile();
-			profile.create({
-				name: name,
-				isNotFriend: true,
-				canFriend: true
-			});
-			profile.y = i * profile.underlay.height + requestsTxt.y + 30;
-			friendsList.push(profile);
-			addChild(profile);
-		}
-
-		if (friendsList.length > 0)
-			lastProfile = friendsList[friendsList.length - 1];
-		pendingTxt.y = lastProfile.y + lastProfile.height;
-
-		for (i => name in data.pending) {
-			var profile = trashedProfiles.length > 0 ? trashedProfiles.pop() : new SmolProfile();
-			profile.create({
-				name: name,
-				isNotFriend: true
-			});
-			profile.y = i * profile.underlay.height + pendingTxt.y + 30;
-			friendsList.push(profile);
-			addChild(profile);
-		}
-
-		if (friendsList.length > 0)
-			lastProfile = friendsList[friendsList.length - 1];
-		
-		pendingTxt.visible = data.pending.length > 0;
+		// İstekler Listesi
 		requestsTxt.visible = data.requests.length > 0;
+		if (requestsTxt.visible) {
+			requestsTxt.y = nextY + (20 * S);
+			nextY = requestsTxt.y + requestsTxt.height + (10 * S);
+			for (name in data.requests) {
+				var profile = trashedProfiles.length > 0 ? trashedProfiles.pop() : new SmolProfile();
+				profile.create({name: name, isNotFriend: true, canFriend: true});
+				profile.y = nextY;
+				nextY += profile.underlay.height + (5 * S);
+				friendsList.push(profile);
+				addChild(profile);
+			}
+		}
 
-		tabBg.bitmapData = new BitmapData(tabWidth, Std.int(height), true, FlxColor.fromRGB(10, 10, 10));
+		// Bekleyenler Listesi
+		pendingTxt.visible = data.pending.length > 0;
+		if (pendingTxt.visible) {
+			pendingTxt.y = nextY + (20 * S);
+			nextY = pendingTxt.y + pendingTxt.height + (10 * S);
+			for (name in data.pending) {
+				var profile = trashedProfiles.length > 0 ? trashedProfiles.pop() : new SmolProfile();
+				profile.create({name: name, isNotFriend: true});
+				profile.y = nextY;
+				nextY += profile.underlay.height + (5 * S);
+				friendsList.push(profile);
+				addChild(profile);
+			}
+		}
 
-		realHeight = this.getRealHeight();
+		realHeight = nextY;
 	}
 
 	override function onShow() {
 		super.onShow();
-
 		loadData();
 	}
 
@@ -126,11 +133,11 @@ class FriendsTab extends TabSprite {
         loading = true;
 		Thread.run(() -> {
 			var response = FunkinNetwork.requestAPI('/api/account/friends');
-
 			if (response != null && !response.isFailed()) {
+				var raw = response.getString();
 				Waiter.putPersist(() -> {
 					loading = false;
-					data = Json.parse(response.getString());
+					data = Json.parse(raw);
 					renderData();
 				});
 			}
@@ -138,37 +145,35 @@ class FriendsTab extends TabSprite {
     }
 
 	function set_loading(v:Bool) {
-		for (child in __children) {
-			child.visible = !v;
+		for (i in 0...numChildren) {
+			var child = getChildAt(i);
+			if (child != tabBg && child != loadingTxt) child.visible = !v;
 		}
-		tabBg.visible = true;
 		loadingTxt.visible = v;
 		return loading = v;
 	}
 
 	override function mouseWheel(e:MouseEvent):Void {
 		super.mouseWheel(e);
-
 		autoScroll(e.delta);
 	}
 
 	function autoScroll(?scrollDelta:Float = 0) {
 		var rect = scrollRect;
 		rect.y -= scrollDelta * 40;
-		if (rect.y <= 0)
-			rect.y = 0;
+		if (rect.y <= 0) rect.y = 0;
 		if (realHeight > rect.height) {
-			if (rect.y + rect.height - y >= realHeight)
-				rect.y = realHeight - rect.height + y;
-		}
-		else {
+			if (rect.y > realHeight - rect.height)
+				rect.y = realHeight - rect.height;
+		} else {
 			rect.y = 0;
 		}
 		scrollRect = rect;
 	}
 }
 
-class SmolProfile extends Sprite implements ITabInteractable {
+// createText kullanabilmesi için WSprite olmalı
+class SmolProfile extends WSprite implements ITabInteractable {
 	public var icon:Bitmap;
 	public var nick:TextField;
 	public var status:TextField;
@@ -176,97 +181,73 @@ class SmolProfile extends Sprite implements ITabInteractable {
 	public var addFriend:TabButton;
 	public var viewProfile:TabButton;
 	public var underlay:Bitmap;
+	public var isAction:Bool = false;
 
     public function new() {
         super();
+		
+		underlay = new Bitmap(new BitmapData(Std.int(SideUI.DEFAULT_TAB_WIDTH * S), Std.int(100 * S), true, FlxColor.fromRGB(30, 30, 30)));
+        addChild(underlay);
 
-		underlay = new Bitmap(new BitmapData(SideUI.DEFAULT_TAB_WIDTH, 100, true, FlxColor.fromHSL(0, 0.2, 0.3)));
-		addChild(underlay);
-
-		icon = new Bitmap(FunkinNetwork.getDefaultAvatar());
-		icon.smoothing = false;
-		icon.width = 80;
-		icon.height = 80;
-		icon.x = 10;
-		icon.y = 10;
+		icon = new Bitmap(new BitmapData(1, 1, true, 0));
+		icon.x = 10 * S;
+		icon.y = 10 * S;
 		addChild(icon);
 
-		nick = this.createText(icon.width + 20, 20, 22);
+		nick = this.createText(100 * S, 15 * S, Std.int(22 * S));
 		addChild(nick);
 
-		status = this.createText(nick.x, nick.y + 30, 18);
+		status = this.createText(nick.x, nick.y + (30 * S), Std.int(17 * S));
 		addChild(status);
 
 		invitePlay = new TabButton('invite', () -> {});
-		invitePlay.x = underlay.width - invitePlay.width - 20;
+		invitePlay.x = underlay.width - invitePlay.width - (15 * S);
 		invitePlay.y = underlay.height / 2 - invitePlay.height / 2;
 		addChild(invitePlay);
 
 		addFriend = new TabButton('add_friend', () -> {});
-		addFriend.x = underlay.width - invitePlay.width - 20;
-		addFriend.y = underlay.height / 2 - invitePlay.height / 2;
+		addFriend.x = invitePlay.x;
+		addFriend.y = invitePlay.y;
 		addChild(addFriend);
 
 		viewProfile = new TabButton('profile', () -> {});
-		viewProfile.x = invitePlay.x - viewProfile.width - 10;
-		viewProfile.y = underlay.height / 2 - viewProfile.height / 2;
+		viewProfile.x = invitePlay.x - viewProfile.width - (10 * S);
+		viewProfile.y = invitePlay.y;
 		addChild(viewProfile);
-
-		updateVisual();
     }
 
 	public function create(data:FriendData) {
-		underlay.bitmapData = new BitmapData(SideUI.DEFAULT_TAB_WIDTH, 100, true, FlxColor.fromHSL(data.hue, 0.2, 0.3));
-
-		var prevIcon = icon;
-		icon = new Bitmap(FunkinNetwork.getDefaultAvatar());
-
-		addChildAt(icon, getChildIndex(prevIcon));
-		removeChild(prevIcon);
-
-		icon.x = 10;
-		icon.y =  10;
-		icon.width = 80;
-		icon.height = 80;
+		var hue = data.hue != null ? data.hue : 0;
+		underlay.bitmapData = new BitmapData(Std.int(SideUI.DEFAULT_TAB_WIDTH * S), Std.int(100 * S), true, FlxColor.fromHSL(hue, 0.2, 0.15));
 
 		status.visible = !data.isNotFriend;
 		invitePlay.visible = !data.isNotFriend;
-		addFriend.visible = data.isNotFriend && data.canFriend;
+		addFriend.visible = (data.isNotFriend == true && data.canFriend == true);
 
-		nick.setText(data.name, 140);
-		status.setText(data.status, 140);
+		nick.text = data.name;
+		status.text = (data.status != null) ? data.status : "";
 
-		var statusFormat = status.defaultTextFormat;
-		if (data.status.toLowerCase() != "offline") {
-			statusFormat.color = FlxColor.LIME;
+		if (data.status != null && data.status.toLowerCase() != "offline") {
+			status.textColor = FlxColor.LIME;
+		} else {
+			status.textColor = FlxColor.GRAY;
 		}
-		else {
-			statusFormat.color = FlxColor.GRAY;
-		}
-		status.defaultTextFormat = statusFormat;
 
-		invitePlay.onClick = () -> {
-			Util.inviteToPlay(data.name);
-		}
-		viewProfile.onClick = () -> {
-			ProfileTab.view(data.name);
-		}
+		invitePlay.onClick = () -> Util.inviteToPlay(data.name);
+		viewProfile.onClick = () -> ProfileTab.view(data.name);
 		addFriend.onClick = () -> {
-			LoadingScreen.toggle(true);
-
 			var daUsername = data.name;
 			Thread.run(() -> {
-				FunkinNetwork.requestAPI('/api/user/friends/request?name=' + StringTools.urlEncode(daUsername));
-				LoadingScreen.toggle(false);
+				FunkinNetwork.requestAPI('/api/user/friends/request?name=' + daUsername.urlEncode());
+				SideUI.instance.curTabIndex = SideUI.instance.curTabIndex; // Refresh
 			});
 		}
 
+		// Avatar Yükleme
 		Thread.run(() -> {
 			var avatarData = FunkinNetwork.getUserAvatar(data.name);
-
 			Waiter.putPersist(() -> {
 				var prevIcon = icon;
-
 				var iconData:Either<BitmapData, com.yagp.Gif>;
 
 				if (avatarData == null)
@@ -277,56 +258,45 @@ class SmolProfile extends Sprite implements ITabInteractable {
 					iconData = Right(GifDecoder.parseBytes(avatarData));
 
 				switch (iconData) {
-					case Left(v):
-						icon = new Bitmap(v);
-					case Right(v):
-						icon = new GifPlayerWrapper(new GifPlayer(v));
+					case Left(v): icon = new Bitmap(v);
+					case Right(v): icon = new GifPlayerWrapper(new GifPlayer(v));
 					default:
 				}
 
-				addChildAt(icon, getChildIndex(prevIcon));
-				removeChild(prevIcon);
+				icon.smoothing = true;
+				icon.x = 10 * S;
+				icon.y = 10 * S;
+				icon.width = icon.height = 80 * S;
 
-				icon.x = 10;
-				icon.y =  10;
-				icon.width = 80;
-				icon.height = 80;
+				addChildAt(icon, getChildIndex(prevIcon));
+				if (prevIcon != null && contains(prevIcon)) removeChild(prevIcon);
 			});
 		});
 	}
 
 	override function __enterFrame(delta) {
 		super.__enterFrame(delta);
-
 		invitePlay.alpha = GameClient.isConnected() ? 1.0 : 0.5;
 	}
 
-	private function mouseDown(event:MouseEvent) {}
-	private function mouseMove(event:MouseEvent) {
-		updateVisual();
+	public function mouseDown(event:MouseEvent) {}
+	public function mouseMove(event:MouseEvent) {
+		underlay.alpha = this.overlapsMouse() ? 0.6 : 0.3;
     }
-
-    function updateVisual() {
-		underlay.alpha = 0.3;
-		if (this.overlapsMouse()) {
-			underlay.alpha = 0.6;
-		}
-    }
-
-	private function keyDown(event:KeyboardEvent) {};
-	private function mouseWheel(event:MouseEvent) {};
+	public function keyDown(event:KeyboardEvent) {}
+	public function mouseWheel(event:MouseEvent) {}
 }
 
 typedef FriendsResponseData = {
 	var friends:Array<FriendData>;
-	var pending:Array<String>; // list of requests the player has sent to other players
-	var requests:Array<String>; // requests to be ignored or accepted
+	var pending:Array<String>;
+	var requests:Array<String>;
 }
 
 typedef FriendData = {
 	var name:String;
-	var ?status:String;
-	var ?hue:Int;
-	var ?isNotFriend:Bool;
-	var ?canFriend:Bool;
+	@:optional var status:String;
+	@:optional var hue:Int;
+	@:optional var isNotFriend:Bool;
+	@:optional var canFriend:Bool;
 }

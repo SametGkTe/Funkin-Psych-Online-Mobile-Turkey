@@ -9,9 +9,21 @@ import online.network.FunkinNetwork;
 import flixel.FlxG;
 import flixel.util.FlxColor;
 import openfl.Lib;
+import openfl.events.Event;
+import openfl.events.KeyboardEvent;
+import openfl.events.MouseEvent;
+import openfl.display.Bitmap;
+import openfl.display.BitmapData;
+import openfl.display.Sprite;
+import openfl.text.TextField;
+import openfl.ui.Keyboard;
+import motion.Actuate;
 
 class SideUI extends WSprite {
 	public static var instance:SideUI;
+	
+	// Ölçeklendirme çarpanı
+	public static var uiScale:Float = 1.0;
 
 	public var active(default, set):Bool;
 	public var cursor:Bitmap;
@@ -22,12 +34,7 @@ class SideUI extends WSprite {
 		NotificationsTab,
 		ProfileTab,
 		FriendsTab,
-		ChatTab,
-		// TODO 
-		// DownloaderTab,
-		// ReportTab,
-		// ServerTab
-		// DebugTab
+		ChatTab
 	];
 
 	public var tabUI:Sprite;
@@ -43,10 +50,11 @@ class SideUI extends WSprite {
 
 	public var tabs:Array<TabSprite> = [];
 	public var curTabIndex(default, set):Int;
+
 	function set_curTabIndex(v:Int) {
 		if (curTab != null) {
 			curTab.onHide();
-			tabUI.removeChild(curTab);
+			if (tabUI.contains(curTab)) tabUI.removeChild(curTab);
 			curTab.onRemove();
 		}
 
@@ -61,6 +69,7 @@ class SideUI extends WSprite {
 
 		return curTabIndex;
 	}
+
 	public var curTab(get, never):TabSprite;
 	function get_curTab() {
 		return tabs[curTabIndex];
@@ -70,7 +79,6 @@ class SideUI extends WSprite {
 
 	public function new() {
 		super();
-
 		instance = this;
 
 		for (file in FunkinFileSystem.readDirectory('assets/images/sidebar')) {
@@ -84,6 +92,13 @@ class SideUI extends WSprite {
 	}
 
 	function init(?e:Event) {
+		// Android/iOS ise ölçeği büyüt
+		#if mobile
+		uiScale = 1.5; 
+		#else
+		uiScale = 1.0;
+		#end
+
 		alpha = 0;
 
 		var bg = new Bitmap(new BitmapData(Lib.application.window.width, Lib.application.window.height, true, 0x8E000000));
@@ -92,20 +107,20 @@ class SideUI extends WSprite {
 		tabUI = new Sprite();
 		addChild(tabUI);
 
-		leftBar = new Bitmap(new BitmapData(50, Lib.application.window.height, true, FlxColor.fromRGB(30, 30, 30)));
+		leftBar = new Bitmap(new BitmapData(Std.int(70 * uiScale), Lib.application.window.height, true, FlxColor.fromRGB(30, 30, 30)));
 		tabUI.addChild(leftBar);
-		
-		upBar = new Bitmap(new BitmapData(Lib.application.window.width, 50, true, FlxColor.BLACK));
-		addChild(upBar);
 
-		welcome = this.createText(15, 15, 20);
+		upBar = new Bitmap(new BitmapData(Lib.application.window.width, Std.int(60 * uiScale), true, FlxColor.BLACK));
+		addChild(upBar);
+		
+		welcome = this.createText(15 * uiScale, 15 * uiScale, Std.int(22 * uiScale));
 		addChild(welcome);
 
-		tip = this.createText(15, 15, 15);
-		tip.setText('Use ' + InputFormatter.getKeyName(cast(ClientPrefs.keyBinds.get('sidebar')[0], FlxKey)) + ' to toggle the Network Sidebar!', upBar.width, 0xFF535353);
+		tip = this.createText(15 * uiScale, 15 * uiScale, Std.int(16 * uiScale));
+		tip.setText('Sidebar\'ı açıp kapatmak için tuşu kullanın!', upBar.width, 0xFF535353);
 		addChild(tip);
 
-		tabTitle = this.createText(15, 15, 20);
+		tabTitle = this.createText(15 * uiScale, 15 * uiScale, Std.int(22 * uiScale));
 		addChild(tabTitle);
 
 		cursor = new Bitmap(new GraphicCursor(0, 0));
@@ -119,68 +134,46 @@ class SideUI extends WSprite {
 			daTab.widthSpace = Std.int(Lib.application.window.width - daTab.x);
 			daTab.heightSpace = Std.int(Lib.application.window.height - daTab.y);
 			tabs.push(daTab);
-			
-			var tabIconUnderlay = new Bitmap(new BitmapData(50, 50, true, FlxColor.fromRGB(100, 100, 100)));
-			tabIconUnderlay.y = upBar.height + i * 50;
+
+			var btnSize = Std.int(70 * uiScale);
+			var tabIconUnderlay = new Bitmap(new BitmapData(btnSize, btnSize, true, FlxColor.fromRGB(100, 100, 100)));
+			tabIconUnderlay.y = upBar.height + (i * btnSize);
 			tabButtonsUnderlay.push(tabIconUnderlay);
 			tabUI.addChild(tabIconUnderlay);
 
 			var tabIcon = new Bitmap(GAssets.image('sidebar/' + daTab.icon));
-			tabIcon.smoothing = false;
-			tabIcon.width = 50;
-			tabIcon.height = 50;
+			tabIcon.smoothing = true;
+			tabIcon.width = btnSize;
+			tabIcon.height = btnSize;
 			tabIcon.y = tabIconUnderlay.y;
 			tabButtons.push(tabIcon);
 			tabUI.addChild(tabIcon);
 		}
 
 		tabUI.x = -totalTabWidth();
-
 		onChangedTab();
 
+		// ETKİLEŞİM DİNLEYİCİLERİ
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, (e:KeyboardEvent) -> {
-			if (LoadingScreen.loading)
-				return;
-
+			if (LoadingScreen.loading) return;
 			if ((e.keyCode.checkKey('sidebar') || (e.keyCode == 27 && active)) && stage.focus == null) {
 				active = !active;
-				// if (FunkinNetwork.loggedIn) {
-				// 	active = !active;
-				// 	return;
-				// }
-				// else {
-				// 	Waiter.put(() -> {
-				// 		Alert.alert("Forbidden!", "Sidebar is only accessible for\npeople that are logged to the network!");
-				// 	});
-				// }
 			}
-			
-			if (active) {
-				curTab.keyDown(e);
-
-				if (e.keyCode == Keyboard.F1) {
-					trace("reloading syncscript!");
-					online.backend.SyncScript.initScript();
-				}
-			}
+			if (active) curTab.keyDown(e);
 		});
+
 		stage.addEventListener(MouseEvent.MOUSE_MOVE, (e:MouseEvent) -> {
 			cursor.x = e.stageX;
 			cursor.y = e.stageY;
-
-			if (LoadingScreen.loading)
-				return;
-
-			if (active) {
+			if (active && !LoadingScreen.loading) {
 				onChangedTab();
 				curTab.mouseMove(e);
 			}
 		});
-		stage.addEventListener(MouseEvent.MOUSE_DOWN, (e:MouseEvent) -> {
-			if (LoadingScreen.loading)
-				return;
 
-			if (e.localY > upBar.height * scaleY && e.localX > totalTabWidth() * scaleX && !Alert.isAnyFreezed())
+		stage.addEventListener(MouseEvent.MOUSE_DOWN, (e:MouseEvent) -> {
+			if (LoadingScreen.loading) return;
+			if (e.localY > upBar.height && e.localX > totalTabWidth() && !Alert.isAnyFreezed())
 				active = false;
 
 			if (active) {
@@ -193,33 +186,31 @@ class SideUI extends WSprite {
 				curTab.mouseDown(e);
 			}
 		});
-		stage.addEventListener(MouseEvent.MOUSE_WHEEL, (e:MouseEvent) -> {
-			if (LoadingScreen.loading)
-				return;
 
-			if (active)
-				curTab.mouseWheel(e);
+		stage.addEventListener(MouseEvent.MOUSE_WHEEL, (e:MouseEvent) -> {
+			if (active && !LoadingScreen.loading) curTab.mouseWheel(e);
 		});
 	}
 
 	function onChangedTab() {
 		tabTitle.setText(curTab.title, upBar.width);
-		tabTitle.x = 20;
-		tabTitle.y = upBar.height / 2 - tabTitle.getTextHeight() / 2 - 5;
+		tabTitle.x = 20 * uiScale;
+		tabTitle.y = upBar.height / 2 - tabTitle.getTextHeight() / 2 - (5 * uiScale);
 
 		for (i => tile in tabButtonsUnderlay) {
 			tile.alpha = 0.2;
-			if (tile.overlapsMouse())
-				tile.alpha = 0.5;
-			if (curTabIndex == i)
-				tile.alpha = 1;
+			if (tile.overlapsMouse()) tile.alpha = 0.5;
+			if (curTabIndex == i) tile.alpha = 1;
 		}
 	}
 
-	function set_active(show:Bool) {
-		if (show == active)
-			return active;
+	function totalTabWidth() {
+		var baseWidth = (curTab != null ? (curTab.tabWidth != null ? curTab.tabWidth : DEFAULT_TAB_WIDTH) : DEFAULT_TAB_WIDTH);
+		return leftBar.width + (baseWidth * uiScale);
+	}
 
+	function set_active(show:Bool) {
+		if (show == active) return active;
 		active = show;
 
 		stage.focus = null;
@@ -232,17 +223,16 @@ class SideUI extends WSprite {
 		cursor.visible = active;
 
 		if (active) {
-			if (!FunkinNetwork.loggedIn)
-				FunkinNetwork.ping();
+			if (!FunkinNetwork.loggedIn) FunkinNetwork.ping();
 
 			tabUI.addChild(curTab);
 			curTab.onShow();
 			_wasMouseShown = FlxG.mouse.visible;
 			FlxG.mouse.visible = false;
 
-			welcome.setText(FunkinNetwork.loggedIn ? 'Logged as ${FunkinNetwork.nickname}' : 'Not logged in', upBar.width);
-			welcome.x = upBar.width - welcome.width - 50;
-			welcome.y = upBar.height / 2 - welcome.getTextHeight() / 2 - 5;
+			welcome.setText(FunkinNetwork.loggedIn ? 'Giriş yapıldı: ${FunkinNetwork.nickname}' : 'Giriş yapılmadı', upBar.width);
+			welcome.x = upBar.width - welcome.width - (50 * uiScale);
+			welcome.y = upBar.height / 2 - welcome.getTextHeight() / 2 - (5 * uiScale);
 
 			tip.x = upBar.width / 2 - tip.width / 2;
 			tip.y = welcome.y;
@@ -251,14 +241,11 @@ class SideUI extends WSprite {
 			Actuate.tween(upBar, 0.2, {y: 0}).onComplete(() -> {
 				Actuate.tween(tabUI, 0.5, {x: 0});
 			});
-		}
-		else {
+		} else {
 			FlxG.mouse.visible = _wasMouseShown;
-
 			curTab.onHide();
-
 			Actuate.tween(this, 1, {alpha: 0}).onComplete(() -> {
-				tabUI.removeChild(curTab);
+				if (tabUI.contains(curTab)) tabUI.removeChild(curTab);
 				curTab.onRemove();
 			});
 			Actuate.tween(tabUI, 0.5, {x: -totalTabWidth()}).onComplete(() -> {
@@ -267,11 +254,8 @@ class SideUI extends WSprite {
 		}
 		return active;
 	}
-
-	function totalTabWidth() {
-		return leftBar.width + (curTab?.tabWidth ?? DEFAULT_TAB_WIDTH);
-	}
 }
 
+// YARDIMCI SINIFLAR ANA SINIFIN DIŞINDA OLMALI
 @:bitmap("assets/images/ui/cursor.png")
 private class GraphicCursor extends BitmapData {}

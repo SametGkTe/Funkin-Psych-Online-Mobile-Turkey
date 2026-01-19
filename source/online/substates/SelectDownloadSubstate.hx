@@ -78,7 +78,7 @@ class SelectDownloadSubstate extends MusicBeatSubstate {
 		var i = -1;
 
 		var altText = new FlxText(bg.x, 0, bg.width);
-		altText.text = 'Files';
+		altText.text = 'Dosyalar';
 		altText.setFormat("VCR OSD Mono", 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		altText.y = 30;
 		add(altText);
@@ -90,7 +90,7 @@ class SelectDownloadSubstate extends MusicBeatSubstate {
 				if (dl._sFile.endsWith(".7z"))
 					continue;
 				
-				dl._sDescription += (dl._sDescription.trim() != "" ? "\n" : "") + "Size: " + DownloadAlert.prettyBytes(dl._nFilesize);
+				dl._sDescription += (dl._sDescription.trim() != "" ? "\n" : "") + "Boyut: " + DownloadAlert.prettyBytes(dl._nFilesize);
 
 				var download = new DownloadBox(dl._sFile, dl._sDescription, dl._sDownloadUrl, ++i);
 				download.y = endCoord + 10;
@@ -102,7 +102,7 @@ class SelectDownloadSubstate extends MusicBeatSubstate {
 
 		if (downloads._aAlternateFileSources != null && downloads._aAlternateFileSources.length > 0) {
 			var altText = new FlxText(bg.x, 0, bg.width);
-			altText.text = 'Alternate File Sources';
+			altText.text = 'Alternatif Dosya Kaynakları';
 			altText.setFormat("VCR OSD Mono", 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			if (items.members.length > 0)
 				altText.y = endCoord + 20;
@@ -175,7 +175,7 @@ class DownloadBox extends FlxSpriteGroup {
 				daDescription = '';
 			}
 			else {
-				daName = '(unknown)';
+				daName = '(bilinmiyor)';
 			}
 		}
 

@@ -30,7 +30,7 @@ class SetupModsState extends MusicBeatState {
 		super.create();
 
 		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("In the Menus", "Mods URL Setup");
+		DiscordClient.changePresence("Menüde", "URL Mod Kurulumu");
 		#end
 
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
@@ -74,12 +74,12 @@ class SetupModsState extends MusicBeatState {
 		items.screenCenter(Y);
 		add(items);
 
-		final accept:String = (controls.mobileControls) ? 'A' : 'ACCEPT, Paste links with CTRL + V';
+		final accept:String = (controls.mobileControls) ? 'A' : 'KABUL ET, CTRL + V ile bağlantıları yapıştır';
 		final back:String = (controls.mobileControls) ? 'B' : 'BACK';
 		final shift:String = (controls.mobileControls) ? 'C' : 'SHIFT';
 
 		var title = new FlxText(0, 0, FlxG.width, 
-		"Before you play, it is recommended to set links for your mods!\nSelect mods with " + accept + ", Leave with " + back + "\nHold " + shift + " while exiting to discard all changes"
+		"Oynamadan önce modlarınız için Link ayarlamanız önerilir!\nModları A ile seçin, B ile çıkın\nÇıkarken B tuşunu basılı tutarak tüm değişiklikleri silin"
 		);
 		title.setFormat("VCR OSD Mono", 22, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		title.y = 50;

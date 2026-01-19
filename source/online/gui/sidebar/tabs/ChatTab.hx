@@ -8,25 +8,28 @@ class ChatTab extends TabSprite {
 	var messageGroup:Sprite;
 
 	public function new() {
-		super('Chat', 'chat');
+		super('Sohbet', 'chat');
 	}
 
 	override function create() {
 		super.create();
 
 		var placeholderInput = this.createText(0, 0, 16, FlxColor.WHITE);
-		placeholderInput.text = '(Click here or press TAB to chat)';
+		placeholderInput.text = '(Buraya tıklayın veya Chat tuşuna basarak sohbet edin)';
 		placeholderInput.width = tabWidth;
 		placeholderInput.height = placeholderInput.textHeight;
 		placeholderInput.alpha = 0.5;
 
-		input = this.createText(0, 0, 16, FlxColor.WHITE);
-		input.text = '\n\n';
-		input.width = tabWidth;
-		input.height = 16;
+		input = this.createText(0, 0, Std.int(18 * S), FlxColor.WHITE); // Font boyutu 16 -> 18 * S yapıldı
+		input.text = ''; // \n\n mobilde garip durabilir, boş bıraktık
+		input.width = (tabWidth * S) - (10 * S); // Genişlik ölçeklendi ve kenarlardan boşluk bırakıldı
+		input.height = Std.int(45 * S); // Yükseklik 16'dan 45 * S'ye çıkarıldı (Dokunması kolay olsun diye)
 		input.type = INPUT;
 		input.multiline = false;
-		input.y = heightSpace - input.height;
+
+		input.x = 5 * S; 
+		input.y = heightSpace - input.height - (5 * S); 
+
 		input.addEventListener(Event.CHANGE, _ -> {
 			placeholderInput.visible = input.text.length <= 0;
 		});
@@ -84,17 +87,17 @@ class ChatTab extends TabSprite {
 			if (input.text.trim() == '/notify pm') {
 				ClientPrefs.data.disablePMs = !ClientPrefs.data.disablePMs;
 				ClientPrefs.saveSettings();
-				addMessage('PM Notifications are now ${ClientPrefs.data.disablePMs ? 'OFF' : 'ON'}!');
+				addMessage('ÖM Bildirimleri şu an ${ClientPrefs.data.disablePMs ? 'KAPALI' : 'AÇIK'}!');
 			}
 			else if (input.text.trim() == '/notify roominvite') {
 				ClientPrefs.data.disableRoomInvites = !ClientPrefs.data.disableRoomInvites;
 				ClientPrefs.saveSettings();
-				addMessage('Room Invite Notifications are now ${ClientPrefs.data.disableRoomInvites ? 'OFF' : 'ON'}!');
+				addMessage('Oda Daveti Bildirimleri şu an ${ClientPrefs.data.disableRoomInvites ? 'KAPALI' : 'AÇIK'}!');
 			}
 			else if (input.text.trim() == '/notify') {
 				ClientPrefs.data.notifyOnChatMsg = !ClientPrefs.data.notifyOnChatMsg;
 				ClientPrefs.saveSettings();
-				addMessage('Chat Notifications are now ${ClientPrefs.data.notifyOnChatMsg ? 'ON' : 'OFF'}!');
+				addMessage('Sohbet Bildirimleri şu an ${ClientPrefs.data.notifyOnChatMsg ? 'AÇIK' : 'KAPALI'}!');
 			}
 			else if (input.text.trim().startsWith('/profile')) {
 				online.gui.sidebar.tabs.ProfileTab.view(input.text.substr('/profile'.length).trim());
@@ -104,7 +107,7 @@ class ChatTab extends TabSprite {
 					NetworkClient.room.send('chat', input.text);
 				}
 				else {
-					addMessage("Not connected to the server! Trying to connect!");
+					addMessage("Sunucuya bağlı değil! Bağlanılmaya çalışılıyor!");
 					NetworkClient.connect();
 				}
 			}
@@ -153,6 +156,7 @@ class ChatTab extends TabSprite {
 
 		var message = instance.createText(0, 0, 15, FlxColor.WHITE);
 		var format = message.defaultTextFormat;
+		format.size = Std.int(18 * S);
 		if (data.color != null)
 			format.color = data.color;
 		else

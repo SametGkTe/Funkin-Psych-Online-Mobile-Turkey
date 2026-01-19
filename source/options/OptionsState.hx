@@ -1,13 +1,13 @@
 package options;
 
+import flixel.FlxObject;
 import online.states.RoomState;
 import states.MainMenuState;
 import backend.StageData;
 
 class OptionsState extends MusicBeatState
 {
-	//I'm feeling old
-	var options:Array<String> = ['Note Colors', 'Controls', 'Adjust Delay and Combo', 'Graphics and Performance', 'Visuals and UI', 'Gameplay', 'Mobile Options'];
+	var options:Array<String> = ['Nota Renkleri', 'Kontroller', 'Gecikme & Kombo', 'Grafik Ve Performans', 'Arayüz & Efektler', 'Oynanis', 'Mobil Ayarlar', 'P.E.T Ayarlari'];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private static var curSelected:Int = 0;
 	public static var menuBG:FlxSprite;
@@ -16,29 +16,44 @@ class OptionsState extends MusicBeatState
 	public static var hadMouseVisible:Bool = false;
 	public static var loadedMod:String = '';
 
+	// CoolCam değişkenleri
+	private var camFollowY:Float = 0;
+
 	function openSelectedSubstate(label:String) {
 		if (label != "Adjust Delay and Combo"){
 			mobileManager.removeMobilePad();
 			persistentUpdate = false;
 		}
+		
+		// Ana menü öğelerini gizle
+		grpOptions.visible = false;
+		selectorLeft.visible = false;
+		selectorRight.visible = false;
+		
+		// Kamera pozisyonunu sıfırla
+		FlxG.camera.scroll.y = 0;
+		camFollowY = 0;
+		
 		switch(label) {
-			case 'Note Colors':
+			case 'Nota Renkleri':
 				openSubState(new options.NotesSubState());
-			case 'Controls':
+			case 'Kontroller':
 				openSubState(new options.ControlsSubState());
-			case 'Graphics and Performance':
+			case 'Grafik Ve Performans':
 				openSubState(new options.GraphicsSettingsSubState());
-			case 'Visuals and UI':
+			case 'Arayüz & Efektler':
 				openSubState(new options.VisualsUISubState());
-			case 'Gameplay':
+			case 'Oynanis':
 				openSubState(new options.GameplaySettingsSubState());
-			case 'Mobile Options':
+			case 'Mobil Ayarlar':
 				openSubState(new mobile.options.MobileOptionsSubState());
-			case 'Mobile Extra Control':
+			case 'Mobile Ekstra Kontroller':
 				controls.isInSubstate = true;
 				openSubState(new mobile.substates.MobileExtraControl());
-			case 'Adjust Delay and Combo':
+			case 'Gecikme & Kombo':
 				FlxG.switchState(() -> new options.NoteOffsetState());
+			case 'P.E.T Ayarlari':
+				openSubState(new options.PETSettingsState());
 		}
 	}
 
@@ -58,8 +73,8 @@ class OptionsState extends MusicBeatState
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.antialiasing = ClientPrefs.data.antialiasing;
 		bg.color = 0xFFea71fd;
+		bg.scale.set(1.1, 1.1);
 		bg.updateHitbox();
-
 		bg.screenCenter();
 		add(bg);
 
@@ -71,6 +86,7 @@ class OptionsState extends MusicBeatState
 			var optionText:Alphabet = new Alphabet(0, 0, options[i], true);
 			optionText.screenCenter();
 			optionText.y += (100 * (i - (options.length / 2))) + 50;
+			optionText.ID = i;
 			grpOptions.add(optionText);
 		}
 
@@ -86,7 +102,7 @@ class OptionsState extends MusicBeatState
 
 		mobileManager.addMobilePad("UP_DOWN", "A_B_E");
 
-		online.GameClient.send("status", "In the Game Options");
+		online.GameClient.send("status", "Oyun Ayarları");
 	}
 
 	override function closeSubState() {
@@ -97,10 +113,18 @@ class OptionsState extends MusicBeatState
 		mobileManager.removeMobilePad();
 		mobileManager.addMobilePad('UP_DOWN', 'A_B_E');
 		persistentUpdate = true;
+		
+		// Ana menü öğelerini tekrar göster
+		grpOptions.visible = true;
+		selectorLeft.visible = true;
+		selectorRight.visible = true;
 	}
 
 	override function update(elapsed:Float) {
 		super.update(elapsed);
+
+		// CoolCam sadece Y ekseninde yumuşak hareket
+		FlxG.camera.scroll.y = FlxMath.lerp(camFollowY, FlxG.camera.scroll.y, Math.exp(-elapsed * 6));
 
 		if (controls.UI_UP_P) {
 			changeSelection(-1);
@@ -137,7 +161,7 @@ class OptionsState extends MusicBeatState
 			else FlxG.switchState(() -> new MainMenuState());
 		}
 		else if (controls.ACCEPT #if desktop || FlxG.mouse.justPressed #end) openSelectedSubstate(options[curSelected]);
-		else if (mobileButtonJustPressed('E')) openSelectedSubstate('Mobile Extra Control');
+		else if (mobileButtonJustPressed('E')) openSelectedSubstate('Mobil Ekstra Kontroller');
 	}
 	
 	function changeSelection(change:Int = 0) {
@@ -160,8 +184,12 @@ class OptionsState extends MusicBeatState
 				selectorLeft.y = item.y;
 				selectorRight.x = item.x + item.width + 15;
 				selectorRight.y = item.y;
+
+				// Kamerayı seçilen öğenin Y pozisyonuna hafifçe kaydır
+				camFollowY = (item.y - FlxG.height / 2) * 0.15;
 			}
 		}
+
 		FlxG.sound.play(Paths.sound('scrollMenu'));
 	}
 

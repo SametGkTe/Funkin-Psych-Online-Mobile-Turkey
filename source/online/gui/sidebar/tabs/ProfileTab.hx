@@ -40,7 +40,7 @@ class ProfileTab extends TabSprite {
 	var web:TabButton;
 
     public function new() {
-        super('Profile', 'profile');
+        super('Profil', 'profile');
     }
 
     public static function view(username:String) {
@@ -49,89 +49,144 @@ class ProfileTab extends TabSprite {
 		SideUI.instance.curTabIndex = SideUI.instance.initTabs.indexOf(ProfileTab);
     }
 
-    override function create() {
-        super.create();
+override function create() {
+    super.create();
 
-		flagCDN = new HTTPHandler('https://flagcdn.com');
-		flagsAPI = new HTTPHandler('https://flagsapi.com');
-		
-		loadingTxt = this.createText(20, 20, 40);
-		loadingTxt.setText('Fetching...');
-		loadingTxt.visible = false;
-		addChild(loadingTxt);
+    flagCDN = new HTTPHandler('https://flagcdn.com');
+    flagsAPI = new HTTPHandler('https://flagsapi.com');
+    
+    // Yükleniyor metni
+    loadingTxt = this.createText(20 * S, 20 * S, Std.int(40 * S));
+    loadingTxt.setText('Bilgi Alınıyor...');
+    loadingTxt.visible = false;
+    addChild(loadingTxt);
 
-		avatar = new Bitmap(FunkinNetwork.getDefaultAvatar());
-		avatar.width = 125;
-		avatar.height = 125;
-		avatar.x = 20;
-		avatar.y = 20;
-		addChild(avatar);
+    // Avatar ve Temel Bilgiler
+    avatar = new Bitmap(new BitmapData(Std.int(110 * S), Std.int(110 * S), true, FlxColor.GRAY));
+    avatar.x = 20 * S;
+    avatar.y = 20 * S;
+    addChild(avatar);
 
-		flag = new Bitmap(new BitmapData(1, 1, true, 0x00000000));
-		addChild(flag);
+    usernameTxt = this.createText(avatar.x + avatar.width + (15 * S), avatar.y + (5 * S), Std.int(35 * S));
+    addChild(usernameTxt);
 
-		usernameTxt = this.createText(avatar.x + avatar.width + 20, avatar.y + 10, 40);
-		addChild(usernameTxt);
+    flag = new Bitmap(new BitmapData(1, 1, true, 0)); 
+    addChild(flag);
 
-		role = this.createText(usernameTxt.x, usernameTxt.y + 40, 22);
-		addChild(role);
+    role = this.createText(usernameTxt.x, usernameTxt.y + (45 * S), Std.int(20 * S));
+    addChild(role);
 
-		seen = this.createText(role.x, role.y + 30, 20, 0xFF7C7C7C);
-		addChild(seen);
+    seen = this.createText(role.x, role.y + (30 * S), Std.int(18 * S), 0xFF7C7C7C);
+    addChild(seen);
 
-		desc = this.createText(avatar.x, avatar.y + avatar.height + 10, 15);
-		desc.setText("");
-		addChild(desc);
+    desc = this.createText(avatar.x, avatar.y + avatar.height + (15 * S), Std.int(16 * S));
+    desc.setText("");
+    addChild(desc);
 
-		line1 = new Bitmap(new BitmapData(1, 2, true, 0xFFFFFFFF));
-		line1.x = desc.x;
-		line1.y = desc.y + desc.height + 10;
-		line1.scaleX = tabBg.width - 40;
-		addChild(line1);
+    // Ayırıcı Çizgiler ve İstatistikler
+    line1 = new Bitmap(new BitmapData(1, 2, true, 0xFFFFFFFF));
+    line1.x = 20 * S;
+    line1.scaleX = (tabWidth * S) - (40 * S);
+    addChild(line1);
 
-		statsTitle = this.createText(0, line1.y + 20, 30);
-		statsTitle.setText("Statistics");
-		statsTitle.x = tabBg.width / 2 - statsTitle.textWidth / 2;
-		addChild(statsTitle);
+    statsTitle = this.createText(0, 0, Std.int(28 * S));
+    statsTitle.setText("Statistics");
+    addChild(statsTitle);
 
-		line2 = new Bitmap(new BitmapData(1, 2, true, 0xFFFFFFFF));
-		line2.x = line1.x;
-		line2.y = statsTitle.y + 50;
-		line2.scaleX = line1.scaleX;
-		addChild(line2);
+    line2 = new Bitmap(new BitmapData(1, 2, true, 0xFFFFFFFF));
+    line2.x = line1.x;
+    line2.scaleX = line1.scaleX;
+    addChild(line2);
 
-		stats = this.createText(50, line2.y + 20, 22);
-		addChild(stats);
+    stats = this.createText(40 * S, 0, Std.int(20 * S));
+    addChild(stats);
 
-		web = new TabButton('internet', () -> {
-			FlxG.openURL(FunkinNetwork.client.getURL("/user/" + StringTools.urlEncode(username)));
+    // Alt Butonlar
+    web = new TabButton('internet', () -> {
+        FlxG.openURL(FunkinNetwork.client.getURL("/user/" + StringTools.urlEncode(username)));
+    });
+    web.x = (tabWidth * S) - web.width - (20 * S);
+    web.y = heightSpace - web.height - (20 * S);
+    addChild(web);
+
+    settings = new TabButton('wheel', () -> {
+        FlxG.openURL(FunkinNetwork.client.getURL("/api/auth/cookie?id=" + Auth.authID + "&token=" + Auth.authToken));
+    });
+    settings.x = web.x;
+    settings.y = web.y;
+    addChild(settings);
+
+    addFriend = new TabButton('add_friend', () -> inviteToFriends());
+    addFriend.x = avatar.x;
+    addFriend.y = seen.y + (40 * S);
+    addChild(addFriend);
+
+    removeFriend = new TabButton('remove_friend', () -> removeFromFriends());
+    removeFriend.x = addFriend.x;
+    removeFriend.y = addFriend.y;
+    addChild(removeFriend);
+
+    invitePlay = new TabButton('invite', () -> Util.inviteToPlay(username));
+    invitePlay.x = addFriend.x + addFriend.width + (10 * S);
+    invitePlay.y = addFriend.y;
+    addChild(invitePlay);
+}
+
+	function renderData() {
+		loading = false;
+		var loadingUser = username;
+    
+		// Arka plan rengini ayarla
+		tabBg.visible = true;
+		tabBg.bitmapData = new BitmapData(Std.int(tabWidth * S), heightSpace, true, FlxColor.fromHSL(user.profileHue, 0.35, 0.2));
+
+		// Avatar Yükleme Kısmı (Genişlik ve Yüksekliği S ile çarpmayı unutma)
+		avatar.width = 110 * S;
+		avatar.height = 110 * S;
+
+		Thread.run(() -> {
+			var avatarData = FunkinNetwork.getUserAvatar(loadingUser);
+			Waiter.putPersist(() -> {
+				if (loadingUser == username) {
+					var prevAvatar = avatar;
+					if (avatarData == null)
+						avatar = new Bitmap(FunkinNetwork.getDefaultAvatar());
+					else if (!ShitUtil.isGIF(avatarData))
+						avatar = new Bitmap(BitmapData.fromBytes(avatarData));
+					else
+						avatar = new GifPlayerWrapper(new GifPlayer(GifDecoder.parseBytes(avatarData)));
+
+					addChildAt(avatar, getChildIndex(prevAvatar));
+					removeChild(prevAvatar);
+
+					avatar.x = 20 * S;
+					avatar.y = 20 * S;
+					avatar.width = 110 * S;
+					avatar.height = 110 * S;
+				}
+			});
+			loadFlag(loadingUser, user.country);
 		});
-		web.x = tabBg.width - web.width - 20;
-		web.y = tabBg.height - web.height - 20;
-		addChild(web);
 
-		settings = new TabButton('wheel', () -> {
-			FlxG.openURL(FunkinNetwork.client.getURL("/api/auth/cookie?id=" + Auth.authID + "&token=" + Auth.authToken));
-		});
-		settings.x = web.x;
-		settings.y = web.y;
-		addChild(settings);
-
-		addFriend = new TabButton('add_friend', () -> inviteToFriends());
-		addFriend.x = web.x - web.width - 20;
-		addFriend.y = web.y;
-		addChild(addFriend);
-
-		removeFriend = new TabButton('remove_friend', () -> removeFromFriends());
-		removeFriend.x = addFriend.x;
-		removeFriend.y = web.y;
-		addChild(removeFriend);
-
-		invitePlay = new TabButton('invite', () -> Util.inviteToPlay(username));
-		invitePlay.x = addFriend.x - addFriend.width - 20;
-		invitePlay.y = web.y;
-		addChild(invitePlay);
-    }
+		updateUsernameText();
+    
+		// ... Metinleri güncelle ...
+		role.setText((user.club != null ? '[${user.club}] | ' : '') + (user.role != null ? user.role : 'Üye'));
+    
+		// Pozisyonları dinamik olarak güncelle
+		line1.y = desc.y + desc.height + (15 * S);
+		statsTitle.x = (tabWidth * S) / 2 - statsTitle.textWidth / 2;
+		statsTitle.y = line1.y + (20 * S);
+		line2.y = statsTitle.y + (45 * S);
+		stats.y = line2.y + (20 * S);
+    
+		// Buton görünürlükleri
+		removeFriend.visible = user.friends.contains(FunkinNetwork.nickname);
+		addFriend.visible = !removeFriend.visible && user.canFriend;
+		invitePlay.visible = removeFriend.visible;
+		settings.visible = (username == FunkinNetwork.nickname);
+		web.visible = !settings.visible;
+	}
 
 	override function onShow() {
         super.onShow();
@@ -191,7 +246,7 @@ class ProfileTab extends TabSprite {
 
 			if (response != null && !response.isFailed()) {
 				Waiter.putPersist(() -> {
-					Alert.alert('Removed ' + daUsername + " from friends");
+					Alert.alert('Kullanıcı ' + daUsername + " arkadaş listesinden çıkarıldı");
 					if (username == daUsername)
 						username = username;
 				});
@@ -210,7 +265,7 @@ class ProfileTab extends TabSprite {
 
 			if (response != null && !response.isFailed()) {
 				Waiter.putPersist(() -> {
-					Alert.alert('Friend invite has been sent to ' + daUsername + "!");
+					Alert.alert('Arkadaşlık isteği ' + daUsername + " adlı kullanıcıya gönderildi!");
 					if (username == daUsername)
 						username = username;
 				});
@@ -218,113 +273,11 @@ class ProfileTab extends TabSprite {
 		});
 	}
 
-	var tabBgGradient:Shape;
-
-    function renderData() {
-		loading = false;
-        var loadingUser = username;
-		
-		tabBg.visible = true;
-		tabBg.bitmapData = new BitmapData(tabBg.bitmapData.width, tabBg.bitmapData.height, true, FlxColor.fromHSL(user.profileHue, 0.35, 0.2));
-
-		removeChild(tabBgGradient);
-		if (user.profileHue2 != null) {
-			tabBgGradient = new Shape();
-			var gradMatrix = new Matrix();
-			gradMatrix.createGradientBox(tabBg.bitmapData.width, tabBg.bitmapData.height, Math.PI / 2, 0, 0);
-			tabBgGradient.graphics.beginGradientFill(GradientType.LINEAR, [
-				FlxColor.fromHSL(user.profileHue, 0.35, 0.2),
-				FlxColor.fromHSL(user.profileHue2, 0.40, 0.15)
-			], [1, 1], [0, 255], gradMatrix, SpreadMethod.PAD, InterpolationMethod.LINEAR_RGB, 0);
-			tabBgGradient.graphics.drawRect(0, 0, tabBg.bitmapData.width, tabBg.bitmapData.height);
-			tabBgGradient.alpha = tabBg.alpha;
-			addChildAt(tabBgGradient, getChildIndex(tabBg));
-			tabBg.visible = false;
-		}
-
-		var prevAvatar = avatar;
-		avatar = new Bitmap(FunkinNetwork.getDefaultAvatar());
-
-		addChildAt(avatar, getChildIndex(prevAvatar));
-		removeChild(prevAvatar);
-
-		avatar.x = 20;
-		avatar.y = 20;
-		avatar.width = 125;
-		avatar.height = 125;
-
-		flag.bitmapData = new BitmapData(1, 1, true, 0x00000000);
-		flag.visible = false;
-		Thread.run(() -> {
-			var avatarData = FunkinNetwork.getUserAvatar(loadingUser);
-
-			Waiter.putPersist(() -> {
-				if (loadingUser == username) {
-					var prevAvatar = avatar;
-
-					if (avatarData == null)
-						avatar = new Bitmap(FunkinNetwork.getDefaultAvatar());
-					else if (!ShitUtil.isGIF(avatarData))
-						avatar = new Bitmap(BitmapData.fromBytes(avatarData));
-					else
-						avatar = new GifPlayerWrapper(new GifPlayer(GifDecoder.parseBytes(avatarData)));
-
-					addChildAt(avatar, getChildIndex(prevAvatar));
-					removeChild(prevAvatar);
-
-					avatar.x = 20;
-					avatar.y = 20;
-					avatar.width = 125;
-					avatar.height = 125;
-				}
-			});
-
-			loadFlag(loadingUser, user.country);
-		});
-
-		updateUsernameText();
-		role.setText((user.club != null ? '[${user.club}] | ' : '') + (user.role != null ? user.role : 'Member'));
-		var seenAgo = ShitUtil.timeAgo(ShitUtil.parseISODate(user.lastActive).getTime());
-		if (seenAgo == 'just now')
-			seen.setText("ONLINE", null, FlxColor.LIME);
-		else
-			seen.setText("Seen " + seenAgo, null, 0xFF7C7C7C);
-
-		desc.setText(ShitUtil.pickReadableHTML(user.bio ?? '').wrapText());
-		desc.selectable = true;
-
-		line1.x = desc.x;
-		line1.y = desc.y + desc.height + 10;
-
-		statsTitle.x = tabBg.width / 2 - statsTitle.textWidth / 2;
-		statsTitle.y = line1.y + 20;
-
-		line2.x = line1.x;
-		line2.y = statsTitle.y + 50;
-
-		stats.y = line2.y + 20;
-
-		var joinDate = ShitUtil.parseISODate(user.joined);
-		stats.setText("Rank: " + ShitUtil.toOrdinalNumber(user.rank) + '\n' + "Points: " + FlxStringUtil.formatMoney(user.points, false) + "FP\n" + "Avg. Accuracy: "
-			+ FlxMath.roundDecimal((user.avgAccuracy * 100), 2) + "%\n" + "Joined: " + joinDate.getDate() + '/' + (joinDate.getMonth() + 1) + '/'
-			+ (joinDate.getFullYear() + '').substr(2) + "\n\n");
-		removeFriend.visible = user.friends.contains(FunkinNetwork.nickname);
-		addFriend.visible = !removeFriend.visible && user.canFriend;
-		invitePlay.visible = removeFriend.visible;
-
-		settings.visible = username == FunkinNetwork.nickname;
-		web.visible = username != FunkinNetwork.nickname;
-		if (settings.visible) {
-			addFriend.visible = false;
-			invitePlay.visible = false;
-		}
-    }
-
 	function updateUsernameText() {
-		usernameTxt.setText(username, 150 + (!flag.visible ? 65 : 0));
-		flag.x = usernameTxt.x + usernameTxt.width + 20;
-		flag.y = avatar.y + 10 + 5;
-		usernameTxt.y = avatar.y + 10 + (40 / 2) - (40 * usernameTxt.scaleY) / 2;
+		usernameTxt.setText(username, Std.int((150 * S) + (!flag.visible ? (65 * S) : 0)));
+		flag.x = usernameTxt.x + usernameTxt.width + (20 * S);
+		flag.y = avatar.y + (15 * S);
+		usernameTxt.y = avatar.y + (10 * S) + ((40 * S) / 2) - ((40 * S) * usernameTxt.scaleY) / 2;
 	}
 
 	override function __enterFrame(delta) {

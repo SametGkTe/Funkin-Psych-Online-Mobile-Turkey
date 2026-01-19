@@ -93,12 +93,12 @@ class ProfileBox extends FlxSpriteGroup {
 			if (profileData != null) {
 				if (autoUpdateThings) {
 					if (isSelf)
-						text.text = "Welcome, " + user + "!";
+						text.text = "Hoşgeldin, " + user + "!";
 					else
 						text.text = user;
-					desc.text = "Points: " + FlxStringUtil.formatMoney(profileData.points ?? 0, false);
-					desc.text += "\nRank: " + ShitUtil.toOrdinalNumber(profileData.rank);
-					desc.text += "\nAvg. Accuracy: " + FlxMath.roundDecimal((profileData.avgAccuracy * 100), 2) + "%";
+					desc.text = "Puanlar: " + FlxStringUtil.formatMoney(profileData.points ?? 0, false);
+					desc.text += "\nRütbe: " + ShitUtil.toOrdinalNumber(profileData.rank);
+					desc.text += "\nOrt. Doğruluk: " + FlxMath.roundDecimal((profileData.avgAccuracy * 100), 2) + "%";
 				}
 
 				Thread.run(() -> {
@@ -128,11 +128,11 @@ class ProfileBox extends FlxSpriteGroup {
 			else {
 				if (autoUpdateThings) {
 					if (isSelf) {
-						text.text = "Not logged in!";
-						desc.text = "(Click to register)";
+						text.text = "Giriş Yapılmadı!";
+						desc.text = "(Kayıt Olmak İçin Tıklayın!)";
 					}
 					else
-						text.text = "User not found!";
+						text.text = "Kullanıcı Bulunamadı!";
 					cardHeight = 50;
 				}
 			}

@@ -39,7 +39,7 @@ class ModDownloader {
 
 		if (downloaders.length >= 6) {
 			Waiter.putPersist(() -> {
-				Alert.alert('Downloading failed!', 'Too many files are downloading right now! (Max 6)');
+				Alert.alert('İndirme Başarısız!', 'Şu anda çok fazla dosya indiriliyor.! (Max 6 dosya)');
 			});
 			return;
 		}
@@ -62,7 +62,7 @@ class ModDownloader {
 					if (!isMediaTypeAllowed(client.response.headers.get("content-type"))) {
 						client.cancel();
 						Waiter.putPersist(() -> {
-							Alert.alert('Downloading failed!', client.response.headers.get("content-type") + " may be invalid or unsupported file type!");
+							Alert.alert('İndirme Başarısız!', client.response.headers.get("content-type") + " may be invalid or unsupported file type!");
 							RequestSubstate.requestURL(url, "The following mod needs to be installed from this source", true);
 						});
 					}
@@ -86,7 +86,7 @@ class ModDownloader {
 			catch (exc) {
 				if (!client.cancelRequested) {
 					Waiter.putPersist(() -> {
-						Alert.alert('Error!', id + ': ' + ShitUtil.prettyError(exc));
+						Alert.alert('Hata!', id + ': ' + ShitUtil.prettyError(exc));
 					});
 				}
 			}
@@ -96,12 +96,12 @@ class ModDownloader {
 			if (client.response.isFailed()) {
 				if (client.cancelRequested) {
 					Waiter.putPersist(() -> {
-						Alert.alert('Download canceled!');
+						Alert.alert('İndirme İptal Edildi!');
 					});
 				}
 				else {
 					Waiter.putPersist(() -> {
-						Alert.alert('Downloading failed!', 
+						Alert.alert('İndirme Başarısız!', 
 							ShitUtil.prettyStatus(client.response.status) + "\n" +
 							(client?.response?.exception != null ? ShitUtil.prettyError(client.response.exception) : '')
 						);
@@ -133,12 +133,12 @@ class ModDownloader {
 			}
 		} catch (_) {}
 	}
-
+	
 	static function get_downloadDir():String
 	{
 		return haxe.io.Path.addTrailingSlash(haxe.io.Path.join([Sys.getCwd(), "downloads"]));
 	}
-
+	
     static var allowedMediaTypes:Array<String> = [
 		"application/zip",
 		"application/zip-compressed",

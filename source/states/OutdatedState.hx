@@ -15,16 +15,17 @@ class OutdatedState extends MusicBeatState
 		add(bg);
 
 		warnText = new FlxText(0, 0, FlxG.width,
-			"Sorry, but you have to update this mod
-			your current version is '" + Main.PSYCH_ONLINE_VERSION + "' while
-			the latest is '" + Main.updateVersion + "'\n
-			ACCEPT - Jump into the download page!
-			BACK - Continue without updating.",
+			"Üzgünüz, Ama Bu Versiyon Artık Güncel Değil,
+			Sizin Versiyonunuz '" + Main.PSYCH_ONLINE_VERSION + "' Son
+			Versiyon '" + Main.updateVersion + "'\n
+			A - İndirme Sayfasına Git!
+			B - Güncellemeden Devam Et.
+			P.E.T ONLINE'IN GÜNCELLENMESINI BEKLEYIN",
 			32);
 		warnText.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, CENTER);
 		warnText.screenCenter(Y);
 		add(warnText);
-
+		
 		mobileManager.addMobilePad('NONE', 'A_B');
 	}
 

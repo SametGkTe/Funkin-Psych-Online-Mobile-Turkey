@@ -51,14 +51,14 @@ class NetworkClient {
 		NetworkClient.room = null;
         if (err != null) {
 			Waiter.putPersist(() -> {
-				ChatTab.addMessage('Failed to connect to the network chatroom! (Reopen this tab to try again)');
+				ChatTab.addMessage('Ağ sohbet odasına bağlanılamadı! (Tekrar denemek için bu sekmeyi yeniden açın)');
 			});
             //trace(err);
             return;
         }
 
 		Waiter.putPersist(() -> {
-			ChatTab.addMessage('Connected to the network chatroom!');
+			ChatTab.addMessage('Ağ sohbet odasına bağlanıldı!');
         });
 
 		NetworkClient.room = room;
@@ -90,7 +90,7 @@ class NetworkClient {
 			var inviteData = Json.parse(message);
 
 			Waiter.putPersist(() -> {
-				Alert.alert(inviteData.name + ' has invited you to their room!', '(Click to Join)', () -> {
+				Alert.alert(inviteData.name + ' sizi odasına davet etti!', '(Katılmak İçin Dokunun)', () -> {
 					OnlineState.inviteRoomID = inviteData.roomid;
 
 					if (GameClient.isConnected()) {
@@ -110,14 +110,14 @@ class NetworkClient {
 				return;
 
 			Waiter.putPersist(() -> {
-				Alert.alert(player + ' is now online!', null);
+				Alert.alert(player + ' Şimdi Çevrimiçi!', null);
 			});
 		});
 
 		room.onError += (code:Int, e:String) -> {
 			Thread.safeCatch(() -> {
 				Waiter.putPersist(() -> {
-					Alert.alert("Network Room error!", "room.onError: " + ShitUtil.prettyStatus(code) + "\n" + ShitUtil.readableError(e));
+					Alert.alert("Ağ Odası Hatası!", "room.onError: " + ShitUtil.prettyStatus(code) + "\n" + ShitUtil.readableError(e));
 				});
 				Sys.println("NetworkRoom.onError: " + code + " - " + e);
             }, e -> {
@@ -128,7 +128,7 @@ class NetworkClient {
 		room.onLeave += () -> {
 			Thread.safeCatch(() -> {
 				Waiter.putPersist(() -> {
-					ChatTab.addMessage('Disconnected from the chatroom');
+					ChatTab.addMessage('Sohbet odasıyla bağlantı kesildi');
 				});
 
 				var recToken = NetworkClient.room.reconnectionToken;

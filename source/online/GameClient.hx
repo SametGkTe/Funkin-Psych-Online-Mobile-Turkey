@@ -65,7 +65,7 @@ class GameClient {
 		}, (exc) -> {
 			onJoin(exc);
 			LoadingScreen.toggle(false);
-			Alert.alert("Failed to connect!", exc.details());
+			Alert.alert("Bağlantı Başarısız!", exc.details());
 		});
     }
 
@@ -94,14 +94,14 @@ class GameClient {
 		}, (exc) -> {
 			onJoin(exc);
 			LoadingScreen.toggle(false);
-			Alert.alert("Failed to connect!", exc.toString());
+			Alert.alert("Bağlantı Başarısız!", exc.toString());
 		});
     }
 
 	private static function _onJoin(err:Error, room:Room<GameRoom>, isHost:Bool, address:String, ?onJoin:(err:Dynamic)->Void) {
 		if (err != null) {
 			trace(err.code + " - " + err.message);
-			Alert.alert("Couldn't connect!", "JOIN ERROR: " + ShitUtil.prettyStatus(err.code) + "\n" + ShitUtil.readableError(err.message));
+			Alert.alert("Bağlanılamadı!", "Katılma Hatası: " + ShitUtil.prettyStatus(err.code) + "\n" + ShitUtil.readableError(err.message));
 			onJoin(err);
 			leaveRoom();
 			LoadingScreen.toggle(false);
@@ -119,7 +119,7 @@ class GameClient {
 		clearOnMessage();
 
 		GameClient.room.onError += (code:Int, e:String) -> {
-			Alert.alert("Room error!", "room.onError: " + ShitUtil.prettyStatus(code) + "\n" + ShitUtil.readableError(e));
+			Alert.alert("Oda Hatası!", "room.onError: " + ShitUtil.prettyStatus(code) + "\n" + ShitUtil.readableError(e));
 			Sys.println("Room.onError: " + code + " - " + e);
 		}
 
@@ -161,14 +161,14 @@ class GameClient {
 		reconnecting = true;
 
 		if (room == null) {
-			leaveRoom('Room Disposed?');
+			leaveRoom('Oda Kapatılmış Olabilir!');
 			return;
 		}
 
 		var reconnectToken = room.reconnectionToken;
 
 		trace("Reconnecting with Token: " + reconnectToken);
-		Alert.alert("Reconnecting...");
+		Alert.alert("Yeniden Bağlanılıyor...");
 
 		try {
 			GameClient.room.teardown();
@@ -191,7 +191,7 @@ class GameClient {
 					if (err != null) {
 						trace(err.code + " - " + err.message);
 						Waiter.putPersist(() -> {
-							Alert.alert("Couldn't reconnect!", "RECONNECT ERROR: " + ShitUtil.prettyStatus(err.code) + " - " + ShitUtil.readableError(err.message));
+							Alert.alert("Bağlanılamadı", "Yeniden Bağlantı Başarısız: " + ShitUtil.prettyStatus(err.code) + " - " + ShitUtil.readableError(err.message));
 						});
 						leaveRoom();
 						return;
@@ -205,13 +205,13 @@ class GameClient {
 							addListeners();
 						sendPending();
 						Waiter.putPersist(() -> {
-							Alert.alert("Reconnected!");
+							Alert.alert("Yeniden Bağlanıldı!");
 						});
 					};
 				}
 				catch (exc) {
 					Waiter.putPersist(() -> {
-						Alert.alert("Critically failed to reconnect!", "RECONNECT ERROR: " + ShitUtil.prettyStatus(err.code) + " - " + ShitUtil.readableError(err.message));
+						Alert.alert("Yeniden bağlanmada kritik hata oluştu!", "BAĞLANMA HATASI: " + ShitUtil.prettyStatus(err.code) + " - " + ShitUtil.readableError(err.message));
 					});
 					leaveRoom();
 				}

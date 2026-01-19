@@ -7,13 +7,22 @@ class Difficulty
 		'Normal',
 		'Hard'
 	];
+	
+	public static var displayList:Map<String, String> = [
+		'Easy' => 'Kolay',
+		'Normal' => 'Normal',
+		'Hard' => 'Zor',
+		'Erect' => 'Erect',
+		'Classic' => 'Klasik',
+		'Hell' => 'Cehennem',
+	];
+	
 	public static var list:Array<String> = [];
-	private static var defaultDifficulty(default, never):String = 'Normal'; //The chart that has no suffix and starting difficulty on Freeplay/Story Mode
-
+	private static var defaultDifficulty(default, never):String = 'Normal'; 
+	
 	inline public static function getFilePath(num:Null<Int> = null)
 	{
 		if(num == null) num = PlayState.storyDifficulty;
-
 		var fileSuffix:String = list[num];
 		if(fileSuffix != defaultDifficulty)
 		{
@@ -25,11 +34,10 @@ class Difficulty
 		}
 		return Paths.formatToSongPath(fileSuffix);
 	}
-
+	
 	inline public static function loadFromWeek(week:WeekData = null)
 	{
 		if(week == null) week = WeekData.getCurrentWeek();
-
 		var diffStr:String = week.difficulties;
 		if(diffStr != null && diffStr.length > 0)
 		{
@@ -44,12 +52,11 @@ class Difficulty
 				}
 				--i;
 			}
-
 			if(diffs.length > 0 && diffs[0].length > 0)
 				list = diffs;
 		}
 		else resetList();
-
+		
 		if (FlxG.state is states.FreeplayState) {
 			var freeplay:states.FreeplayState = cast FlxG.state;
 			if (freeplay.songs[states.FreeplayState.curSelected].hasErect)
@@ -58,12 +65,12 @@ class Difficulty
 				list.push("Nightmare");
 		}
 	}
-
+	
 	inline public static function resetList()
 	{
 		list = defaultList.copy();
 	}
-
+	
 	inline public static function copyFrom(diffs:Array<String>)
 	{
 		list = diffs.copy();
@@ -71,9 +78,19 @@ class Difficulty
 
 	inline public static function getString(num:Null<Int> = null):String
 	{
-		return list[num == null ? PlayState.storyDifficulty : num];
+		var diffName:String = list[num == null ? PlayState.storyDifficulty : num];
+		if(displayList.exists(diffName))
+		{
+			return displayList.get(diffName);
+		}
+		return diffName;
 	}
 
+	inline public static function getRawName(num:Null<Int> = null):String
+	{
+		return list[num == null ? PlayState.storyDifficulty : num];
+	}
+	
 	inline public static function getDefault():String
 	{
 		return defaultDifficulty;

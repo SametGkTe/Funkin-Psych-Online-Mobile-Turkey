@@ -51,10 +51,10 @@ class DownloaderState extends MusicBeatState {
 		FlxG.mouse.visible = true;
 
 		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("Browsing mods on GameBanana.", null, null, false);
+		DiscordClient.changePresence("Gamebanana da Modlara Bakıyor.", null, null, false);
 		#end
 
-		GameClient.send("status", "Browsing mods on GameBanana");
+		GameClient.send("status", "Gamebanana da Modlara Bakıyor.");
 
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = 0xff46463b;
@@ -81,7 +81,7 @@ class DownloaderState extends MusicBeatState {
 		add(searchBg);
 
 		searchPlaceholder = new FlxText();
-		searchPlaceholder.text = "Search mods here // Enter a URL to download...";
+		searchPlaceholder.text = "Modları burada arat veya İndirmek için URL yi gir...";
 		searchPlaceholder.setFormat("VCR OSD Mono", 20, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		searchPlaceholder.alpha = 0.6;
 		searchPlaceholder.x = searchBg.x + 20;
@@ -106,14 +106,14 @@ class DownloaderState extends MusicBeatState {
 		add(searchInput);
 
 		pageInfo = new FlxText(0, 0, FlxG.width);
-		pageInfo.text = '< Page ${page} >';
+		pageInfo.text = '< Sayfa ${page} >';
 		pageInfo.setFormat("VCR OSD Mono", 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		pageInfo.y = FlxG.height - pageInfo.height - 30;
 		add(pageInfo);
 
 		final q:String = (controls.mobileControls) ? 'LEFT' : 'Q';
 
-		var pageTip1 = new FlxText(20, 0, FlxG.width, '$q - Go to previous page');
+		var pageTip1 = new FlxText(20, 0, FlxG.width, '$q - Önceki sayfa');
 		pageTip1.setFormat("VCR OSD Mono", 20, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		pageTip1.y = pageInfo.y;
 		pageTip1.alpha = 0.6;
@@ -121,7 +121,7 @@ class DownloaderState extends MusicBeatState {
 
 		final e:String = (controls.mobileControls) ? 'RIGHT' : 'E';
 
-		var pageTip2 = new FlxText(-20, 0, FlxG.width, '$e - Go to next page');
+		var pageTip2 = new FlxText(-20, 0, FlxG.width, '$e - Sonraki sayfa');
 		pageTip2.setFormat("VCR OSD Mono", 20, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		pageTip2.y = pageInfo.y;
 		pageTip2.alpha = pageTip1.alpha;
@@ -167,15 +167,15 @@ class DownloaderState extends MusicBeatState {
 					return;
 
 				if (mods == null)
-					err = "Mods not found!";
+					err = "Modlar bulunamadı!";
 
 				if (err != null) {
-					pageInfo.text = "Error: " + err;
+					pageInfo.text = "Hata: " + err;
 					return;
 				}
 
 				page = newPage;
-				pageInfo.text = '< Page ${page} >';
+				pageInfo.text = '< Sayfa ${page} >';
 
 				loadMods(mods);
 			});
@@ -269,15 +269,15 @@ class DownloaderState extends MusicBeatState {
 					return;
 
 				if (mods == null)
-					err = "Mods not found!";
+					err = "Modlar Bulunamadı, İnternet Bağlantınızı Kontrol Edin!";
 
 				if (err != null) {
-					pageInfo.text = "Error: " + err;
+					pageInfo.text = "Hata: " + err;
 					return;
 				}
 
 				page = newPage;
-				pageInfo.text = '< Page ${page} >';
+				pageInfo.text = '< Sayfa ${page} >';
 
 				loadMods(mods);
 			});
@@ -335,7 +335,6 @@ class DownloaderState extends MusicBeatState {
 
 					if (FlxG.mouse.overlaps(searchBg)) {
 						curSelected = -1;
-						FlxG.stage.window.textInputEnabled = true;
 					}
 				}
 			}
@@ -354,6 +353,7 @@ class DownloaderState extends MusicBeatState {
 			if (controls.ACCEPT || FlxG.mouse.justPressed) {
 				if (curSelected == -1) {
 					searchInput.hasFocus = true;
+					FlxG.stage.window.textInputEnabled = true;
 				}
 				else if (curSelected >= 0 && items.length - 1 >= curSelected) {
 					if (FlxG.mouse.justPressed) {
@@ -361,7 +361,7 @@ class DownloaderState extends MusicBeatState {
 							openModDownloads(items.members[curSelected].mod.id);
 						}
 						else if (FlxG.mouse.overlaps(items.members[curSelected].linkBg)) {
-							RequestSubstate.requestURL(items.members[curSelected].mod.url, "The following button redirects to:", true);
+							RequestSubstate.requestURL(items.members[curSelected].mod.url, "Bu Buton Şuraya Yönlendiriyor:", true);
 						}
 					}
 					else {
@@ -383,12 +383,12 @@ class DownloaderState extends MusicBeatState {
 			LoadingScreen.toggle(false);
 
 			if (err != null) {
-				Alert.alert("Fetching downloads failed!", err);
+				Alert.alert("indirme Başarısız!", err);
 				return;
 			}
 
 			if (downloads._bIsTrashed || downloads._bIsWithheld) {
-				Alert.alert("Fetching downloads failed!", "That mod is deleted!");
+				Alert.alert("indirme işlemi başarısız oldu!", "Bu mod silinmiş!");
 				return;
 			}
 
@@ -449,7 +449,7 @@ class DownloaderState extends MusicBeatState {
 		}
 
 		if (i == 0) {
-			pageInfo.text = "No mods found!";
+			pageInfo.text = "Mod Bulunamadı!";
 		}
 
 		items.screenCenter(X);

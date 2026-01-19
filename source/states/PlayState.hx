@@ -1,15 +1,5 @@
 package states;
 
-// If you want to add your stage to the game, copy states/stages/Template.hx,
-// and put your stage code there, then, on PlayState, search for
-// "switch (curStage)", and add your stage to that list.
-
-// If you want to code Events, you can either code it on a Stage file or on PlayState, if you're doing the latter, search for:
-// "function eventPushed" - Only called *one time* when the game loads, use it for precaching events that use the same assets, no matter the values
-// "function eventPushedUnique" - Called one time per event, use it for precaching events that uses different assets based on its values
-// "function eventEarlyTrigger" - Used for making your event start a few MILLISECONDS earlier
-// "function triggerEvent" - Called when the song hits your event's timestamp, this is probably what you were looking for
-
 import haxe.ds.HashMap;
 import online.away.AwayStage3D;
 import online.substates.PostTextSubstate;
@@ -111,17 +101,18 @@ class PlayState extends MusicBeatState
 	@:deprecated public static var STRUM_X_MIDDLESCROLL = -278;
 
 	public static var ratingStuff:Array<Dynamic> = [
-		['You Suck!', 0.2], //From 0% to 19%
-		['Shit', 0.4], //From 20% to 39%
-		['Bad', 0.5], //From 40% to 49%
-		['Bruh', 0.6], //From 50% to 59%
-		['Meh', 0.69], //From 60% to 68%
-		['Nice', 0.7], //69%
-		['Good', 0.8], //From 70% to 79%
-		['Great', 0.9], //From 80% to 89%
-		['Sick!', 1], //From 90% to 99%
-		['Perfect!!', 1] //The value on this one isn't used actually, since Perfect is always "1"
+		['Çok Kötü!', 0.2], //From 0% to 19%
+		['Berbat!', 0.4], //From 20% to 39%
+		['Kötü', 0.5], //From 40% to 49%
+		['Fena', 0.6], //From 50% to 59%
+		['Eh İşte', 0.69], //From 60% to 68%
+		['İyi', 0.7], //69%
+		['Güzel', 0.8], //From 70% to 79%
+		['Harika', 0.9], //From 80% to 89%
+		['Çok İyi!', 1], //From 90% to 99%
+		['Mükemmel!!', 1] //The value on this one isn't used actually, since Perfect is always "1"
 	];
+
 
 	//event variables
 	private var isCameraOnForcedPos:Bool = false;
@@ -277,6 +268,10 @@ class PlayState extends MusicBeatState
 	public var healthBar:HealthBar;
 	public var timeBar:HealthBar;
 	var songPercent:Float = 0;
+	
+	// P.E.T Filigran değişkenleri
+	var petLogo:FlxSprite;
+	var petText:FlxText;
 
 	public var ratingsData:Array<Rating> = Rating.loadDefault();
 	public var fullComboFunction:Void->Void = null;
@@ -1309,7 +1304,7 @@ class PlayState extends MusicBeatState
 
 		if (GameClient.isConnected()) {
 			preloadTasks.push(() -> {
-				waitReadySpr = new Alphabet(0, 0, controls.mobileControls ? "TOUCH YOUR SCREEN TO START" : "PRESS ACCEPT TO START", true);
+				waitReadySpr = new Alphabet(0, 0, controls.mobileControls ? "BASLATMAK IÇIN DOKUN" : "BASLATMAK IÇIN DOKUN", true);
 				waitReadySpr.cameras = [camOther];
 				waitReadySpr.alignment = CENTERED;
 				waitReadySpr.x = FlxG.width / 2;
@@ -1472,6 +1467,10 @@ class PlayState extends MusicBeatState
 		orderOffset = 2;
 
 		super.create();
+		// P.E.T Filigranını oluştur
+		if (ClientPrefs.data.petwatermark) {
+		createPETWatermark();
+		}
 	}
 
 	var debugPoser:online.objects.DebugPosHelper;
@@ -2306,7 +2305,7 @@ class PlayState extends MusicBeatState
 			str += ' ($percent%) - $ratingFC';
 		}
 
-		scoreTextObject.text = 'Score: ' + FlxStringUtil.formatMoney(songScore, false) + ' | Misses: ' + songMisses + ' | Rating: ' + str;
+		scoreTextObject.text = 'Skor: ' + FlxStringUtil.formatMoney(songScore, false) + ' | Iskalar: ' + songMisses + ' | Doğruluk: ' + str;
 
 		if (skipRest) {
 			if (ClientPrefs.data.showFP)
@@ -2895,7 +2894,7 @@ class PlayState extends MusicBeatState
 			babyArrow.postAddedToGroup();
 		}
 
-		if (replayPlayer == null && ClientPrefs.data.noteUnderlayOpacity > 0 && strumGroup == getPlayerStrums() && ClientPrefs.data.noteUnderlayType == 'All-In-One') {
+		if (replayPlayer == null && ClientPrefs.data.noteUnderlayOpacity > 0 && strumGroup == getPlayerStrums() && ClientPrefs.data.noteUnderlayType == 'Hepsi-Bir-Arada') {
 			var vsliceControlFix:Float = 1;
 			if (ClientPrefs.data.ogGameControls && Note.maniaKeys < 10) {
 				switch (Note.maniaKeys) {
@@ -3089,7 +3088,7 @@ class PlayState extends MusicBeatState
 		if (FlxG.keys.justPressed.F2) {
 			ClientPrefs.data.disableSubmiting = !ClientPrefs.data.disableSubmiting;
 			ClientPrefs.saveSettings();
-			Alert.alert("Replay Submiting: " + (ClientPrefs.data.disableSubmiting ? "OFF" : "ON"));
+			Alert.alert("Tekrar Gönderme: " + (ClientPrefs.data.disableSubmiting ? "KAPALI" : "AÇIK"));
 		}
 		
 		if (!GameClient.isConnected()) {
@@ -3101,7 +3100,7 @@ class PlayState extends MusicBeatState
 			{
 				setSongTime(Conductor.songPosition - 2000);
 				lastLagPos = Conductor.songPosition + 3000; // don't tp for another 3s starting from last lag pos
-				Alert.alert("Mod Lag Detected (-2s)");
+				Alert.alert("Gecikme Algılandı! (-2s)");
 			}
 
 			// if (FlxG.keys.justPressed.F6) {
@@ -3166,7 +3165,7 @@ class PlayState extends MusicBeatState
 				isReady = true;
 				FlxG.sound.play(Paths.sound('confirmMenu'), 0.5);
 				if (ClientPrefs.data.flashing)
-					freakyFlicker = FlxFlicker.flicker(waitReadySpr, 0.5, 0.05, true, false, _ -> waitReadySpr.text = "waiting for other player...");
+					freakyFlicker = FlxFlicker.flicker(waitReadySpr, 0.5, 0.05, true, false, _ -> waitReadySpr.text = "Diğer oyuncu bekleniyor...");
 				GameClient.send("playerReady");
 			}
 
@@ -3509,7 +3508,7 @@ class PlayState extends MusicBeatState
 		{
 			setSongTime(Conductor.songPosition - 2000);
 			lastLagPos = Conductor.songPosition + 3000; // don't tp for another 3s starting from last lag pos
-			Alert.alert("Mod Lag Detected (-2s)");
+			Alert.alert("Gecikme Algılandı! (-2s)");
 		}
 
 		#if debug
@@ -4330,13 +4329,13 @@ class PlayState extends MusicBeatState
 			}
 
 			if (!GameClient.isConnected() && replayPlayer != null) {
-				online.gui.Alert.alert("Calculated Points from Replay", "+" + songPoints);
+				online.gui.Alert.alert("Tekrardan Puanlar Hesaplandı!", "+" + songPoints);
 			}
 
 			if (GameClient.isConnected()) {
 				Lib.application.window.resizable = true;
 				states.TitleState.playFreakyMusic();
-				if (isInvalidScore()) online.gui.Alert.alert("Calculated Points", "+" + songPoints);
+				if (isInvalidScore()) online.gui.Alert.alert("Hesaplanan Puanlar", "+" + songPoints);
 				online.states.ResultsState.gainedPoints = gainedPoints;
 				if (!skipResults)
 					FlxG.switchState(() -> new online.states.ResultsState());
@@ -5671,6 +5670,14 @@ class PlayState extends MusicBeatState
 		if (!isCreated) {
 			return;
 		}
+		
+		if (ClientPrefs.data.petwatermark && petLogo != null && curBeat % 2 == 0) {
+
+			petLogo.scale.set(0.45, 0.45);
+			
+			FlxTween.tween(petLogo.scale, {x: 0.4, y: 0.4}, 0.5, {ease: FlxEase.circOut});
+
+		}
 
 		if(lastBeatHit >= curBeat) {
 			//trace('BEAT HIT: ' + curBeat + ', LAST HIT: ' + lastBeatHit);
@@ -5719,7 +5726,55 @@ class PlayState extends MusicBeatState
 		setOnScripts('curBeat', curBeat);
 		callOnScripts('onBeatHit');
 	}
+	
+	function createPETWatermark():Void {
+		// trace("=== P.E.T WATERMARK OLUŞTURULUYOR ===");
+		// trace("petwatermark ayarı: " + ClientPrefs.data.petwatermark);
+		// trace("logo stili: " + ClientPrefs.data.petwatermarklogo);
+		// Logo yolu seç
+		var logoPath:String = 'pet/petlogos/';
+		switch (ClientPrefs.data.petwatermarklogo.toUpperCase()) {
+			case 'V1':
+				logoPath += 'V1';
+			case 'V2':
+				logoPath += 'V2';
+			case 'V2U':
+				logoPath += 'V2U';
+			default: // ONLINE
+				logoPath += 'online';
+		}
+		// P.E.T Logo
+		petLogo = new FlxSprite(-200, 20);
+		try {
+			petLogo.loadGraphic(Paths.image(logoPath));
+			petLogo.setGraphicSize(Std.int(petLogo.width * 0.4));
+			petLogo.updateHitbox();
+			petLogo.antialiasing = ClientPrefs.data.antialiasing;
+			petLogo.cameras = [camHUD];
+			add(petLogo);
+			// trace("LOGO BAŞARIYLA EKLENDİ!");
+		} catch (e:Dynamic) {
+			trace("LOGO YÜKLEME HATASI: " + e);
+			return; // Hata varsa fonksiyondan çık
+		}
+		// P.E.T Yazı
+		try {
 
+			petText = new FlxText(-200, 35, 0, "Psych Engine Türkiye Online V1");
+			petText.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
+			petText.borderSize = 2;
+			petText.cameras = [camHUD];
+			add(petText);
+		} catch (e:Dynamic) {
+			return; // İnşallah olmaz
+		}
+		// P.E.T Logo Tween
+		if (petLogo != null && petText != null) {
+			FlxTween.tween(petLogo, {x: 10}, 1.5, {ease: FlxEase.elasticOut});
+			FlxTween.tween(petText, {x: 10 + 75}, 1.5, {ease: FlxEase.elasticOut});
+		}
+	}
+	
 	override function sectionHit()
 	{	
 		if (!isCreated) {
@@ -6341,7 +6396,7 @@ class PlayState extends MusicBeatState
 
 		GameClient.room.onMessage("log", function(message) {
 			Waiter.putPersist(() -> {
-				Alert.alert("New message", online.util.ShitUtil.parseLog(message).content);
+				Alert.alert("Yeni Mesaj", online.util.ShitUtil.parseLog(message).content);
 			});
 		});
 
@@ -6758,11 +6813,11 @@ class PlayState extends MusicBeatState
 
 	public function removePlayStateHitbox()
 	{
-		mobileManager.hitbox.forEachAlive((button) ->
+		mobileManager?.hitbox?.forEachAlive((button) ->
 		{
 			button.deadZones = [];
 		});
-		mobileManager.removeHitbox();
+		mobileManager?.removeHitbox();
 	}
 }
 
